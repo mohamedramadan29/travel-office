@@ -26,5 +26,22 @@ class Admin extends Authenticatable
         ];
     }
 
+    public function Role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
 
+    public function hasAccess($config_permission)
+    {
+        $role = $this->Role;
+        if (!$role) {
+            return false;
+        }
+        foreach ($role->permission as $permission) {
+            if ($permission == $config_permission ?? false) {
+                return true;
+            }
+        }
+    }
+    
 }

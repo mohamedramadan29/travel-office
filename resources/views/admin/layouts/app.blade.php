@@ -10,6 +10,20 @@
     <!-- ////////////////////////////////////////////////////////////////////////////-->
     @include('admin.layouts._sidebar')
     @yield('content')
+
+    <!---------------------------- Success Failes MEssages  ------------------>
+    @if (Session::has('Success_message'))
+        @php
+            toastify()->success(\Illuminate\Support\Facades\Session::get('Success_message'));
+        @endphp
+    @endif
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            @php
+                toastify()->error($error);
+            @endphp
+        @endforeach
+    @endif
     <!-- ////////////////////////////////////////////////////////////////////////////-->
     @include('admin.layouts._footer')
     @include('admin.layouts._footer_scripts')

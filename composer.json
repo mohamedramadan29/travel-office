@@ -8,10 +8,13 @@
     "require": {
         "php": "^8.2",
         "anhskohbo/no-captcha": "^3.6",
+        "codezero/laravel-unique-translation": "^4.3",
         "ichtrojan/laravel-otp": "^2.0",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
-        "mcamara/laravel-localization": "^2.2"
+        "mcamara/laravel-localization": "^2.2",
+        "redot/laravel-toastify": "^1.0",
+        "spatie/laravel-translatable": "^6.9"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -23,7 +23,6 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/fonts/simple-line-icons/style.css">
     @if(Config::get('app.locale') == 'ar')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/css-rtl/vendors.css">
-
     <!-- END VENDOR CSS-->
     <!-- BEGIN MODERN CSS-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/css-rtl/app.css">
@@ -65,5 +64,5 @@
 
     @endif
 
-
+    @toastifyCss
 </head>

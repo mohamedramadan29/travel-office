@@ -193,6 +193,9 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'role.ar'=>' Please Enter Roles With Arabic Lanaguage ',
+        'role.en'=>' Please Enter Roles With English Lanaguage  ',
+    ],
 
 ];
