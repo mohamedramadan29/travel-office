@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\dashboard\AdminController;
+
 use App\Http\Controllers\dashboard\auth\AuthController;
 use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
@@ -60,6 +62,13 @@ Route::group([
         });
 
         ##################### End Role Permissions #########################
+
+        ##################### Start Admins Routes #########################
+        Route::group(['middleware'=>'can:admins'],function () {
+           Route::resource('admins', AdminController::class);
+            Route::get('admins/status/{id}',[AdminController::class],'ChangeStatus')->name('admins.status');
+        });
+        ################### End Admins Routes ###########################
 
     });
 
