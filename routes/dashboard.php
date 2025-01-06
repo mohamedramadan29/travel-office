@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Dashboard\AdminController;
 use App\Http\Controllers\dashboard\auth\AuthController;
 use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
@@ -52,7 +51,7 @@ Route::group([
             Route::controller(RolesController::class)->group(function () {
                 Route::get('index', 'index')->name('index');
                 Route::get('create', 'create')->name('create');
-                // Route::post('store', 'store')->name('store')->middleware('can:roles');
+               // Route::post('store', 'store')->name('store')->middleware('can:roles');
                 Route::post('store', 'store')->name('store');
                 Route::get('edit/{id}', 'edit')->name('edit');
                 Route::post('update/{id}', 'update')->name('update');
@@ -61,13 +60,6 @@ Route::group([
         });
 
         ##################### End Role Permissions #########################
-
-        ##################### Start Admins Routes #########################
-        Route::group(['middleware'=>'can:admins'],function () {
-            Route::resource('admins', 'AdminsController');
-            Route::get('admins/status/{id}',[AdminController::class],'ChangeStatus')->name('admins.status');
-        });
-        ################### End Admins Routes ###########################
 
     });
 

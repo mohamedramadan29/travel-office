@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('password');
             $table->foreignId('role_id')->references('id')->on('roles')->cascadeOnDelete();
             $table->rememberToken();
-            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }
