@@ -3,63 +3,88 @@
 namespace App\Http\Controllers\dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AdminRequest;
+use App\Http\Services\Auth\Dashboard\RoleService;
+use App\Http\Services\Dashboard\AdminService;
+use App\Http\Traits\Message_Trait;
+use App\Models\admin\Role;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    use Message_Trait;
+    protected $adminService, $roleService;
+    public function __construct(AdminService $adminService, RoleService $roleService)
+    {
+        $this->adminService = $adminService;
+        $this->roleService = $roleService;
+    }
     public function index()
     {
-        return view('admin.admins.index');
+        $admins = $this->adminService->getAdmins();
+        return view('admin.admins.index', compact('admins'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $roles = $this->roleService->getRoles();
+
+        return view('admin.admins.create', compact('roles'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(AdminRequest $request)
     {
-        //
+        $data = $request->all();
+
+        $admin = $this->adminService->storeAdmin($data);
+        if (!$admin) {
+            return $this->Error_message(' لم يتم التخزين بنجاح ، الرجاء المحاولة مرة اخرى ');
+        }
+
+        return $this->Success_message('تم التخزين بنجاح');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        if (!$admin = $this->adminService->getAdmin($id)) {
+            return abort(404);
+        }
+        return view('admin.admins.show', compact('admin'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
+        $roles = $this->roleService->getRoles();
+        if (!$admin = $this->adminService->getAdmin($id)) {
+            return abort(404);
+        }
+        return view('admin.admins.edit', data: compact('admin','roles'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(AdminRequest $request, string $id)
     {
-        //
+        $data = $request->all();
+        $admin = $this->adminService->updateAdmin($request, $id);
+        if (!$admin) {
+            return $this->Error_message(' لم يتم التخزين بنجاح ، الرجاء المحاولة مرة اخرى ');
+        }
+        return $this->Success_message('تم التخزين بنجاح');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    public function ChangeStatus($id){
+
+        $admin = $this->adminService->changeStatus($id);
+        if (!$admin) {
+            return $this->Error_message(' لم يتم تغير الحالة  ');
+        }
+        return $this->Success_message('تم تغير الحالة  بنجاح');
+    }
     public function destroy(string $id)
     {
-        //
+        $admin = $this->adminService->destroyAdmin($id);
+        if (!$admin) {
+            return $this->Error_message(' لم يتم الحذف بنجاح ، الرجاء المحاولة مرة اخرى ');
+        }
+        return $this->Success_message('تم الحذف بنجاح');
     }
 }

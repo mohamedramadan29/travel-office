@@ -66,7 +66,7 @@ Route::group([
         ##################### Start Admins Routes #########################
         Route::group(['middleware' => 'can:admins'], function () {
             Route::resource('admins', AdminController::class);
-            Route::get('admins/status/{id}', [AdminController::class], 'ChangeStatus')->name('admins.status');
+            Route::get('admins/status/{id}', [AdminController::class,'ChangeStatus'])->name('admins.status');
         });
         ################### End Admins Routes ###########################
 

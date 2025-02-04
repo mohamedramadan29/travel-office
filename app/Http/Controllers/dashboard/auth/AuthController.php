@@ -14,7 +14,8 @@ class AuthController extends Controller implements HasMiddleware
 {
 
     protected $authService;
-    public function __construct(AuthService $authService){
+    public function __construct(AuthService $authService)
+    {
         $this->authService = $authService;
     }
     public static function middleware()
@@ -32,8 +33,8 @@ class AuthController extends Controller implements HasMiddleware
     {
         if ($request->isMethod("POST")) {
             $data = $request->all();
-            $credentials = $request->only("email","password");
-            if ($this->authService->login($credentials,'admin', $request->remeber)) {
+            $credentials = $request->only("email", "password");
+            if ($this->authService->login($credentials, 'admin', $request->remeber)) {
                 // return redirect()->route('dashboard.welcome')->with('success','تم تسجيل الدخول بنجاح ');
                 ////// intebded = > بيرجعك علي اخر حاجة كنت شغال عليها بعد التسجيل مرة اخري
                 return redirect()->intended(route('dashboard.welcome'));

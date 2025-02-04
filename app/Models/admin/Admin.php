@@ -43,5 +43,10 @@ class Admin extends Authenticatable
             }
         }
     }
-    
+
+    ///////// Use Acceessories
+    public function getStatusAttribute($value){
+        return $value == 1 ? 'active' : 'inactive';
+    }
+
 }

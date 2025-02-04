@@ -224,7 +224,8 @@
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('dashboard.logout') }}">
                                 @csrf
-                                <button type="submit" class="dropdown-item" href="#"><i class="ft-power"></i> {{ __('auth.logout') }} </button>
+                                <button type="submit" class="dropdown-item" href="#"><i class="ft-power"></i>
+                                    {{ __('auth.logout') }} </button>
                             </form>
 
                         </div>
