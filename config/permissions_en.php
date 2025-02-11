@@ -15,4 +15,5 @@ return [
     'dashboard' => 'Manage Dashboard',
     'profile' => 'Manage Profile',
     'home' => 'Manage Home',
+    'global_shipping'=>' Manage Global Shipping',
 ];

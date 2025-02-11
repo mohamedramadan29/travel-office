@@ -17,4 +17,5 @@
   <!-- BEGIN PAGE LEVEL JS-->
   <script src="{{ asset('assets/admin/') }}/js/scripts/pages/dashboard-ecommerce.js" type="text/javascript"></script>
   <!-- END PAGE LEVEL JS-->
+  @yield('js')
   @toastifyJs

@@ -42,6 +42,19 @@
                       </ul>
                   </li>
               @endcan
+              @can('admins')
+              <li class="nav-item{{ Route::is('dashboard.world.*') ? 'active' : '' }}"><a href="#"><i
+                          class="la la-user"></i><span class="menu-title" data-i18n="nav.users.main"> الدول والشحن
+                      </span></a>
+                  <ul class="menu-content">
+                      <li class="{{ Route::is('dashboard.world.countries') ? 'active' : '' }}">
+                          <a class="menu-item" href="{{ route('dashboard.world.countries') }}"
+                              data-i18n="nav.users.user_profile"> ادارة الدول
+                          </a>
+                      </li>
+                  </ul>
+              </li>
+          @endcan
           </ul>
       </div>
   </div>

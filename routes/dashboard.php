@@ -7,6 +7,7 @@ use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
 use App\Http\Controllers\dashboard\RolesController;
 use App\Http\Controllers\dashboard\WelcomeController;
+use App\Http\Controllers\dashboard\WorldController;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
@@ -69,6 +70,18 @@ Route::group([
             Route::get('admins/status/{id}', [AdminController::class,'ChangeStatus'])->name('admins.status');
         });
         ################### End Admins Routes ###########################
+
+        ################ Start World Routes #######################
+        Route::group(['middleware' => 'can:global_shipping','prefix' => 'world', 'as' => 'world.'], function () {
+            Route::controller(WorldController::class)->group(function () {
+                Route::get('countries','AllCountry')->name('countries');
+                Route::get('countries/status/{id}','UpdateStatus')->name('update_status');
+                Route::get('governorates/{country_id}','GovernorateByCountry')->name('governorates');
+                Route::get('governorates/status/{id}','UpdateGovernrateStatus')->name('update_status_governorates');
+                Route::post('governorate/change_price/{id}','GovernrateChangePrice')->name('GovernrateChangePrice');
+            });
+        });
+        ################# End World Routes #######################
 
     });
 

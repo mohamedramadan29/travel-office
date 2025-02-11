@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->decimal('price',10,2)->default(0);
             $table->foreignId('governrate_id')->references('id')->on('govern_rates')->cascadeOnDelete();
+        
             $table->timestamps();
         });
     }
