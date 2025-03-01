@@ -16,8 +16,10 @@ class GovernrateSeeder extends Seeder
     public function run(): void
     {
 
-        //Truncate Governate
-     //   DB::table('govern_rates')->truncate();
+        ####### لحل مشكلة لو فية علاقات بين الجداول
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        GovernRate::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         $governates = [
             [
                 'country_id' => 1,
@@ -73,24 +75,24 @@ class GovernrateSeeder extends Seeder
             ],
             #######Suadia Governarate
             [
-                'country_id'=>2,
-                'name'=>['ar'=>'الرياض','en'=>'Riyad']
+                'country_id' => 2,
+                'name' => ['ar' => 'الرياض', 'en' => 'Riyad']
             ],
             [
-                'country_id'=>2,
-                'name'=>['ar'=>'مكة المكرمة','en'=>'Makka']
+                'country_id' => 2,
+                'name' => ['ar' => 'مكة المكرمة', 'en' => 'Makka']
             ]
 
             ###########
         ];
-        foreach($governates as $governate){
+        foreach ($governates as $governate) {
             GovernRate::create($governate);
 
             ########## Add Shipping Foreach Goverate
 
             ShippingGovernrate::create([
-                'governrate_id'=>$governate['country_id'],
-                'price'=>100
+                'governrate_id' => $governate['country_id'],
+                'price' => 100
             ]);
         }
     }

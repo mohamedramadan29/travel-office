@@ -45,6 +45,14 @@ return [
             'throw' => false,
         ],
 
+        'brands'=> [
+            'driver' => 'local',
+            'root' => public_path('uploads/brands'),
+            'url' => env('APP_URL').'/uploads/brands',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

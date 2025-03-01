@@ -72,12 +72,12 @@
                                                         <td> {{ $country->phone_code }} </td>
                                                         <td>
                                                             <span class="badge badge-info">
-                                                                {{ $country->governorates->count() }}
+                                                                {{ $country->governorates_count }}
                                                             </span>
                                                         </td>
                                                         <td>
                                                             <span class="badge badge-warning">
-                                                                {{ $country->Users->count() }}
+                                                                {{ $country->users_count }}
                                                             </span>
                                                         </td>
                                                         <td>

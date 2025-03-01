@@ -14,9 +14,10 @@ class CountrySeeder extends Seeder
      */
     public function run(): void
     {
-        // First Truncate Data
-      //  DB::table('countries')->truncate();
-        // Insert All Countries
+        ####### لحل مشكلة لو فية علاقات بين الجداول
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Country::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         $countries = [
             [
                 'id' => 1,

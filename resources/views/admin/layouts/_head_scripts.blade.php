@@ -5,10 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-    <meta name="description"
-        content=" بصمة الاهتمام للاتصالات  ">
-    <meta name="keywords"
-        content=" بصمة الاهتمام للاتصالات ">
+    <meta name="description" content=" بصمة الاهتمام للاتصالات  ">
+    <meta name="keywords" content=" بصمة الاهتمام للاتصالات ">
     <meta name="author" content="Mohamed Ramadan +201011642731">
     <title> @yield('title')
     </title>
@@ -32,10 +30,16 @@
     <!-- END Page Level CSS-->
     <!-- BEGIN Custom CSS-->
     <link rel="stylesheet" type="text/css" href="../../../assets/css/style-rtl.css">
-   @yield('css')
+
+    <!-------- File Input --------->
+    <link rel="stylesheet" href="{{ asset('vendor/fileinput/css/fileinput.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" crossorigin="anonymous">
+    <!-------- End File Input ---------->
+    @yield('css')
     @toastifyCss
     <!-- END Custom CSS-->
 </head>
-<body class="vertical-layout vertical-menu 2-columns menu-expanded fixed-navbar"
-data-open="click" data-menu="vertical-menu" data-col="2-columns">
-  <!-- fixed-top-->
+
+<body class="vertical-layout vertical-menu 2-columns menu-expanded fixed-navbar" data-open="click"
+    data-menu="vertical-menu" data-col="2-columns">
+    <!-- fixed-top-->

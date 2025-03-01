@@ -73,15 +73,15 @@
                                                         <th scope="row">{{ $loop->iteration }}</th>
                                                         <td> <a href="#"> {{ $gov->getTranslation('name', 'ar') }}
                                                             </a></td>
-                                                        <td> {{ $gov->country->name }} </td>
+                                                        <td> {{ $gov['country']->name }} </td>
                                                         <td>
                                                             <span class="badge badge-info">
-                                                                {{ $gov->cities->count() }}
+                                                                {{ $gov->cities_count}}
                                                             </span>
                                                         </td>
                                                         <td>
                                                             <span class="badge badge-warning">
-                                                                {{ $gov->Users->count() }}
+                                                                {{ $gov->users_count }}
                                                             </span>
                                                         </td>
                                                         <td>
@@ -99,7 +99,7 @@
                                                                     gov-id="{{ $gov->id }}">
                                                             </fieldset>
                                                         </td>
-                                                        <td>{{ $gov->ShippingPrice->price ?? 'لا يوجد' }}</td>
+                                                        <td>{{ $gov['shippingPrice']->price ?? 'لا يوجد' }}</td>
                                                         <td>
                                                             <button type="button"
                                                                 class="block btn btn-outline-primary btn-sm"

@@ -5,6 +5,8 @@ use App\Http\Controllers\dashboard\AdminController;
 use App\Http\Controllers\dashboard\auth\AuthController;
 use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
+use App\Http\Controllers\dashboard\BrandController;
+use App\Http\Controllers\dashboard\CategoryController;
 use App\Http\Controllers\dashboard\RolesController;
 use App\Http\Controllers\dashboard\WelcomeController;
 use App\Http\Controllers\dashboard\WorldController;
@@ -67,21 +69,34 @@ Route::group([
         ##################### Start Admins Routes #########################
         Route::group(['middleware' => 'can:admins'], function () {
             Route::resource('admins', AdminController::class);
-            Route::get('admins/status/{id}', [AdminController::class,'ChangeStatus'])->name('admins.status');
+            Route::get('admins/status/{id}', [AdminController::class, 'ChangeStatus'])->name('admins.status');
         });
         ################### End Admins Routes ###########################
 
         ################ Start World Routes #######################
-        Route::group(['middleware' => 'can:global_shipping','prefix' => 'world', 'as' => 'world.'], function () {
+        Route::group(['middleware' => 'can:global_shipping', 'prefix' => 'world', 'as' => 'world.'], function () {
             Route::controller(WorldController::class)->group(function () {
-                Route::get('countries','AllCountry')->name('countries');
-                Route::get('countries/status/{id}','UpdateStatus')->name('update_status');
-                Route::get('governorates/{country_id}','GovernorateByCountry')->name('governorates');
-                Route::get('governorates/status/{id}','UpdateGovernrateStatus')->name('update_status_governorates');
-                Route::post('governorate/change_price/{id}','GovernrateChangePrice')->name('GovernrateChangePrice');
+                Route::get('countries', 'AllCountry')->name('countries');
+                Route::get('countries/status/{id}', 'UpdateStatus')->name('update_status');
+                Route::get('governorates/{country_id}', 'GovernorateByCountry')->name('governorates');
+                Route::get('governorates/status/{id}', 'UpdateGovernrateStatus')->name('update_status_governorates');
+                Route::post('governorate/change_price/{id}', 'GovernrateChangePrice')->name('GovernrateChangePrice');
             });
         });
         ################# End World Routes #######################
+        ################# Start Categories Routes #####################
+        Route::group(['middleware' => 'can:categories'], function () {
+            Route::resource('categories', CategoryController::class);
+            Route::get('categories-all',[CategoryController::class,'CategoryAll'])->name('categories.all');
+        });
+        ################# End Categories Routes #######################
+
+        ################# Start Brands Routes #####################
+        Route::group(['middleware' => 'can:brands'], function () {
+            Route::resource('brands', BrandController::class);
+            Route::get('brands-all',[BrandController::class,'BrandsAll'])->name('brands.all');
+        });
+        ################# End Brands Routes #######################
 
     });
 

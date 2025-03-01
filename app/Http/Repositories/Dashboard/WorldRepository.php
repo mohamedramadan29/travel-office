@@ -27,15 +27,20 @@ class WorldRepository
     public function AllCountry()
     {
 
-        $countries = Country::when(!empty(request()->keyword), function ($query) {
+        $countries = Country::withCount(['governorates','Users'])->when(!empty(request()->keyword), function ($query) {
             $query->where('name', 'like', '%' . request()->keyword . '%');
         })->paginate(10);
+        //dd($countries);
         return $countries;
     }
     /////// All Governorate
     public function GovernorateByCountry($country)
     {
-        $governorates = $country->governorates()->paginate(5);
+        $governorates = $country->governorates()
+        ->withCount(['cities','Users'])
+        ->with(['country','shippingPrice'])
+        ->paginate(5);
+        //dd($governorates);
         return $governorates;
     }
     ############## All Citizen
