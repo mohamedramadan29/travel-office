@@ -36,6 +36,19 @@
                       </ul>
                   </li>
               @endcan
+              @can('coupons')
+              <li class="nav-item {{ Route::is('dashboard.coupons.*') ? 'active' : '' }}"><a href="#"><i
+                          class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> الكوبونات
+                      </span> <span class="float-right mr-2 badge badge-info badge-pill"> {{ $CouponCount }} </span></a>
+                  <ul class="menu-content">
+                    <li class="{{ Route::is('dashboard.coupons.index') ? 'active' : '' }}">
+                          <a class="menu-item" href="{{ route('dashboard.coupons.index') }}" data-i18n="nav.role.index">
+                              جميع الكوبونات   </a>
+                      </li>
+
+                  </ul>
+              </li>
+          @endcan
               @can('roles')
                   <li class="nav-item {{ Route::is('dashboard.roles.*') ? 'active' : '' }}"><a href="#"><i
                               class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> الصلاحيات

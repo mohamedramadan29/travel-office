@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\admin\Admin;
 use App\Models\admin\Brand;
+use App\Models\admin\Coupon;
 use App\Models\admin\Category;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
@@ -38,6 +39,12 @@ class ViewServiceProvider extends ServiceProvider
                 });
             }
 
+            ########## Coupon Count
+            if (!Cache::has('CouponCount')) {
+                Cache::remember('CouponCount', 60, function () {
+                    return Coupon::count();
+                });
+            }
             ########## Admin Count
             if (!Cache::has('AdminCount')) {
 
@@ -49,6 +56,7 @@ class ViewServiceProvider extends ServiceProvider
                 'CategoryCount' => Cache::get('CategoryCount'),
                 'BrandCount' => Cache::get('BrandCount'),
                 'AdminCount' => Cache::get('AdminCount'),
+                'CouponCount' => Cache::get('CouponCount'),
             ]);
         });
     }
