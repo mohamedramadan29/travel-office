@@ -46,8 +46,8 @@
                                     اضافة كوبون
                                 </button>
 
-                                @include('admin.coupons.create')
-
+                                @include('admin.coupons._create')
+                                @include('admin.coupons._edit')
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">
@@ -163,6 +163,123 @@
                 language: lang === 'ar' ? {
                     url: '//cdn.datatables.net/plug-ins/2.2.2/i18n/ar.json',
                 } : {},
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $("#createcoupon_form").submit(function(e) {
+                e.preventDefault();
+                var currentPage = $("#yajra_datatable").DataTable().page(); // Get the current page number
+                $.ajax({
+                    url: "{{ route('dashboard.coupons.store') }}",
+                    type: "POST",
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    success: function(data) {
+                        if (data.status == 'success') {
+                            $("#createcoupon_form")[0].reset();
+                            $("#yajra_datatable").DataTable().page(currentPage).draw(false); // Draw the table with the current page
+                            $("#createcoupon").modal('hide');
+                            Swal.fire({
+                                position: "center",
+                                icon: "success",
+                                title: data.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        } else {
+                            Swal.fire({
+                                position: "center",
+                                icon: "error",
+                                title: data.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                    },
+                    error: function(data) {
+                        if (data.responseJSON.errors) {
+                            $.each(data.responseJSON.errors, function(key, value) {
+                                $("#" + key + "_error").html(value[0]);
+                                $("#error_list").append('<li>' + value[0] + '</li>');
+                                $("#error_div").show();
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).on('click', '.edit_coupon', function(e) {
+            e.preventDefault();
+
+            var coupon_id = $(this).attr('data-coupon-id');
+            var coupon_code = $(this).attr('data-coupon-code');
+            var coupon_discount_percentage = $(this).attr('data-coupon-discount-percentage');
+            var coupon_start_date = $(this).attr('data-coupon-start-date');
+            var coupon_end_date = $(this).attr('data-coupon-end-date');
+            var coupon_limit = $(this).attr('data-coupon-limit');
+            var coupon_time_used = $(this).attr('data-coupon-time-used');
+            var coupon_is_active = $(this).attr('data-coupon-is-active');
+
+            $('#coupon_id').val(coupon_id);
+            $('#coupon_code').val(coupon_code);
+            $('#coupon_discount_percentage').val(coupon_discount_percentage);
+            $('#coupon_start_date').val(coupon_start_date);
+            $('#coupon_end_date').val(coupon_end_date);
+            $('#coupon_limit').val(coupon_limit);
+            $('#coupon_is_active').val(coupon_is_active);
+            $('#coupon_is_active_1').prop('selected', coupon_is_active == 1);
+            $('#coupon_is_active_0').prop('selected', coupon_is_active == 0);
+            $('#edit_coupon').modal('show');
+        });
+    </script>
+    <!-- Edit Coupon -->
+    <script>
+        $(document).on('submit', '#edit_coupon_form', function(e) {
+            e.preventDefault();
+            var currentPage = $("#yajra_datatable").DataTable().page(); // Get the current page number
+            var coupon_id = $('#coupon_id').val();
+            $.ajax({
+                url: "{{ route('dashboard.coupons.update', ':coupon_id') }}".replace(':coupon_id', coupon_id),
+                type: "POST",
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    if (data.status == 'success') {
+                       // $("#createcoupon_form")[0].reset();
+                        $("#yajra_datatable").DataTable().page(currentPage).draw(false); // Draw the table with the current page
+                        $("#edit_coupon").modal('hide');
+                        Swal.fire({
+                            position: "center",
+                            icon: "success",
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    } else {
+                        Swal.fire({
+                            position: "center",
+                            icon: "error",
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                },
+                error: function(data) {
+                    if (data.responseJSON.errors) {
+                        $.each(data.responseJSON.errors, function(key, value) {
+                            $("#" + key + "_error").html(value[0]);
+                            $("#error_list_edit_coupon").append('<li>' + value[0] + '</li>');
+                            $("#error_div_edit_coupon").show();
+                        });
+                    }
+                }
             });
         });
     </script>

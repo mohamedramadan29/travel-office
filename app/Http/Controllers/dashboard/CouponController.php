@@ -33,9 +33,22 @@ class CouponController extends Controller
         $data = $request->only(['code', 'discount_percentage', 'start_date', 'end_date', 'is_active', 'limit', 'is_used']);
         $coupon = $this->couponService->createCoupon($data);
         if (!$coupon) {
-            return $this->error_message('حدث خطأ ما أثناء إنشاء الكوبون');
+            //  return $this->error_message('حدث خطأ ما أثناء إنشاء الكوبون');
+            return response()->json(
+                [
+                    'status' => 'error',
+                    'message' => 'حدث خطأ ما أثناء إنشاء الكوبون'
+                ],
+                500
+            );
         }
-        return $this->success_message('تم إنشاء الكوبون بنجاح');
+        return response()->json(
+            [
+                'status' => 'success',
+                'message' => 'تم إنشاء الكوبون بنجاح'
+            ],
+            201
+        );
     }
 
     public function edit(string $id)
@@ -45,12 +58,26 @@ class CouponController extends Controller
     }
     public function update(CouponRequest $request, string $id)
     {
+        // dd($request->all());
         $data = $request->only(['code', 'discount_percentage', 'start_date', 'end_date', 'is_active', 'limit', 'is_used', 'id']);
         $coupon = $this->couponService->updateCoupon($id, $data);
         if (!$coupon) {
-            return $this->error_message('حدث خطأ ما أثناء تعديل الكوبون');
+            //  return $this->error_message('حدث خطأ ما أثناء إنشاء الكوبون');
+            return response()->json(
+                [
+                    'status' => 'error',
+                    'message' => 'حدث خطأ ما أثناء تعديل الكوبون'
+                ],
+                500
+            );
         }
-        return $this->success_message('تم تعديل الكوبون بنجاح');
+        return response()->json(
+            [
+                'status' => 'success',
+                'message' => 'تم تعديل الكوبون بنجاح'
+            ],
+            201
+        );
     }
     public function destroy(string $id)
     {

@@ -25,6 +25,12 @@ class CouponService
         $coupons = $this->couponRepository->getCoupons();
         return DataTables::of($coupons)
             ->addIndexColumn()
+            ->addColumn('is_active', function ($coupon) {
+                return $coupon->status();
+            })
+            ->addColumn('discount_percentage', function ($coupon) {
+                return $coupon->discount_percentage . '%';
+            })
             ->addColumn('action', function ($coupon) {
                 return view('admin.coupons.datatables.actions', compact('coupon'));
             })
@@ -32,6 +38,7 @@ class CouponService
     }
     public function createCoupon($data)
     {
+        //dd($data);
         return $this->couponRepository->createCoupon($data);
     }
     public function updateCoupon($id, $data)

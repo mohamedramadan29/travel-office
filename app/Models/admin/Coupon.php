@@ -37,6 +37,11 @@ class Coupon extends Model
         return $this->is_active == 1 && $this->time_used < $this->limit && $this->end_date > now();
     }
 
+    public function status()
+    {
+        return $this->is_active == 1 ? 'مفعل' : 'غير مفعل';
+    }
+
 
 
 }

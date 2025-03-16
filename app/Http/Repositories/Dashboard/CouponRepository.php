@@ -15,7 +15,7 @@ class CouponRepository
 
     public function getCoupons()
     {
-        $coupons = Coupon::all();
+        $coupons = Coupon::latest()->get();
         return $coupons;
     }
 
