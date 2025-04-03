@@ -60,6 +60,4 @@ class Brand extends Model
         return 'uploads/brands/'.$logo;
     }
 
-
-
 }

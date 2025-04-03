@@ -75,7 +75,7 @@ class BrandService
         if (!$brand) {
             abort(404);
         }
-        if($data['logo'] !=null){
+        if(array_key_exists('logo', $data) && $data['logo'] !=null){
             ###### Delete Old Logo
             $this->imageManager->deleteImageFromLocal($brand->logo);
             $filename = $this->imageManager->UploadSingleImage('/', $data['logo'],'brands');

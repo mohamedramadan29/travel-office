@@ -6,10 +6,10 @@
                 <li class="mr-auto nav-item mobile-menu d-md-none"><a class="nav-link nav-menu-main menu-toggle hidden-xs"
                         href="#"><i class="ft-menu font-large-1"></i></a></li>
                 <li class="mr-auto nav-item">
-                    <a class="navbar-brand" href="index.html">
-                        <img class="brand-logo" alt="modern admin logo"
-                            src="{{ asset('assets/admin/') }}/images/logo/logo.png">
-                        <h3 class="brand-text">Modern Admin</h3>
+                    <a class="navbar-brand" href="{{ route('dashboard.welcome') }}">
+                        <img class="brand-logo" alt="{{ $setting->site_name }}"
+                            src={{ asset($setting->logo) }}>
+                        <h3 class="brand-text">{{ $setting->site_name }}</h3>
                     </a>
                 </li>
                 <li class="float-right nav-item d-none d-md-block"><a class="pr-0 nav-link modern-nav-toggle"

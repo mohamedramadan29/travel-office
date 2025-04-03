@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             GovernrateSeeder::class,
             CitySeeder::class,
             CouponSeeder::class,
+            FaqSeeder::class,
         ]);
 
     }

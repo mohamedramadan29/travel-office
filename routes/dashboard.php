@@ -1,19 +1,20 @@
 <?php
 
-use App\Http\Controllers\dashboard\AdminController;
-
-use App\Http\Controllers\dashboard\auth\AuthController;
-use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
-use App\Http\Controllers\dashboard\auth\ResetPasswordController;
-use App\Http\Controllers\dashboard\BrandController;
-use App\Http\Controllers\dashboard\CategoryController;
-use App\Http\Controllers\dashboard\CouponController;
-use App\Http\Controllers\dashboard\RolesController;
-use App\Http\Controllers\dashboard\WelcomeController;
-use App\Http\Controllers\dashboard\WorldController;
 use Illuminate\Support\Facades\Route;
-use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
+use App\Http\Controllers\dashboard\FaqController;
+use App\Http\Controllers\dashboard\AdminController;
+use App\Http\Controllers\dashboard\BrandController;
+use App\Http\Controllers\dashboard\RolesController;
+use App\Http\Controllers\dashboard\WorldController;
+use App\Http\Controllers\dashboard\CouponController;
+use App\Http\Controllers\dashboard\WelcomeController;
+use App\Http\Controllers\dashboard\CategoryController;
+use App\Http\Controllers\dashboard\auth\AuthController;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+use App\Http\Controllers\dashboard\auth\ResetPasswordController;
+use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
+use App\Http\Controllers\dashboard\SettingController;
 
 Route::group([
     'prefix' => LaravelLocalization::setLocale() . '/dashboard',
@@ -88,24 +89,39 @@ Route::group([
         ################# Start Categories Routes #####################
         Route::group(['middleware' => 'can:categories'], function () {
             Route::resource('categories', CategoryController::class);
-            Route::get('categories-all',[CategoryController::class,'CategoryAll'])->name('categories.all');
+            Route::get('categories-all', [CategoryController::class, 'CategoryAll'])->name('categories.all');
         });
         ################# End Categories Routes #######################
 
         ################# Start Brands Routes #####################
         Route::group(['middleware' => 'can:brands'], function () {
             Route::resource('brands', BrandController::class);
-            Route::get('brands-all',[BrandController::class,'BrandsAll'])->name('brands.all');
+            Route::get('brands-all', [BrandController::class, 'BrandsAll'])->name('brands.all');
         });
         ################# End Brands Routes #######################
 
-         ################# Start Coupons  Routes #####################
-         Route::group(['middleware' => 'can:coupons'], function () {
+        ################# Start Coupons  Routes #####################
+        Route::group(['middleware' => 'can:coupons'], function () {
             Route::resource('coupons', CouponController::class);
-            Route::get('coupons-all',[CouponController::class,'CouponsAll'])->name('coupons.all');
+            Route::get('coupons-all', [CouponController::class, 'CouponsAll'])->name('coupons.all');
         });
         ################# End Coupons Routes #######################
 
+        ################ Start Faqs Routes #######################
+        Route::group(['middleware' => 'can:faqs'], function () {
+            Route::resource('faqs', FaqController::class);
+            Route::get('faqs-all', [FaqController::class, 'FaqsAll'])->name('faqs.all');
+        });
+        ################# End Faqs Routes #######################
+
+        ################ Start Settings Routes #######################
+        Route::group(['middleware' => 'can:settings', 'prefix' => 'settings', 'as' => 'settings.'], function () {
+            Route::controller(SettingController::class)->group(function () {
+                Route::get('setting', 'index')->name('index');
+                Route::put('settings/{id}', 'update')->name('update');
+            });
+        });
+        ################# End Settings Routes #######################
     });
 
 });

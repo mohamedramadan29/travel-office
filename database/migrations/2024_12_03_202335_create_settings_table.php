@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,16 +14,18 @@ return new class extends Migration
             $table->id();
             $table->string('site_name');
             $table->text('site_desc');
-            $table->text('site_keywords')->nullable();
-            $table->string('phone');
-            $table->string('email');
-            $table->string('address');
+            $table->string('site_phone');
+            $table->string('site_email');
+            $table->string('site_address');
             $table->string('email_support');
-            $table->string('facebook')->nullable();
-            $table->string('twitter')->nullable();
-            $table->string('youtube')->nullable();
+            $table->string('facebook_url')->nullable();
+            $table->string('twitter_url')->nullable();
+            $table->string('youtube_url')->nullable();
             $table->string('favicon');
             $table->string('logo');
+            $table->text('meta_description')->nullable();
+            $table->string('site_copyright');
+            $table->text('promotion_video_url')->nullable();
             $table->timestamps();
         });
     }
