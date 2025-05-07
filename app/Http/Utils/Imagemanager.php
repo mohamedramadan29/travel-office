@@ -8,6 +8,17 @@ use \Illuminate\Support\Facades\File;
 class Imagemanager
 {
 
+    public function UploadImages($images, $model, $disk)
+    {
+        foreach ($images as $image) {
+            $filename = $this->GenerateImageName($image);
+            $this->StoreImageLocale($image, '/', $filename, $disk);
+            $model->images()->create([
+
+                'file_name' => $filename,
+            ]);
+        }
+    }
     public function UploadSingleImage($path, $image, $disk)
     {
         $file_name = $this->GenerateImageName($image);

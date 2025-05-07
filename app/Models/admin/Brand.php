@@ -8,8 +8,8 @@ use Spatie\Translatable\HasTranslations;
 use Cviebrock\EloquentSluggable\Sluggable;
 
 class Brand extends Model
-{
-    use Sluggable;
+{ use Sluggable;
+
     use HasTranslations;
     protected $guarded = [];
 

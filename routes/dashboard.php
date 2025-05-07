@@ -1,20 +1,23 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use Livewire\Livewire;
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\dashboard\FaqController;
 use App\Http\Controllers\dashboard\AdminController;
 use App\Http\Controllers\dashboard\BrandController;
 use App\Http\Controllers\dashboard\RolesController;
 use App\Http\Controllers\dashboard\WorldController;
 use App\Http\Controllers\dashboard\CouponController;
+use App\Http\Controllers\dashboard\ProductController;
+use App\Http\Controllers\dashboard\SettingController;
 use App\Http\Controllers\dashboard\WelcomeController;
 use App\Http\Controllers\dashboard\CategoryController;
+use App\Http\Controllers\dashboard\AttributeController;
 use App\Http\Controllers\dashboard\auth\AuthController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
 use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
-use App\Http\Controllers\dashboard\SettingController;
 
 Route::group([
     'prefix' => LaravelLocalization::setLocale() . '/dashboard',
@@ -122,6 +125,26 @@ Route::group([
             });
         });
         ################# End Settings Routes #######################
+        ################# Start Attribute Routes ####################
+        Route::group(['middleware' => 'can:attribute'], function () {
+            Route::resource('attributes', AttributeController::class);
+            Route::get('attributes-all', [AttributeController::class, 'AttributesAll'])->name('attributes.all');
+        });
+        ################ End Attribute Routes #######################
+        ########
+
+        ################# Start Product Routes ####################
+        ####### LiveWire
+        Livewire::setUpdateRoute(function ($handle) {
+            return Route::post('/custom/livewire/update', $handle);
+        });
+        Route::group(['middleware' => 'can:products'], function () {
+            Route::resource('products', ProductController::class);
+            Route::post('product/status', [ProductController::class, 'ChangeStatus'])->name('product.status');
+            Route::get('products-all', [ProductController::class, 'ProductAll'])->name('products.all');
+            Route::get('product/vartiants/{vartiant_id}', [ProductController::class, 'DeleteVartiant'])->name('product.vartiants.delete');
+        });
+        ################ End Product Routes #######################
     });
 
 });

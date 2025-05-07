@@ -15,6 +15,10 @@ class BrandService
         $this->imageManager = $imagemanager;
     }
 
+    public function getAll(){
+        return $this->brandRepository->getBrands();
+    }
+
     ########## Get All Brands ##########
     public function getBrands()
     {

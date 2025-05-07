@@ -14,6 +14,9 @@ class CategoriesService
         $this->categoriesRepository = $categoriesRepository;
     }
 
+    public function getAllServices(){
+        return $this->categoriesRepository->getAll();
+    }
 
     ########### For Yajra Datatable ###########
     public function getAll()

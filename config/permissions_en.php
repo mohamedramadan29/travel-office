@@ -18,4 +18,5 @@ return [
     'global_shipping'=>' Manage Global Shipping',
     'faqs' => 'Manage Faqs',
     'contacts' => 'Manage Contacts',
+    'attribute' => 'Manage Attributes', 
 ];

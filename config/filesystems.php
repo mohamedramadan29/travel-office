@@ -40,29 +40,29 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
         ],
 
-        'brands'=> [
+        'brands' => [
             'driver' => 'local',
             'root' => public_path('uploads/brands'),
-            'url' => env('APP_URL').'/uploads/brands',
+            'url' => env('APP_URL'),
             'visibility' => 'public',
             'throw' => false,
         ],
-        'settings'=> [
+        'settings' => [
             'driver' => 'local',
             'root' => public_path('/uploads/settings'),
-            'url' => env('APP_URL').'/uploads/settings',
+            'url' => env('APP_URL'),
             'visibility' => 'public',
             'throw' => false,
         ],
-        'products'=> [
+        'products' => [
             'driver' => 'local',
             'root' => public_path('/uploads/products'),
-            'url' => env('APP_URL').'/uploads/products',
+            'url' => env('APP_URL'),
             'visibility' => 'public',
             'throw' => false,
         ],
