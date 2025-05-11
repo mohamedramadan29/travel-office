@@ -1,0 +1,28 @@
+<?php
+
+return [
+    ######## Login Page
+    'register' => 'حساب جديد ',
+    'login' => 'تسجيل دخول',
+    'log_in' => 'تسجيل دخول',
+    'email_address' => 'البريد الالكتروني',
+    'password' => 'كلمة المرور',
+    'remember_me' => 'تذكرني',
+    'forgot_password' => 'نسيت كلمة المرور',
+    'dont_have_an_account' => 'ليس لديك حساب',
+    ######### Register Page ########
+    'sign_up_free' => 'اشترك مجانا',
+    'create_an_account' => 'إنشاء حساب',
+    'name' => 'الاسم',
+    'email_address' => 'البريد الالكتروني',
+    'phone' => 'الهاتف',
+    'country' => 'البلد',
+    'already_have_an_account' => 'هل لديك حساب',
+    'shop_us' => 'ShopUs',
+    'postcode_zip' => 'الرمز البريدي / البريد البريدي',
+    'city' => 'المدينة',
+    'address' => 'العنوان',
+    'i_agree_all_terms_and_condition_in' => 'أوافق جميع الشروط والاحكام في',
+    'password_confirmation' => 'تأكيد كلمة المرور',
+    'profile' => 'الملف الشخصي',
+];

@@ -3,17 +3,19 @@
 use Livewire\Livewire;
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\dashboard\FaqController;
-use App\Http\Controllers\dashboard\AdminController;
-use App\Http\Controllers\dashboard\BrandController;
-use App\Http\Controllers\dashboard\RolesController;
-use App\Http\Controllers\dashboard\WorldController;
-use App\Http\Controllers\dashboard\CouponController;
-use App\Http\Controllers\dashboard\ProductController;
-use App\Http\Controllers\dashboard\SettingController;
-use App\Http\Controllers\dashboard\WelcomeController;
-use App\Http\Controllers\dashboard\CategoryController;
-use App\Http\Controllers\dashboard\AttributeController;
+use App\Http\Controllers\dashboard\{
+    FaqController,
+    AdminController,
+    BrandController,
+    RolesController,
+    WorldController,
+    CouponController,
+    ProductController,
+    SettingController,
+    WelcomeController,
+    CategoryController,
+    AttributeController
+};
 use App\Http\Controllers\dashboard\auth\AuthController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
@@ -42,7 +44,6 @@ Route::group([
     Route::controller(ResetPasswordController::class)->group(function () {
         Route::get('password/reset/{email}', 'ShowResetForm')->name('password.reset');
         Route::post('password/reset', 'resetpassword')->name('password.reset.post');
-
     });
 
     ############################### Start Admin Auth Route  ###############
@@ -146,5 +147,4 @@ Route::group([
         });
         ################ End Product Routes #######################
     });
-
 });

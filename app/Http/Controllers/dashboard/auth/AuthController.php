@@ -17,13 +17,18 @@ class AuthController extends Controller implements HasMiddleware
     public function __construct(AuthService $authService)
     {
         $this->authService = $authService;
+        #### If Use Laravel UI ####
+        $this->middleware('guest:admin')->except('logout');
     }
-    public static function middleware()
-    {
-        return [
-            new Middleware(middleware: 'guest:admin', except: ['logout']),
-        ];
-    }
+
+
+
+    // public static function middleware()
+    // {
+    //     return [
+    //         new Middleware(middleware: 'guest:admin', except: ['logout']),
+    //     ];
+    // }
 
     public function show_login()
     {
