@@ -60,10 +60,10 @@
                                   المنتجات </a>
                           </li>
                           <li class="{{ Route::is('dashboard.products.create') ? 'active' : '' }}">
-                            <a class="menu-item" href="{{ route('dashboard.products.create') }}"
-                                data-i18n="nav.role.index">
-                                اضافة منتج </a>
-                        </li>
+                              <a class="menu-item" href="{{ route('dashboard.products.create') }}"
+                                  data-i18n="nav.role.index">
+                                  اضافة منتج </a>
+                          </li>
                       @endcan
 
                   </ul>
@@ -149,6 +149,19 @@
                       </ul>
                   </li>
               @endcan
+              @can('users')
+                  <li class="nav-item{{ Route::is('dashboard.users.*') ? 'active' : '' }}"><a href="#"><i
+                              class="la la-users"></i><span class="menu-title" data-i18n="nav.users.main"> المستخدمين
+                          </span></a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.users.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.users.index') }}"
+                                  data-i18n="nav.users.user_profile"> ادارة المستخدمين
+                              </a>
+                          </li>
+                      </ul>
+                  </li>
+              @endcan
               @can('settings')
                   <li class="nav-item{{ Route::is('dashboard.settings.*') ? 'active' : '' }}"><a href="#"><i
                               class="la la-dashboard"></i><span class="menu-title" data-i18n="nav.users.main"> الاعدادات
@@ -160,10 +173,10 @@
                               </a>
                           </li>
                           <li class="{{ Route::is('dashboard.sliders.*') ? 'active' : '' }}">
-                            <a class="menu-item" href="{{ route('dashboard.sliders.index') }}"
-                                data-i18n="nav.users.user_profile"> ادارة البنرات
-                            </a>
-                        </li>
+                              <a class="menu-item" href="{{ route('dashboard.sliders.index') }}"
+                                  data-i18n="nav.users.user_profile"> ادارة البنرات
+                              </a>
+                          </li>
                       </ul>
                   </li>
               @endcan

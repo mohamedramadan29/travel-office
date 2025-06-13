@@ -35,7 +35,6 @@ class CitySeeder extends Seeder
                 'name' => ['ar' => 'التبين', 'en' => 'Tebin'],
                 'governrate_id' => 1
             ],
-
         ];
         foreach ($citizens as $city) {
             City::create($city);

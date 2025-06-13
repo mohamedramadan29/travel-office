@@ -15,7 +15,8 @@ use App\Http\Controllers\dashboard\{
     WelcomeController,
     CategoryController,
     AttributeController,
-    SliderController
+    SliderController,
+    UserController
 };
 use App\Http\Controllers\dashboard\auth\AuthController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -157,5 +158,14 @@ Route::group([
             });
         });
         ################# End Sliders Routes #######################
+        ################# Start Users Routes #####################
+
+        Route::group(['middleware' => 'can:users'], function () {
+            Route::resource('users', UserController::class);
+            Route::get('users-all', [UserController::class, 'getAll'])->name('users.all');
+            Route::post('users/status', [UserController::class, 'ChangeStatus'])->name('users.status');
+
+        });
+        ################# End Users Routes #######################
     });
 });

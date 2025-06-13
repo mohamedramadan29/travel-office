@@ -12,7 +12,7 @@ class City extends Model
     public $translatable = ['name'];
     protected $fillable = ['name','governrate_id'];
     public $timestamps = false;
-    public function governorate(){
+    public function governorate(){ 	//governrate_id
         return $this->belongsTo(GovernRate::class,'governrate_id');
     }
 }

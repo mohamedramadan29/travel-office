@@ -21,7 +21,7 @@ class GovernRate extends Model
     }
 
 
-    public function cities(){
+    public function cities(){ 	//governrate_id
         return $this->hasMany(City::class,'governrate_id');
     }
 
