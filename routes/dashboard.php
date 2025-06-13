@@ -14,7 +14,8 @@ use App\Http\Controllers\dashboard\{
     SettingController,
     WelcomeController,
     CategoryController,
-    AttributeController
+    AttributeController,
+    SliderController
 };
 use App\Http\Controllers\dashboard\auth\AuthController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -146,5 +147,15 @@ Route::group([
             Route::get('product/vartiants/{vartiant_id}', [ProductController::class, 'DeleteVartiant'])->name('product.vartiants.delete');
         });
         ################ End Product Routes #######################
+           ################ Start Sliders Routes #######################
+           Route::group(['middleware' => 'can:settings'], function () {
+            Route::controller(SliderController::class)->group(function(){
+                Route::get('sliders','index')->name('sliders.index');
+                Route::post('slider/store','store')->name('slider.store');
+                Route::get('sliders-all','getAll')->name('sliders.all');
+                Route::get('slider/delete/{id}','destroy')->name('slider.delete');
+            });
+        });
+        ################# End Sliders Routes #######################
     });
 });

@@ -7,10 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\CreateAuthAdminRequest;
-use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Routing\Controllers\HasMiddleware;
 
-class AuthController extends Controller implements HasMiddleware
+class AuthController extends Controller
 {
 
     protected $authService;

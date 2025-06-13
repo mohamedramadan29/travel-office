@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('file_name');
             $table->string('product_slug')->nullable();
-
+            $table->string('note');
             $table->timestamps();
         });
     }

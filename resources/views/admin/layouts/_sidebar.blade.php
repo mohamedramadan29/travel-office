@@ -159,6 +159,11 @@
                                   data-i18n="nav.users.user_profile"> ادارة الاعدادات
                               </a>
                           </li>
+                          <li class="{{ Route::is('dashboard.sliders.*') ? 'active' : '' }}">
+                            <a class="menu-item" href="{{ route('dashboard.sliders.index') }}"
+                                data-i18n="nav.users.user_profile"> ادارة البنرات
+                            </a>
+                        </li>
                       </ul>
                   </li>
               @endcan
