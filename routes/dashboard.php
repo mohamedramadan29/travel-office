@@ -16,7 +16,8 @@ use App\Http\Controllers\dashboard\{
     CategoryController,
     AttributeController,
     SliderController,
-    UserController
+    UserController,
+    ContactController
 };
 use App\Http\Controllers\dashboard\auth\AuthController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -167,5 +168,12 @@ Route::group([
 
         });
         ################# End Users Routes #######################
+        ################# Start Contacts Routes ##################
+        Route::group(['middleware' => 'can:contacts'], function () {
+            Route::controller(ContactController::class)->group(function(){
+                Route::get('contacts','index')->name('contacts.index');
+            });
+        });
+        ################## End Contacts Routes ###################
     });
 });

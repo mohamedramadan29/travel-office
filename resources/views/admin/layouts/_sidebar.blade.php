@@ -162,6 +162,19 @@
                       </ul>
                   </li>
               @endcan
+              @can('contacts')
+              <li class="nav-item{{ Route::is('dashboard.contacts.*') ? 'active' : '' }}"><a href="#"><i
+                          class="la la-users"></i><span class="menu-title" data-i18n="nav.users.main"> الاتصالات
+                      </span> <span class="float-right mr-2 badge badge-info badge-pill"> {{ $ContactCount }} </span> </a>
+                  <ul class="menu-content">
+                      <li class="{{ Route::is('dashboard.contacts.index') ? 'active' : '' }}">
+                          <a class="menu-item" href="{{ route('dashboard.contacts.index') }}"
+                              data-i18n="nav.users.user_profile"> ادارة الاتصالات
+                          </a>
+                      </li>
+                  </ul>
+              </li>
+          @endcan
               @can('settings')
                   <li class="nav-item{{ Route::is('dashboard.settings.*') ? 'active' : '' }}"><a href="#"><i
                               class="la la-dashboard"></i><span class="menu-title" data-i18n="nav.users.main"> الاعدادات

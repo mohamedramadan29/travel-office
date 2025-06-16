@@ -6,8 +6,9 @@ use App\Models\admin\Faq;
 use App\Models\admin\Admin;
 use App\Models\admin\Brand;
 use App\Models\admin\Coupon;
-use App\Models\admin\Category;
+use App\Models\admin\Contact;
 use App\Models\admin\Setting;
+use App\Models\admin\Category;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
@@ -60,12 +61,19 @@ class ViewServiceProvider extends ServiceProvider
                     return Admin::count();
                 });
             }
+            ########## Contact Count
+            if (!Cache::has('ContactCount')) {
+                Cache::remember('ContactCount', 60, function () {
+                    return Contact::where('is_read', 0)->count();
+                });
+            }
             view()->share([
                 'CategoryCount' => Cache::get('CategoryCount'),
                 'BrandCount' => Cache::get('BrandCount'),
                 'AdminCount' => Cache::get('AdminCount'),
                 'CouponCount' => Cache::get('CouponCount'),
                 'FaqCount' => Cache::get('FaqCount'),
+                'ContactCount' => Cache::get('ContactCount'),
             ]);
         });
 

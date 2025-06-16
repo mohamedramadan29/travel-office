@@ -17,6 +17,7 @@
   <!-- BEGIN PAGE LEVEL JS-->
   <script src="{{ asset('assets/admin/') }}/js/scripts/pages/dashboard-ecommerce.js" type="text/javascript"></script>
   <!-- END PAGE LEVEL JS-->
+  <script src="{{ asset('assets/admin/') }}/js/scripts/pages/email-application.js" type="text/javascript"></script>
   <!---- Sweat Alert  --->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-------- File Input --------->
