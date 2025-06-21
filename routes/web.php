@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\website\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\dashboard\BrandController;
+use App\Http\Controllers\website\ProductController;
+use App\Http\Controllers\website\BrandsController;
+use App\Http\Controllers\website\CategoriesController;
 use App\Http\Controllers\website\ProfileController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
@@ -16,7 +20,8 @@ Route::group([
     'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'localeViewPath']
 ], function () {
     Route::controller(HomeController::class)->group(function () {
-        Route::get('/home', 'index')->name('website.home');
+        Route::get('/home', 'index')->name('home');
+        Route::get('/', 'index')->name('home');
     });
     ############## Start Register Controller #############
 
@@ -39,6 +44,27 @@ Route::group([
         });
     });
     ############## End Profile Controller #############
+    ########### Start Brand Controller ##########
+    Route::prefix('brands')->name('brands.')->controller(BrandsController::class)->group(function(){
+        Route::get('/','index')->name('index');
+        Route::get('/{slug}/products','GetProductsByBrand')->name('products');
+    });
+    ############# End Brand Controller ##########
+    ############# Start Categoreis Controller #########
+    Route::prefix('categories')->name('categories.')->controller(CategoriesController::class)->group(function(){
+        Route::get('/','index')->name('index');
+        Route::get('/{slug}/products','GetProductsByCategory')->name('products');
+    });
+
+    ############# Start Products ##########
+
+    Route::prefix('products')->name('product.')->controller(ProductController::class)->group(function(){
+
+        Route::get('/{slug}','showProduct')->name('show');
+    });
+
+    ############ End Products ###########
+
 });
 
 Auth::routes();

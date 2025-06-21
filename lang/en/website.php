@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'home' => 'Home',
     ############# Login Page
     'register' => 'Register',
     'login' => 'Login',
@@ -25,4 +26,13 @@ return [
     'i_agree_all_terms_and_condition_in' => 'I agree all terms and condition in',
     'password_confirmation' => 'Password Confirmation',
     'profile' => 'Profile',
+    'categories' => 'Categories',
+    'brands' => 'Brands',
+    'view_all' => 'View All',
+    'no_products' => 'No Products',
+    'show_vartiant' => 'Show Vartiant',
+    'showing' => 'Showing',
+    'of' => 'of',
+    'results' => 'results',
+    'show_product'=>'show product'
 ];

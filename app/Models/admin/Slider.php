@@ -24,4 +24,7 @@ class Slider extends Model
     {
         return date('d-m-y h:i a', strtotime($this->attributes['created_at']));
     }
+    public function Image(){
+        return $this->file_name;
+    }
 }

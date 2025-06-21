@@ -46,6 +46,10 @@ class SliderService
     }
     public function createSlider($data)
     {
+        if ($data['file_name'] != null) {
+            $file_name = $this->imagemanager->UploadSingleImage('/', $data['file_name'], 'sliders');
+            $data['file_name'] = $file_name;
+        }
         return $this->sliderRepository->createSlider($data);
     }
     public function updateSlider($data, $slider)

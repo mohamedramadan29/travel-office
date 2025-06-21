@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'home' => 'الرئيسية',
     ######## Login Page
     'register' => 'حساب جديد ',
     'login' => 'تسجيل دخول',
@@ -25,4 +26,13 @@ return [
     'i_agree_all_terms_and_condition_in' => 'أوافق جميع الشروط والاحكام في',
     'password_confirmation' => 'تأكيد كلمة المرور',
     'profile' => 'الملف الشخصي',
+    'categories' => 'التصنيفات',
+    'brands' => 'العلامات التجارية',
+    'view_all' => 'عرض الكل',
+    'no_products' => 'لا يوجد منتجات',
+    'show_vartiant' => 'عرض المتغيرات',
+    'showing' => 'عرض',
+    'of' => 'من',
+    'results' => 'نتائج',
+     'show_product'=>' مشاهدة المنتج  '
 ];

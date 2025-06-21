@@ -22,14 +22,14 @@
                     </div>
                     <div class="form-group">
                         <label for="note_ar"> الوصف بالعربي </label>
-                        <input type="text" class="form-control" id="note_ar" name="note_ar"
-                            value="{{ old('note_ar') }}">
+                        <input type="text" class="form-control" id="note_ar" name="note[ar]"
+                            value="{{ old('note[ar]') }}">
                         <strong class="text-danger" id="note_ar_error"></strong>
                     </div>
                     <div class="form-group">
                         <label for="note_en"> الوصف بالانجليزية </label>
-                        <input type="text" class="form-control" id="note_en" name="note_en"
-                            value="{{ old('note_en') }}">
+                        <input type="text" class="form-control" id="note_en" name="note[en]"
+                            value="{{ old('note[en]') }}">
                         <strong class="text-danger" id="note_en_error"></strong>
                     </div>
 

@@ -66,7 +66,7 @@ class Product extends Model
     public function hasVariantTranslated(){
         return $this->has_variant == 1 ? 'متغير' : 'بسيط ';
     }
-    
+
 
     public function getProductStatus(){
         return $this->status == 1 ? 'مفعل' : 'غير مفعل';
@@ -78,6 +78,17 @@ class Product extends Model
 
     public function getQtyAttribute($value){
         return $this->has_variant == 0 ? $value : ' منتج متغير  ';
+    }
+
+    public function scopeActive($query){
+        return $query->where('status',1);
+    }
+
+    public function getPriceAfterDiscount(){
+        if($this->has_discount){
+          return  $this->price - $this->discount;
+        }
+        return $this->price;
     }
 
 }

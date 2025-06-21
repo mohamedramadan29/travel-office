@@ -57,4 +57,10 @@ class Category extends Model
         return $this->belongsTo(Category::class, 'parent');
     }
 
+    #### Add Scop Active
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
+
 }

@@ -60,4 +60,6 @@ class Brand extends Model
         return 'uploads/brands/'.$logo;
     }
 
+    ###### Add Scop
+
 }
