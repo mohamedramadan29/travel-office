@@ -73,7 +73,7 @@ class Product extends Model
     }
 
     public function getPriceAttribute($value){
-        return $this->has_variant == 0 ? number_format($value,2) : ' منتج متغير  ';
+        return $this->has_variant == 0 ? $value : ' منتج متغير  ';
     }
 
     public function getQtyAttribute($value){
@@ -85,10 +85,10 @@ class Product extends Model
     }
 
     public function getPriceAfterDiscount(){
-        if($this->has_discount){
-          return  $this->price - $this->discount;
+        if ($this->has_discount && $this->discount > 0) {
+            return number_format($this->getRawOriginal('price') - $this->discount, 2);
         }
-        return $this->price;
+        return number_format($this->getRawOriginal('price'), 2);
     }
 
 }

@@ -185,6 +185,28 @@
                     <div class="col-lg-9">
                         <div class="product-sidebar-section" data-aos="fade-up">
                             <div class="row g-5">
+                                @if ($flashtimer == 'true')
+                                    <div class="col-12">
+                                        <div class="countdown-section">
+                                            <div class="countdown-items">
+                                                <span id="day" class="number" style="color: red">0</span>
+                                                <span class="text">Days</span>
+                                            </div>
+                                            <div class="countdown-items">
+                                                <span id="hour" class="number" style="color: skyblue">0</span>
+                                                <span class="text">Hours</span>
+                                            </div>
+                                            <div class="countdown-items">
+                                                <span id="minute" class="number" style="color: green">0</span>
+                                                <span class="text">Minutes</span>
+                                            </div>
+                                            <div class="countdown-items">
+                                                <span id="second" class="number" style="color: red">0</span>
+                                                <span class="text">seconds</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                                 <div class="col-lg-12">
                                     <div class="product-sorting-section">
                                         <div class="result">
@@ -294,10 +316,10 @@
                                                     </a>
                                                     <div class="price">
                                                         @if ($item->has_variant == 0)
-                                                            @if ($item->has_discount)
+                                                            @if ($item->has_discount == 1)
                                                                 <span class="price-cut">{{ $item->price }}</span>
                                                                 <span
-                                                                    class="new-price">{{ $item->priceAfterDiscount }}</span>
+                                                                    class="new-price">{{ $item->getPriceAfterDiscount() }}</span>
                                                             @else
                                                                 <span class="new-price">{{ $item->price }}</span>
                                                             @endif
@@ -342,4 +364,40 @@
             </div>
         </section>
     @endif
+@endsection
+
+
+
+@section('js')
+
+@if($flashtimer == 'true')
+    <script>
+        function StartCountDown() {
+            const now = new Date();
+            const endOfDate = new Date();
+            endOfDate.setHours(23, 59, 59, 999);
+            const diff = endOfDate - now;
+            if (diff < 0) {
+                $("#day").text(0);
+                $("#hour").text(0);
+                $("#minute").text(0);
+                $("#second").text(0);
+            } else {
+                const totalsecond = Math.floor(diff / 1000);
+                const hour = Math.floor((totalsecond % (86400)) / (3600));
+                const minute = Math.floor((totalsecond % (3600)) / 60);
+                const second = Math.floor(totalsecond % 60);
+                $("#day").text("0");
+                $("#hour").text(String(hour).padStart(2,'0'));
+                $("#minute").text(String(minute).padStart(2,'0'));
+                $("#second").text(String(second).padStart(2,'0'));
+            }
+        }
+        $(function(){
+            StartCountDown();
+            setInterval(StartCountDown, 1000);
+        })
+
+    </script>
+@endif
 @endsection

@@ -40,8 +40,7 @@
     <script src="{{ asset('assets/front/assets/js/swiper10-bundle.min.js') }}"></script>
 
     <script src="{{ asset('assets/front/assets/js/shopus.js') }}"></script>
+    @yield('js')
 </body>
-
-<!-- Mirrored from quomodothemes.website/html/shopus/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 15 Nov 2023 07:47:15 GMT -->
 
 </html>

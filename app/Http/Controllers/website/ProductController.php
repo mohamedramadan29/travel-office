@@ -20,4 +20,23 @@ class ProductController extends Controller
         }
         return view('front.show',compact('product'));
     }
+
+    public function getProductsByType($type){
+        if($type == 'new-arrivals'){
+            $products = $this->productService->getNewArrivalsProducts();
+
+        }elseif($type == 'flash-sale'){
+            $products = $this->productService->getFlashProducts();
+
+        }elseif($type == 'flash-sale-timer'){
+            $products = $this->productService->getFlashProductsWithTimer();
+
+        }else{
+            abort(404);
+        }
+        return view('front.products',
+        ['products'=>$products,
+        'flashtimer'=>$type == 'flash-sale-timer'  ? 'true':'false',
+    ]);
+    }
 }

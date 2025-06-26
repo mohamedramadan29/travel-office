@@ -46,7 +46,7 @@ class HomeService{
         $products = Product::with('brand','category','images')
         ->where('category_id',$category->id)
         ->active()
-        ->select('id','name','slug','price','category_id','brand_id','has_variant','price','has_discount')
+        ->select('id','name','slug','price','category_id','brand_id','has_variant','price','has_discount','discount')
         ->latest()
         ->paginate(2);
         return $products;
@@ -55,7 +55,7 @@ class HomeService{
         $brand = Brand::where('slug',$slug)->first();
         $products = Product::active()->with('brand','category','images')
         ->where('brand_id',$brand->id)
-        ->select('id','name','slug','price','category_id','brand_id','has_variant','price','has_discount')
+        ->select('id','name','slug','price','category_id','brand_id','has_variant','price','has_discount','discount')
         ->latest()
         ->paginate(2);
         return $products;

@@ -134,8 +134,8 @@
     <section class="product arrival">
         <div class="container">
             <div class="section-title">
-                <h5>NEW ARRIVALS</h5>
-                <a href="product-sidebar.html" class="view">View All</a>
+                <h5>{{ __('website.new_arrivals') }}</h5>
+                <a href="{{ route('website.product.by.type','new-arrivals') }}" class="view">{{ __('website.view_all') }}</a>
             </div>
             <div class="arrival-section">
                 <div class="row g-5">
@@ -243,7 +243,7 @@
                                             @if ($item->has_variant == 0)
                                                 @if ($item->has_discount)
                                                     <span class="price-cut">{{ $item->price }}</span>
-                                                    <span class="new-price">{{ $item->priceAfterDiscount }}</span>
+                                                    <span class="new-price">{{ $item->getPriceAfterDiscount() }}</span>
                                                 @else
                                                     <span class="new-price">{{ $item->price }}</span>
                                                 @endif
@@ -268,7 +268,7 @@
     {{-- ########## End New Arrivales Section ########### --}}
 
 
-    {{-- ########### Start Flash Sale Products #############  --}}
+    {{-- ########### Start Flash Sale Products With Timer #############  --}}
     @if ($flashProductsWithTimer->count() > 0)
         <section class="product flash-sale">
             <div class="container">
@@ -292,7 +292,7 @@
                             <span class="text">seconds</span>
                         </div>
                     </div>
-                    <a href="flash-sale.html" class="view">View All</a>
+                    <a href="{{ route('website.product.by.type','flash-sale-timer') }}" class="view">View All</a>
                 </div>
                 <div class="flash-sale-section">
                     <div class="row g-5">
@@ -398,16 +398,18 @@
                                         <div class="product-description">
                                             <a href="product-info.html"
                                                 class="product-details">{{ $item->getTranslation('name', app()->getLocale()) }}</a>
-                                            @if ($item->has_variant == 0)
-                                                @if ($item->has_discount)
-                                                    <span class="price-cut">{{ $item->price }}</span>
-                                                    <span class="new-price">{{ $item->priceAfterDiscount }}</span>
-                                                @else
+                                                <div class="price">
+                                                    @if ($item->has_variant == 0)
+                                                    @if ($item->has_discount)
+                                                        <span class="price-cut">{{ $item->price }}</span>
+                                                        <span class="new-price">{{ $item->getPriceAfterDiscount() }}</span>
+                                                    @else
                                                     <span class="new-price">{{ $item->price }}</span>
                                                 @endif
                                             @else
                                                 <span class="new-price">{{ __('website.show_vartiant') }}</span>
                                             @endif
+                                            </div>
 
                                         </div>
                                     </div>
@@ -1704,7 +1706,7 @@
             <div class="container">
                 <div class="section-title">
                     <h5>Flash Sale</h5>
-                    <a href="flash-sale.html" class="view">{{ __('website.view_all') }}</a>
+                    <a href="{{ route('website.product.by.type','flash-sale') }}" class="view">{{ __('website.view_all') }}</a>
                 </div>
                 <div class="best-product-section">
                     <div class="row g-4">
@@ -1713,7 +1715,7 @@
                                 <div class="product-wrapper" data-aos="fade-up">
                                     <div class="product-img">
                                         <img src="{{ asset('uploads/products/' . $item->images->first()->file_name) }}"
-                                                    alt="{{ $item->getTranslation('name',app()->getLocale()) }}">
+                                            alt="{{ $item->getTranslation('name', app()->getLocale()) }}">
                                     </div>
                                     <div class="product-info">
                                         <div class="ratings">
@@ -1739,21 +1741,21 @@
                                             </span>
                                         </div>
                                         <div class="product-description">
-                                            <a href="product-info.html" class="product-details">{{ $item->getTranslation('name',app()->getLocale())  }}
+                                            <a href="product-info.html"
+                                                class="product-details">{{ $item->getTranslation('name', app()->getLocale()) }}
                                             </a>
+
                                             <div class="price">
                                                 @if ($item->has_variant == 0)
-                                                @if ($item->has_discount)
-                                                    <span class="price-cut">{{ $item->price }}</span>
-                                                    <span
-                                                        class="new-price">{{ $item->priceAfterDiscount }}</span>
+                                                    @if ($item->has_discount == 1)
+                                                        <span class="price-cut">{{ $item->price }}</span>
+                                                        <span class="new-price">{{ $item->getPriceAfterDiscount() }}</span>
+                                                    @else
+                                                        <span class="new-price">{{ $item->price }}</span>
+                                                    @endif
                                                 @else
-                                                    <span class="new-price">{{ $item->price }}</span>
+                                                    <span class="new-price">{{ __('website.show_vartiant') }}</span>
                                                 @endif
-                                            @else
-                                                <span
-                                                    class="new-price">{{ __('website.show_vartiant') }}</span>
-                                            @endif
                                             </div>
                                         </div>
                                     </div>
@@ -1769,4 +1771,37 @@
 
     {{-- End Flash Sale Products  --}}
 
+@endsection
+
+
+@section('js')
+
+    <script>
+        function StartCountDown() {
+            const now = new Date();
+            const endOfDate = new Date();
+            endOfDate.setHours(23, 59, 59, 999);
+            const diff = endOfDate - now;
+            if (diff < 0) {
+                $("#day").text(0);
+                $("#hour").text(0);
+                $("#minute").text(0);
+                $("#second").text(0);
+            } else {
+                const totalsecond = Math.floor(diff / 1000);
+                const hour = Math.floor((totalsecond % (86400)) / (3600));
+                const minute = Math.floor((totalsecond % (3600)) / 60);
+                const second = Math.floor(totalsecond % 60);
+                $("#day").text("0");
+                $("#hour").text(String(hour).padStart(2,'0'));
+                $("#minute").text(String(minute).padStart(2,'0'));
+                $("#second").text(String(second).padStart(2,'0'));
+            }
+        }
+        $(function(){
+            StartCountDown();
+            setInterval(StartCountDown, 1000);
+        })
+
+    </script>
 @endsection

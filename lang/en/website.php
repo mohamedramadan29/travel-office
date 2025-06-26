@@ -34,5 +34,8 @@ return [
     'showing' => 'Showing',
     'of' => 'of',
     'results' => 'results',
-    'show_product'=>'show product'
+    'show_product'=>'show product',
+    'new_arrivals'=>'new arrivals',
+    'flash_sale'=>'flash sale',
+    'flash_sale_timer'=>'flash sale timer',
 ];

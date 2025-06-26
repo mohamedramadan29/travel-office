@@ -34,5 +34,8 @@ return [
     'showing' => 'عرض',
     'of' => 'من',
     'results' => 'نتائج',
-     'show_product'=>' مشاهدة المنتج  '
+     'show_product'=>' مشاهدة المنتج  ',
+     'new_arrivals'=>'المنتجات الجديدة',
+     'flash_sale'=>'العروض',
+     'flash_sale_timer'=>'العروض بالوقت'
 ];
