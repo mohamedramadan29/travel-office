@@ -19,9 +19,6 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->boolean('status')->default(1);
             $table->string('password');
-            $table->foreignId('city_id')->references('id')->on('cities')->cascadeOnDelete();
-            $table->foreignId('governrate_id')->references('id')->on('govern_rates')->cascadeOnDelete();
-            $table->foreignId('country_id')->references('id')->on('countries')->cascadeOnDelete();
             $table->rememberToken();
             $table->timestamps();
         });

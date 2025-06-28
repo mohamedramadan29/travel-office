@@ -27,68 +27,69 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        view()->composer('admin.*', function () {
-            ####### CategoryCount
-            if (!Cache::has("CategoryCount")) {
-                Cache::remember('CategoryCount', 60, function () {
-                    return Category::count();
-                });
-            }
+    //     view()->composer('admin.*', function () {
+    //         ####### CategoryCount
+    //         if (!Cache::has("CategoryCount")) {
+    //             Cache::remember('CategoryCount', 60, function () {
+    //                 return Category::count();
+    //             });
+    //         }
 
-            ########## Brand Count
-            if (!Cache::has('BrandCount')) {
-                Cache::remember('BrandCount', 60, function () {
-                    return Brand::count();
-                });
-            }
+    //         ########## Brand Count
+    //         if (!Cache::has('BrandCount')) {
+    //             Cache::remember('BrandCount', 60, function () {
+    //                 return Brand::count();
+    //             });
+    //         }
 
-            ########## Coupon Count
-            if (!Cache::has('CouponCount')) {
-                Cache::remember('CouponCount', 60, function () {
-                    return Coupon::count();
-                });
-            }
-            ########## Faq Count
-            if (!Cache::has('FaqCount')) {
-                Cache::remember('FaqCount', 60, function () {
-                    return Faq::count();
-                });
-            }
-            ########## Admin Count
-            if (!Cache::has('AdminCount')) {
+    //         ########## Coupon Count
+    //         if (!Cache::has('CouponCount')) {
+    //             Cache::remember('CouponCount', 60, function () {
+    //                 return Coupon::count();
+    //             });
+    //         }
+    //         ########## Faq Count
+    //         if (!Cache::has('FaqCount')) {
+    //             Cache::remember('FaqCount', 60, function () {
+    //                 return Faq::count();
+    //             });
+    //         }
+    //         ########## Admin Count
+    //         if (!Cache::has('AdminCount')) {
 
-                Cache::remember('AdminCount', 60, function () {
-                    return Admin::count();
-                });
-            }
-            ########## Contact Count
-            if (!Cache::has('ContactCount')) {
-                Cache::remember('ContactCount', 60, function () {
-                    return Contact::where('is_read', 0)->count();
-                });
-            }
-            view()->share([
-                'CategoryCount' => Cache::get('CategoryCount'),
-                'BrandCount' => Cache::get('BrandCount'),
-                'AdminCount' => Cache::get('AdminCount'),
-                'CouponCount' => Cache::get('CouponCount'),
-                'FaqCount' => Cache::get('FaqCount'),
-                'ContactCount' => Cache::get('ContactCount'),
-            ]);
-        });
+    //             Cache::remember('AdminCount', 60, function () {
+    //                 return Admin::count();
+    //             });
+    //         }
+    //         ########## Contact Count
+    //         if (!Cache::has('ContactCount')) {
+    //             Cache::remember('ContactCount', 60, function () {
+    //                 return Contact::where('is_read', 0)->count();
+    //             });
+    //         }
+    //         view()->share([
+    //             'CategoryCount' => Cache::get('CategoryCount'),
+    //             'BrandCount' => Cache::get('BrandCount'),
+    //             'AdminCount' => Cache::get('AdminCount'),
+    //             'CouponCount' => Cache::get('CouponCount'),
+    //             'FaqCount' => Cache::get('FaqCount'),
+    //             'ContactCount' => Cache::get('ContactCount'),
+    //         ]);
+    //     });
 
-        ///// Get Settings And Share
+    //     ///// Get Settings And Share
 
-        $setting = $this->getSettingOrCreate();
-        view()->share([
-            'setting' => $setting
-        ]);
-    }
+    //     $setting = $this->getSettingOrCreate();
+    //     view()->share([
+    //         'setting' => $setting
+    //     ]);
+    // }
     /**
      * Get the settings or create a new one if it doesn't exist.
      *
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      */
+    }
 
     public function getSettingOrCreate()
     {

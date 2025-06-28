@@ -26,9 +26,6 @@ class User extends Authenticatable
         'email',
         'password',
         'mobile',
-        'country_id',
-        'governrate_id',
-        'city_id',
     ];
 
     /**
@@ -40,27 +37,6 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-
-    public function country()
-    {
-        return $this->belongsTo(Country::class,'country_id');
-    }
-    public function governorate()
-    {
-        return $this->belongsTo(GovernRate::class,'governrate_id');
-    }
-    public function city()
-    {
-        return $this->belongsTo(City::class,'city_id');
-    }
-    public function status()
-    {
-        return $this->is_active == 1 ? 'مفعل' : 'غير مفعل';
-    }
-    public function orders()
-    {
-        return $this->hasMany(Order::class,'user_id');
-    }
 
     /**
      * Get the attributes that should be cast.
