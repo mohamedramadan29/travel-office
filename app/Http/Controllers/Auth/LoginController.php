@@ -40,7 +40,7 @@ class LoginController extends Controller
     }
     public function showLoginForm()
     {
-        return view('front.auth.login');
+        return view('admin.auth.login');
     }
     protected function authenticated(Request $request, $user)
     {

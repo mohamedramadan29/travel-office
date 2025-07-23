@@ -98,3 +98,23 @@ code[class*='language-'], pre[class*='language-'] {
 .jp-card .jp-card-front .jp-card-lower .jp-card-expiry {
   right : 65%;
 }
+
+.main-menu.menu-dark .navigation{
+    background: #2A3B4C;
+}
+.main-menu .main-menu-content{
+    background: #2A3B4C;
+}
+.main-menu.menu-dark .navigation > li.open > a{
+    background-color: #22303F;
+}
+.main-menu.menu-dark .navigation > li ul li{
+    background-color: #1a2530;
+}
+.btn-primary,
+.btn-primary:hover {
+    border-color: #1a2530 !important;
+    background-color: #1a2530 !important;
+    color: #FFFFFF;
+}
+

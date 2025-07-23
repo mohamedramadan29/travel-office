@@ -20,6 +20,9 @@ return new class extends Migration
             $table->string('whatsapp')->nullable()->unique();
             $table->double('balance', 8, 2)->default(0);
             $table->tinyInteger('status')->default(1);
+            $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('country')->nullable();
             $table->timestamps();
         });
     }

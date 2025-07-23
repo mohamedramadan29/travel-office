@@ -56,38 +56,10 @@
                                                         <div class="form-group">
                                                             <label for="projectinput1"> اسم القسم </label>
                                                             <input type="text" id="projectinput1" class="form-control"
-                                                                placeholder="  " name="name[ar]"
-                                                                value="{{ $category->getTranslation('name', 'ar') }}">
+                                                                placeholder="  " name="name"
+                                                                value="{{ $category->name }}">
                                                         </div>
                                                     </div>
-
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="projectinput1"> اسم القسم بالانجليزي </label>
-                                                            <input type="text" id="projectinput1" class="form-control"
-                                                                placeholder="  " name="name[en]"
-                                                                value="{{ $category->getTranslation('name', 'en') }}">
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-
-                                                <div class="row">
-
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="projectinput3"> حدد الاب </label>
-                                                            <select name="parent" id="" class="form-control">
-                                                                <option value=""> -- حدد الاب -- </option>
-                                                                <option value="" {{ $category->parent == null ? 'selected' : '' }}> قسم رئيسي </option>
-                                                                @foreach ($categories as $cat)
-                                                                    <option value="{{ $cat['id'] }}" @selected($cat['id'] == $category->parent)>
-                                                                        {{ $cat['name'] }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="projectinput1"> حالة القسم </label>
@@ -104,13 +76,12 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                             </div>
                                             <div class="form-actions">
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
                                                 </button>
-                                                <a href="{{ url()->previous() }}" type="button" class="mr-1 btn btn-warning">
+                                                <a href="{{ route('dashboard.categories.index') }}" type="button" class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> رجوع
                                                 </a>
 

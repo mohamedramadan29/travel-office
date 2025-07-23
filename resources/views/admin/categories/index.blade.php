@@ -1,10 +1,6 @@
 @extends('admin.layouts.app')
-
 @section('title', ' الاقسام ')
-
 @section('css')
-
-
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.min.css">
     {{-- <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.2/css/buttons.dataTables.min.css"> --}}
 
@@ -54,22 +50,41 @@
                                     @include('admin.layouts.toaster_success')
 
                                     <div class="table-responsive">
-                                        <table id="yajra_datatable"
+                                        <table
                                             class="table table-striped table-bordered column-rendering">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
                                                     <th> الاسم </th>
                                                     <th> الحالة </th>
-                                                    <th> عدد المنتجات </th>
                                                     <th> تاريخ الانشاء </th>
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @forelse ($categories as $category)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $category->name }}</td>
+                                                        <td>
+                                                            @if($category->status == 1)
+                                                                <span class="badge badge-success">مفعل</span>
+                                                            @else
+                                                                <span class="badge badge-danger">غير مفعل</span>
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ $category->created_at }}</td>
+                                                        <td>
+                                                            @include('admin.categories.actions', ['category' => $category])
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <td colspan="4"> لا يوجد بيانات </td>
+                                                @endforelse
 
                                             </tbody>
                                         </table>
+                                        {{ $categories->links() }}
                                     </div>
                                 </div>
                             </div>
@@ -111,10 +126,6 @@
                     {
                         data: 'status',
                         name: 'status',
-                    },
-                    {
-                        data: 'products_count',
-                        name: 'products_count',
                     },
                     {
                         data: 'created_at',

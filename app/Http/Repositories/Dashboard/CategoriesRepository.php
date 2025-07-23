@@ -10,7 +10,7 @@ class CategoriesRepository
 
     public function getAll()
     {
-        $categories = Category::all();
+        $categories = Category::paginate(10);
         return $categories;
     }
 
@@ -45,26 +45,4 @@ class CategoriesRepository
         $category = $category->delete();
         return $category;
     }
-
-
-    ########### Get Parent Categories
-
-    public function getParentCategories(){
-        $categories = Category::whereNull('parent')->get();
-        return $categories;
-    }
-
-    public function getCategoriesExceptionChildren($id)
-    {
-        $categories = Category::where('id', '!=', $id)
-            //->whereDoesntHave('Childrens')
-            ->whereNull('parent')
-            ->get();
-        return $categories;
-    }
-
-
-
-
-
 }

@@ -1,17 +1,17 @@
 @extends('admin.layouts.app')
-@section('title', 'ادارة الصلاحيات ')
+@section('title', 'الموردين ')
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> ادارة الصلاحيات </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block"> ادارة الموردين </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item active"> ادارة الصلاحيات
+                                <li class="breadcrumb-item active"> ادارة الموردين
                                 </li>
                             </ol>
                         </div>
@@ -28,7 +28,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <a href="{{ route('dashboard.roles.create') }}" class="btn btn-primary"> اضافة صلاحية </a>
+                                <a href="{{ route('dashboard.suppliers.create') }}" class="btn btn-primary"> اضافة مورد </a>
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">
@@ -37,26 +37,27 @@
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th> اسم الصلاحية </th>
-                                                    <th> الصلاحيات </th>
+                                                    <th> الاسم </th>
+                                                    <th> رقم الهاتف </th>
+                                                    <th> رقم التيلغرام </th>
+                                                    <th> رقم الواتساب </th>
+                                                    <th> الحالة </th>
+                                                    <th> تاريخ الانشاء </th>
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ($roles as $role)
+                                                @forelse ($suppliers as $supplier)
                                                     <tr>
-                                                        <th scope="row">{{ $role->iteration }}</th>
-                                                        <td> {{ $role->role }} </td>
-                                                        <td>
-                                                            @foreach ($role['permission'] as $permission)
-                                                                @foreach (config('permissions') as $key => $value)
-                                                                    @if ($key == $permission)
-                                                                        <span class="badge badge-info"> {{ $value }}
-                                                                        </span>
-                                                                    @endif
-                                                                @endforeach
-                                                            @endforeach
+                                                        <th scope="row">{{ $loop->iteration }}</th>
+                                                        <td> {{ $supplier->name }} </td>
+                                                        <td> {{ $supplier->mobile }} </td>
+                                                        <td> {{ $supplier->telegram }} </td>
+                                                        <td> {{ $supplier->whatsapp }} </td>
+                                                        <td> <span
+                                                                class="badge badge-pill badge-{{ $supplier->status == 'نشط' ? 'success' : 'danger' }}">{{ $supplier->status }}</span>
                                                         </td>
+                                                        <td> {{ $supplier->created_at->format('Y-m-d') }} </td>
                                                         <td>
                                                             <div class="dropdown float-md-left">
                                                                 <button class="px-2 btn btn-primary dropdown-toggle"
@@ -66,13 +67,20 @@
                                                                 <div class="dropdown-menu"
                                                                     aria-labelledby="dropdownBreadcrumbButton"><a
                                                                         class="dropdown-item"
-                                                                        href="{{ route('dashboard.roles.edit', $role->id) }}"><i
+                                                                        href="{{ route('dashboard.suppliers.edit', $supplier->id) }}"><i
                                                                             class="la la-edit"></i> تعديل </a>
-                                                                            <form action="{{ route('dashboard.roles.destroy', $role->id) }}" method="get">
-                                                                                @csrf
-                                                                                <button type="submit" class="dropdown-item delete_confirm"><i
-                                                                                    class="la la-trash"></i> حذف </button>
-                                                                            </form>
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('dashboard.suppliers.status', $supplier->id) }}"><i
+                                                                            class="la la-edit"></i> تعديل الحالة </a>
+                                                                    <form
+                                                                        action="{{ route('dashboard.suppliers.destroy', $supplier->id) }}"
+                                                                        method="post">
+                                                                        @csrf
+                                                                        @method('delete')
+                                                                        <button type="submit"
+                                                                            class="dropdown-item delete_confirm"><i
+                                                                                class="la la-trash"></i> حذف </button>
+                                                                    </form>
 
                                                                 </div>
                                                             </div>
@@ -83,7 +91,7 @@
                                                 @endforelse
                                             </tbody>
                                         </table>
-                                        {{ $roles->links() }}
+                                        {{ $suppliers->links() }}
                                     </div>
                                 </div>
 

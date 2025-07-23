@@ -12,7 +12,7 @@ class AdminRepository
     /////////////// Get All  Admins /////////////
     public function getAdmins()
     {
-        $admins = Admin::paginate(1);
+        $admins = Admin::paginate(10);
         return $admins;
     }
 
@@ -26,13 +26,13 @@ class AdminRepository
     ////////////// Store Admin ////////////
     public function storeAdmin($request)
     {
-        $admin = Admin::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-            'role_id' => $request->role_id,
-            'status' => $request->status,
-        ]);
+        $admin = new Admin();
+        $admin->name = $request['name'];
+        $admin->email = $request['email'];
+        $admin->password = bcrypt($request['password']); // تشفير كلمة المرور
+        $admin->role_id = $request['role_id'];
+        $admin->status = $request['status'];
+        $admin->save();
         return $admin;
     }
     /////////////////// Update Admin ////////////

@@ -53,7 +53,7 @@
                         <a class="navbar-brand" href="index.html">
                             <img class="brand-logo" alt="modern admin logo"
                                 src="{{ asset('assets/admin') }}/images/logo/logo.png">
-                            <h3 class="brand-text">Modern Admin</h3>
+                            <h3 class="brand-text"> {{ $setting->site_name }} </h3>
                         </a>
                     </li>
                     <li class="nav-item d-md-none">
@@ -64,35 +64,7 @@
             </div>
             <div class="navbar-container">
                 <div class="collapse navbar-collapse justify-content-end" id="navbar-mobile">
-                    <ul class="nav navbar-nav">
 
-                        <li class="dropdown dropdown-language nav-item">
-                            <a class="dropdown-toggle nav-link" id="dropdown-flag" href="#" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false"><i
-                                    class="flag-icon @if (Config::get('app.locale') == 'ar') flag-icon-eg  @else flag-icon-gb @endif "></i><span
-                                    class="selected-language"></span>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdown-flag">
-                                @foreach (LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
-                                    <a class="dropdown-item" rel="alternate" hreflang="{{ $localeCode }}"
-                                        href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
-                                        <i
-                                            class="flag-icon @if ($localeCode == 'ar') flag-icon-eg
-                                            @else
-                                            flag-icon-gb @endif"></i>
-                                        {{ $properties['native'] }}
-                                    </a>
-                                @endforeach
-                            </div>
-                        </li>
-
-                        <li class="nav-item"><a class="mr-2 nav-link nav-link-label" href="index.html"><i
-                                    class="ficon ft-arrow-left"></i></a></li>
-                        <li class="dropdown nav-item">
-                            <a class="mr-2 nav-link nav-link-label" href="#" data-toggle="dropdown"><i
-                                    class="ficon ft-settings"></i></a>
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>
@@ -101,13 +73,9 @@
     @yield('content')
     <!-- ////////////////////////////////////////////////////////////////////////////-->
     <footer class="footer fixed-bottom footer-dark navbar-border navbar-shadow">
-        <p class="clearfix px-2 mb-0 blue-grey lighten-2 text-sm-center">
-            <span class="float-md-left d-block d-md-inline-block">Copyright &copy; 2018 <a
-                    class="text-bold-800 grey darken-2"
-                    href="https://themeforest.net/user/pixinvent/portfolio?ref=pixinvent" target="_blank">PIXINVENT
-                </a>, All rights reserved. </span>
-            <span class="float-md-right d-block d-md-inline-blockd-none d-lg-block">Hand-crafted & Made with <i
-                    class="ft-heart pink"></i></span>
+        <p class="px-2 mb-0 clearfix blue-grey lighten-2 text-sm-center">
+            <span class="float-md-left d-block d-md-inline-block"> جميع الحقوق محفوظة  &copy; {{ date('Y') }}  </span>
+
         </p>
     </footer>
     <!-- BEGIN VENDOR JS-->

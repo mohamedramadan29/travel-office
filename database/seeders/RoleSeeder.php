@@ -19,14 +19,11 @@ class RoleSeeder extends Seeder
         Role::truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         $permisions = [];
-        foreach (config('permissions_ar') as $key => $value) {
+        foreach (config('permissions') as $key => $value) {
             $permisions[] = $key;
         }
         Role::create([
-            'role' => [
-                'ar' => 'مدير',
-                'en' => 'Manager',
-            ],
+            'role' => 'مدير',
             'permission' => json_encode($permisions)
         ]);
     }

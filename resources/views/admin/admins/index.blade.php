@@ -52,7 +52,7 @@
                                                         <td> {{ $admin->name }} </td>
                                                         <td> {{ $admin->email }} </td>
                                                         <td> {{ $admin->role->role }} </td>
-                                                        <td> {{ $admin->status }} </td>
+                                                        <td> <span class="badge badge-pill badge-{{ $admin->status == 'نشط' ? 'success' : 'danger' }}">{{ $admin->status }}</span> </td>
                                                         <td> {{ $admin->created_at->format('Y-m-d') }} </td>
                                                         <td>
                                                             <div class="dropdown float-md-left">
@@ -68,9 +68,13 @@
                                                                     <a class="dropdown-item"
                                                                         href="{{ route('dashboard.admins.status', $admin->id) }}"><i
                                                                             class="la la-edit"></i> تعديل الحالة  </a>
-                                                                    <a class="dropdown-item"
-                                                                        href="{{ route('dashboard.admins.destroy', $admin->id) }}"><i
-                                                                            class="la la-trash"></i> حذف </a>
+                                                                            <form action="{{ route('dashboard.admins.destroy', $admin->id) }}" method="post">
+                                                                                @csrf
+                                                                                @method('delete')
+                                                                                <button type="submit" class="dropdown-item delete_confirm"><i
+                                                                                    class="la la-trash"></i> حذف </button>
+                                                                            </form>
+
                                                                 </div>
                                                             </div>
                                                         </td>

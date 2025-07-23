@@ -18,14 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             AdminSeeder::class,
-            CountrySeeder::class,
-            GovernrateSeeder::class,
-            CitySeeder::class,
-            CouponSeeder::class,
-            FaqSeeder::class,
-            AttributeSeeder::class,
-            UserSeeder::class,
-            ContactSeeder::class,
+            SettingSeeder::class,
         ]);
 
     }

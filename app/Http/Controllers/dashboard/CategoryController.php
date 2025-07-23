@@ -22,8 +22,9 @@ class CategoryController extends Controller
 
     public function index()
     {
+        $categories = $this->categoryService->getAll();
 
-        return view('admin.categories.index');
+        return view('admin.categories.index', compact('categories'));
     }
 
     public function CategoryAll()
@@ -34,8 +35,7 @@ class CategoryController extends Controller
 
     public function create()
     {
-        $categories = $this->categoryService->getParentCategories();
-        return view('admin.categories.create', compact('categories'));
+        return view('admin.categories.create');
     }
 
 
@@ -52,9 +52,8 @@ class CategoryController extends Controller
 
     public function edit(string $id)
     {
-        $categories = $this->categoryService->getCategoriesExceptionChildren($id);
         $category = $this->categoryService->findById($id);
-        return view('admin.categories.update', compact('categories','category'));
+        return view('admin.categories.update', compact('category'));
     }
 
     public function update(CategoryRequest $request, string $id)

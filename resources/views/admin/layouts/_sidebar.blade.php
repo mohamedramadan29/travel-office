@@ -6,10 +6,45 @@
                       href="{{ route('dashboard.welcome') }}"><i class="la la-home"></i><span class="menu-title"
                           data-i18n="nav.dash.main">الرئيسية</span></a>
               </li>
+              @can('suppliers')
+                  <li class="nav-item {{ Route::is('dashboard.suppliers.*') ? 'active' : '' }}"><a href="#"> <i class="bi bi-buildings"></i> <span class="menu-title" data-i18n="nav.role.main"> الموردين
+                          </span><span class="float-right mr-2 badge badge-info badge-pill"> {{ $SuppliersCount }} </span>
+                      </a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.suppliers.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.suppliers.index') }}"
+                                  data-i18n="nav.role.index">
+                                  جميع الموردين </a>
+                          </li>
+                          <li class="{{ Route::is('dashboard.suppliers.create') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.suppliers.create') }}"
+                                  data-i18n="nav.templates.vert.classic_menu"> <i class="la la-plus"></i> <span
+                                      class="menu-title"> اضافة مورد جديد </a>
+                          </li>
+                      </ul>
+                  </li>
+              @endcan
+              @can('clients')
+              <li class="nav-item {{ Route::is('dashboard.clients.*') ? 'active' : '' }}"><a href="#"> <i class="bi bi-people-fill"></i> <span class="menu-title" data-i18n="nav.role.main"> العملاء
+                      </span><span class="float-right mr-2 badge badge-info badge-pill"> {{ $ClientsCount }} </span>
+                  </a>
+                  <ul class="menu-content">
+                      <li class="{{ Route::is('dashboard.clients.index') ? 'active' : '' }}">
+                          <a class="menu-item" href="{{ route('dashboard.clients.index') }}"
+                              data-i18n="nav.role.index">
+                              جميع العملاء </a>
+                      </li>
+                      <li class="{{ Route::is('dashboard.clients.create') ? 'active' : '' }}">
+                          <a class="menu-item" href="{{ route('dashboard.clients.create') }}"
+                              data-i18n="nav.templates.vert.classic_menu"> <i class="la la-plus"></i> <span
+                                  class="menu-title"> اضافة عميل جديد </a>
+                      </li>
+                  </ul>
+              </li>
+          @endcan
               @can('categories')
-                  <li class="nav-item {{ Route::is('dashboard.categories.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> الاقسام
-                          </span><span class="float-right mr-2 badge badge-info badge-pill"> {{ $CategoryCount }} </span>
+                  <li class="nav-item {{ Route::is('dashboard.categories.*') ? 'active' : '' }}"><a href="#"> <i class="bi bi-bookmarks-fill"></i> <span class="menu-title" data-i18n="nav.role.main"> الاقسام
+                          </span><span class="float-right mr-2 badge badge-info badge-pill"> {{ $CategoriesCount }} </span>
                       </a>
                       <ul class="menu-content">
                           <li class="{{ Route::is('dashboard.categories.index') ? 'active' : '' }}">
@@ -25,83 +60,9 @@
                       </ul>
                   </li>
               @endcan
-              @can('brands')
-                  <li class="nav-item {{ Route::is('dashboard.brands.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> العلامات
-                              التجارية
-                          </span> <span class="float-right mr-2 badge badge-info badge-pill"> {{ $BrandCount }}
-                          </span></a>
-                      <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.brands.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.brands.index') }}" data-i18n="nav.role.index">
-                                  جميع العلامات التجارية </a>
-                          </li>
-
-                      </ul>
-                  </li>
-              @endcan
-
-              <li class="nav-item {{ Route::is('dashboard.attributes.*') ? 'active' : '' }}"><a href="#"><i
-                          class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> المنتجات
-                      </span> <span class="float-right mr-2 badge badge-info badge-pill"> {{ $BrandCount }}
-                      </span></a>
-                  <ul class="menu-content">
-                      @can('attribute')
-                          <li class="{{ Route::is('dashboard.attributes.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.attributes.index') }}"
-                                  data-i18n="nav.role.index">
-                                  سمات المنتجات </a>
-                          </li>
-                      @endcan
-                      @can('products')
-                          <li class="{{ Route::is('dashboard.products.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.products.index') }}"
-                                  data-i18n="nav.role.index">
-                                  المنتجات </a>
-                          </li>
-                          <li class="{{ Route::is('dashboard.products.create') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.products.create') }}"
-                                  data-i18n="nav.role.index">
-                                  اضافة منتج </a>
-                          </li>
-                      @endcan
-
-                  </ul>
-              </li>
-
-              @can('coupons')
-                  <li class="nav-item {{ Route::is('dashboard.coupons.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> الكوبونات
-                          </span> <span class="float-right mr-2 badge badge-info badge-pill"> {{ $CouponCount }}
-                          </span></a>
-                      <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.coupons.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.coupons.index') }}"
-                                  data-i18n="nav.role.index">
-                                  جميع الكوبونات </a>
-                          </li>
-
-                      </ul>
-                  </li>
-              @endcan
-              @can('faqs')
-                  <li class="nav-item {{ Route::is('dashboard.faqs.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> الاسئلة
-                              الشائعة
-                          </span> <span class="float-right mr-2 badge badge-info badge-pill"> {{ $FaqCount }}
-                          </span></a>
-                      <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.faqs.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.faqs.index') }}" data-i18n="nav.role.index">
-                                  جميع الاسئلة الشائعة </a>
-                          </li>
-
-                      </ul>
-                  </li>
-              @endcan
               @can('roles')
-                  <li class="nav-item {{ Route::is('dashboard.roles.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> الصلاحيات
+                  <li class="nav-item {{ Route::is('dashboard.roles.*') ? 'active' : '' }}"><a href="#"><i class="bi bi-key-fill"></i><span class="menu-title" data-i18n="nav.role.main"> الصلاحيات
+                          </span><span class="float-right mr-2 badge badge-info badge-pill"> {{ $PermissionsCount }}
                           </span></a>
                       <ul class="menu-content">
                           <li class="{{ Route::is('dashboard.roles.index') ? 'active' : '' }}">
@@ -118,8 +79,7 @@
               @endcan
 
               @can('admins')
-                  <li class="nav-item{{ Route::is('dashboard.admins.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-user"></i><span class="menu-title" data-i18n="nav.users.main"> الموظفين
+                  <li class="nav-item{{ Route::is('dashboard.admins.*') ? 'active' : '' }}"><a href="#"><i class="bi bi-people"></i><span class="menu-title" data-i18n="nav.users.main"> الموظفين
                           </span><span class="float-right mr-2 badge badge-info badge-pill"> {{ $AdminCount }}
                           </span></a>
                       <ul class="menu-content">
@@ -136,45 +96,7 @@
                       </ul>
                   </li>
               @endcan
-              @can('admins')
-                  <li class="nav-item{{ Route::is('dashboard.world.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-user"></i><span class="menu-title" data-i18n="nav.users.main"> الدول والشحن
-                          </span></a>
-                      <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.world.countries') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.world.countries') }}"
-                                  data-i18n="nav.users.user_profile"> ادارة الدول
-                              </a>
-                          </li>
-                      </ul>
-                  </li>
-              @endcan
-              @can('users')
-                  <li class="nav-item{{ Route::is('dashboard.users.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-users"></i><span class="menu-title" data-i18n="nav.users.main"> المستخدمين
-                          </span></a>
-                      <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.users.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.users.index') }}"
-                                  data-i18n="nav.users.user_profile"> ادارة المستخدمين
-                              </a>
-                          </li>
-                      </ul>
-                  </li>
-              @endcan
-              @can('contacts')
-              <li class="nav-item{{ Route::is('dashboard.contacts.*') ? 'active' : '' }}"><a href="#"><i
-                          class="la la-users"></i><span class="menu-title" data-i18n="nav.users.main"> الاتصالات
-                      </span> <span class="float-right mr-2 badge badge-info badge-pill"> {{ $ContactCount }} </span> </a>
-                  <ul class="menu-content">
-                      <li class="{{ Route::is('dashboard.contacts.index') ? 'active' : '' }}">
-                          <a class="menu-item" href="{{ route('dashboard.contacts.index') }}"
-                              data-i18n="nav.users.user_profile"> ادارة الاتصالات
-                          </a>
-                      </li>
-                  </ul>
-              </li>
-          @endcan
+ 
               @can('settings')
                   <li class="nav-item{{ Route::is('dashboard.settings.*') ? 'active' : '' }}"><a href="#"><i
                               class="la la-dashboard"></i><span class="menu-title" data-i18n="nav.users.main"> الاعدادات
@@ -183,11 +105,6 @@
                           <li class="{{ Route::is('dashboard.settings.index') ? 'active' : '' }}">
                               <a class="menu-item" href="{{ route('dashboard.settings.index') }}"
                                   data-i18n="nav.users.user_profile"> ادارة الاعدادات
-                              </a>
-                          </li>
-                          <li class="{{ Route::is('dashboard.sliders.*') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.sliders.index') }}"
-                                  data-i18n="nav.users.user_profile"> ادارة البنرات
                               </a>
                           </li>
                       </ul>

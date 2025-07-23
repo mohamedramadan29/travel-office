@@ -12,7 +12,8 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id'
+        'role_id',
+        'status'
     ];
     protected $hidden = [
         'password',
@@ -46,7 +47,7 @@ class Admin extends Authenticatable
 
     ///////// Use Acceessories
     public function getStatusAttribute($value){
-        return $value == 1 ? 'active' : 'inactive';
+        return $value == 1 ? 'نشط' : 'غير نشط';
     }
 
 }

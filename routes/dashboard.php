@@ -4,30 +4,23 @@ use Livewire\Livewire;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\dashboard\{
-    FaqController,
     AdminController,
-    BrandController,
     RolesController,
-    WorldController,
-    CouponController,
-    ProductController,
     SettingController,
     WelcomeController,
     CategoryController,
-    AttributeController,
-    SliderController,
     UserController,
-    ContactController
+    SuppliersController,
+    ClientsController,
 };
 use App\Http\Controllers\dashboard\auth\AuthController;
-use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+//use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
 use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
 
 Route::group([
-    'prefix' => LaravelLocalization::setLocale() . '/dashboard',
+    'prefix' =>'/dashboard',
     'as' => 'dashboard.',
-    'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'localeViewPath']
 ], function () {
 
     ##################### Auth Login Controller  ########################
@@ -77,49 +70,31 @@ Route::group([
 
         ##################### Start Admins Routes #########################
         Route::group(['middleware' => 'can:admins'], function () {
-            Route::resource('admins', AdminController::class);
+            Route::resource('admins', AdminController::class)->except(['show']);
             Route::get('admins/status/{id}', [AdminController::class, 'ChangeStatus'])->name('admins.status');
         });
         ################### End Admins Routes ###########################
-
-        ################ Start World Routes #######################
-        Route::group(['middleware' => 'can:global_shipping', 'prefix' => 'world', 'as' => 'world.'], function () {
-            Route::controller(WorldController::class)->group(function () {
-                Route::get('countries', 'AllCountry')->name('countries');
-                Route::get('countries/status/{id}', 'UpdateStatus')->name('update_status');
-                Route::get('governorates/{country_id}', 'GovernorateByCountry')->name('governorates');
-                Route::get('governorates/status/{id}', 'UpdateGovernrateStatus')->name('update_status_governorates');
-                Route::post('governorate/change_price/{id}', 'GovernrateChangePrice')->name('GovernrateChangePrice');
-            });
+        ##################### Start Suppliers Routes ####################
+        Route::group(['middleware' => 'can:suppliers'], function () {
+            Route::resource('suppliers', SuppliersController::class);
+            Route::get('suppliers/status/{id}', [SuppliersController::class, 'ChangeStatus'])->name('suppliers.status');
         });
-        ################# End World Routes #######################
+        ##################### End Suppliers Routes ######################
+
+        ##################### Start Clients Routes ####################
+        Route::group(['middleware' => 'can:clients'], function () {
+            Route::resource('clients', ClientsController::class);
+            Route::get('clients/status/{id}', [ClientsController::class, 'ChangeStatus'])->name('clients.status');
+        });
+        ##################### End Clients Routes ######################
+
+
         ################# Start Categories Routes #####################
         Route::group(['middleware' => 'can:categories'], function () {
             Route::resource('categories', CategoryController::class);
             Route::get('categories-all', [CategoryController::class, 'CategoryAll'])->name('categories.all');
         });
         ################# End Categories Routes #######################
-
-        ################# Start Brands Routes #####################
-        Route::group(['middleware' => 'can:brands'], function () {
-            Route::resource('brands', BrandController::class);
-            Route::get('brands-all', [BrandController::class, 'BrandsAll'])->name('brands.all');
-        });
-        ################# End Brands Routes #######################
-
-        ################# Start Coupons  Routes #####################
-        Route::group(['middleware' => 'can:coupons'], function () {
-            Route::resource('coupons', CouponController::class);
-            Route::get('coupons-all', [CouponController::class, 'CouponsAll'])->name('coupons.all');
-        });
-        ################# End Coupons Routes #######################
-
-        ################ Start Faqs Routes #######################
-        Route::group(['middleware' => 'can:faqs'], function () {
-            Route::resource('faqs', FaqController::class);
-            Route::get('faqs-all', [FaqController::class, 'FaqsAll'])->name('faqs.all');
-        });
-        ################# End Faqs Routes #######################
 
         ################ Start Settings Routes #######################
         Route::group(['middleware' => 'can:settings', 'prefix' => 'settings', 'as' => 'settings.'], function () {
@@ -129,51 +104,6 @@ Route::group([
             });
         });
         ################# End Settings Routes #######################
-        ################# Start Attribute Routes ####################
-        Route::group(['middleware' => 'can:attribute'], function () {
-            Route::resource('attributes', AttributeController::class);
-            Route::get('attributes-all', [AttributeController::class, 'AttributesAll'])->name('attributes.all');
-        });
-        ################ End Attribute Routes #######################
-        ########
 
-        ################# Start Product Routes ####################
-        ####### LiveWire
-        Livewire::setUpdateRoute(function ($handle) {
-            return Route::post('/custom/livewire/update', $handle);
-        });
-        Route::group(['middleware' => 'can:products'], function () {
-            Route::resource('products', ProductController::class);
-            Route::post('product/status', [ProductController::class, 'ChangeStatus'])->name('product.status');
-            Route::get('products-all', [ProductController::class, 'ProductAll'])->name('products.all');
-            Route::get('product/vartiants/{vartiant_id}', [ProductController::class, 'DeleteVartiant'])->name('product.vartiants.delete');
-        });
-        ################ End Product Routes #######################
-           ################ Start Sliders Routes #######################
-           Route::group(['middleware' => 'can:settings'], function () {
-            Route::controller(SliderController::class)->group(function(){
-                Route::get('sliders','index')->name('sliders.index');
-                Route::post('slider/store','store')->name('slider.store');
-                Route::get('sliders-all','getAll')->name('sliders.all');
-                Route::get('slider/delete/{id}','destroy')->name('slider.delete');
-            });
-        });
-        ################# End Sliders Routes #######################
-        ################# Start Users Routes #####################
-
-        Route::group(['middleware' => 'can:users'], function () {
-            Route::resource('users', UserController::class);
-            Route::get('users-all', [UserController::class, 'getAll'])->name('users.all');
-            Route::post('users/status', [UserController::class, 'ChangeStatus'])->name('users.status');
-
-        });
-        ################# End Users Routes #######################
-        ################# Start Contacts Routes ##################
-        Route::group(['middleware' => 'can:contacts'], function () {
-            Route::controller(ContactController::class)->group(function(){
-                Route::get('contacts','index')->name('contacts.index');
-            });
-        });
-        ################## End Contacts Routes ###################
     });
 });

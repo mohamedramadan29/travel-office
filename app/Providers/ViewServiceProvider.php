@@ -2,13 +2,12 @@
 
 namespace App\Providers;
 
-use App\Models\admin\Faq;
+use App\Models\admin\Role;
 use App\Models\admin\Admin;
-use App\Models\admin\Brand;
-use App\Models\admin\Coupon;
-use App\Models\admin\Contact;
+use App\Models\admin\Client;
 use App\Models\admin\Setting;
 use App\Models\admin\Category;
+use App\Models\admin\Supplier;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,105 +26,56 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-    //     view()->composer('admin.*', function () {
-    //         ####### CategoryCount
-    //         if (!Cache::has("CategoryCount")) {
-    //             Cache::remember('CategoryCount', 60, function () {
-    //                 return Category::count();
-    //             });
-    //         }
 
-    //         ########## Brand Count
-    //         if (!Cache::has('BrandCount')) {
-    //             Cache::remember('BrandCount', 60, function () {
-    //                 return Brand::count();
-    //             });
-    //         }
+        ########## Admin Count
+        if (!Cache::has('AdminCount')) {
+            Cache::remember('AdminCount', 60, function () {
+                return Admin::count();
+            });
+        }
+         ########## Permissions Count
+         if (!Cache::has('PermissionsCount')) {
+            Cache::remember('PermissionsCount', 60, function () {
+                return Role::count();
+            });
+        }
+        ######## Categories Count
+        if (!Cache::has('CategoriesCount')) {
+            Cache::remember('CategoriesCount', 60, function () {
+                return Category::count();
+            });
+        }
+        ######## Suppliers Count
+        if (!Cache::has('SuppliersCount')) {
+            Cache::remember('SuppliersCount', 60, function () {
+                return Supplier::count();
+            });
+        }
+        ######## Clients Count
+        if (!Cache::has('ClientsCount')) {
+            Cache::remember('ClientsCount', 60, function () {
+                return Client::count();
+            });
+        }
+        view()->share([
+            'AdminCount' => Cache::get('AdminCount'),
+            'PermissionsCount' => Cache::get('PermissionsCount'),
+            'CategoriesCount' => Cache::get('CategoriesCount'),
+            'SuppliersCount' => Cache::get('SuppliersCount'),
+            'ClientsCount' => Cache::get('ClientsCount'),
+        ]);
 
-    //         ########## Coupon Count
-    //         if (!Cache::has('CouponCount')) {
-    //             Cache::remember('CouponCount', 60, function () {
-    //                 return Coupon::count();
-    //             });
-    //         }
-    //         ########## Faq Count
-    //         if (!Cache::has('FaqCount')) {
-    //             Cache::remember('FaqCount', 60, function () {
-    //                 return Faq::count();
-    //             });
-    //         }
-    //         ########## Admin Count
-    //         if (!Cache::has('AdminCount')) {
 
-    //             Cache::remember('AdminCount', 60, function () {
-    //                 return Admin::count();
-    //             });
-    //         }
-    //         ########## Contact Count
-    //         if (!Cache::has('ContactCount')) {
-    //             Cache::remember('ContactCount', 60, function () {
-    //                 return Contact::where('is_read', 0)->count();
-    //             });
-    //         }
-    //         view()->share([
-    //             'CategoryCount' => Cache::get('CategoryCount'),
-    //             'BrandCount' => Cache::get('BrandCount'),
-    //             'AdminCount' => Cache::get('AdminCount'),
-    //             'CouponCount' => Cache::get('CouponCount'),
-    //             'FaqCount' => Cache::get('FaqCount'),
-    //             'ContactCount' => Cache::get('ContactCount'),
-    //         ]);
-    //     });
+    ///// Get Settings And Share
 
-    //     ///// Get Settings And Share
-
-    //     $setting = $this->getSettingOrCreate();
-    //     view()->share([
-    //         'setting' => $setting
-    //     ]);
-    // }
     /**
      * Get the settings or create a new one if it doesn't exist.
      *
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      */
+    view()->share([
+        'setting' => Setting::first(),
+    ]);
     }
 
-    public function getSettingOrCreate()
-    {
-        $getsetting = Setting::firstOr(function () {
-            return Setting::create([
-                'site_name' => [
-                    'en' => 'Ecommerce',
-                    'ar' => 'تجارة إلكترونية',
-                ],
-                'site_desc' => [
-                    'en' => 'Ecommerce',
-                    'ar' => 'تجارة إلكترونية',
-                ],
-                'site_phone' => '01011642731',
-                'site_email' => 'b1YtM@example.com',
-                'site_address' => [
-                    'en' => 'cairo',
-                    'ar' => 'القاهرة',
-                ],
-                'email_support' => 'b1YtM@example.com',
-                'facebook_url' => 'https://www.facebook.com/',
-                'twitter_url' => 'https://twitter.com/',
-                'youtube_url' => 'https://www.youtube.com/',
-                'favicon' => '/uploads/settings/favicon.png',
-                'logo' => '/uploads/settings/logo.png',
-                'meta_description' => [
-                    'en' => 'Ecommerce',
-                    'ar' => 'تجارة إلكترونية',
-                ],
-                'site_copyright' => [
-                    'en' => 'Ecommerce',
-                    'ar' => 'تجارة إلكترونية',
-                ],
-                'promotion_video_url' => 'https://www.youtube.com/watch?v=example',
-            ]);
-        });
-        return $getsetting;
-    }
 }

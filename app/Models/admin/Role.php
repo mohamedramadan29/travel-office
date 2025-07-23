@@ -8,9 +8,9 @@ use Spatie\Translatable\HasTranslations;
 class Role extends Model
 {
 
-    use HasTranslations;
+   // use HasTranslations;
     protected $guarded = [];
-    public $translatable = ['role'];
+    //public $translatable = ['role'];
 
     public function getPermissionAttribute($value){
         return json_decode($value);

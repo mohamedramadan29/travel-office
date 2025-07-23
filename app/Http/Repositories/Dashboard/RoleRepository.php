@@ -11,16 +11,13 @@ class RoleRepository
         $data = $request->all();
         $role = new Role();
         $role->create([
-            'role' => [
-                'ar' => $data['role']['ar'],
-                'en' => $data['role']['en'],
-            ],
+            'role' => $data['role'],
             'permission' => json_encode($data['permissions'])
         ]);
         return $role;
     }
     public function getRoles(){
-        $roles = Role:: paginate(1);
+        $roles = Role:: paginate(10);
         return $roles;
     }
 
@@ -32,10 +29,7 @@ class RoleRepository
     public function updaterole($request,$role){
         $data = $request->all();
         $role->update([
-            'role' => [
-                'ar' => $data['role']['ar'],
-                'en' => $data['role']['en'],
-            ],
+            'role' => $data['role'],
             'permission' => json_encode($data['permissions'])
         ]);
         return $role;

@@ -54,35 +54,8 @@
                                                         <div class="form-group">
                                                             <label for="projectinput1"> اسم القسم </label>
                                                             <input type="text" id="projectinput1" class="form-control"
-                                                                placeholder="  " name="name[ar]"
-                                                                value="{{ old('name.ar') }}">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="projectinput1"> اسم القسم بالانجليزي </label>
-                                                            <input type="text" id="projectinput1" class="form-control"
-                                                                placeholder="  " name="name[en]"
-                                                                value="{{ old('name.en') }}">
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-
-                                                <div class="row">
-
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="projectinput3"> حدد الاب </label>
-                                                            <select name="parent" id="" class="form-control">
-                                                                <option value=""> -- حدد الاب -- </option>
-                                                                <option value=""> قسم رئيسي </option>
-                                                                @foreach ($categories as $cat)
-                                                                    <option value="{{ $cat['id'] }}" @selected($cat['id'] == old('parent'))>
-                                                                        {{ $cat['name'] }}</option>
-                                                                @endforeach
-                                                            </select>
+                                                                placeholder="  " name="name"
+                                                                value="{{ old('name') }}">
                                                         </div>
                                                     </div>
 
@@ -102,13 +75,12 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                             </div>
                                             <div class="form-actions">
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
                                                 </button>
-                                                <a href="{{ url()->previous() }}" type="button" class="mr-1 btn btn-warning">
+                                                <a href="{{ route('dashboard.categories.index') }}" type="button" class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> رجوع
                                                 </a>
 

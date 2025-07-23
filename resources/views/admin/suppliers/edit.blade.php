@@ -1,21 +1,21 @@
 @extends('admin.layouts.app')
 @section('title')
-    اضافة موظف جديد
+    تعديل مورد
 @endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block">اضافة موظف جديد</h3>
+                    <h3 class="mb-0 content-header-title d-inline-block">تعديل مورد</h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.admins.index') }}">الموظفين</a>
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.suppliers.index') }}">الموردين</a>
                                 </li>
-                                <li class="breadcrumb-item active"><a href="#">اضافة موظف جديد</a>
+                                <li class="breadcrumb-item active"><a href="#">تعديل مورد</a>
                                 </li>
                             </ol>
                         </div>
@@ -30,32 +30,32 @@
                             <div class="card">
 
                                 <div class="card-header">
-                                    <h4 class="card-title" id="basic-layout-colored-form-control">اضافة موظف جديد</h4>
+                                    <h4 class="card-title" id="basic-layout-colored-form-control">تعديل مورد</h4>
                                     <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
 
                                 </div>
                                 <div class="card-content collapse show">
                                     <div class="card-body">
                                         @include('admin.layouts.validation_errors')
-                                        <form class="form" action="{{ route('dashboard.admins.store') }}" method="POST">
+                                        <form class="form" action="{{ route('dashboard.suppliers.update', $supplier->id) }}"
+                                            method="POST">
                                             @csrf
+                                            @method('PUT')
                                             <div class="form-body">
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="userinput1"> اسم الموظف</label>
-                                                            <input type="text" id="userinput1"
-                                                                class="form-control"
-                                                                name="name">
+                                                            <label for="userinput1"> اسم المورد</label>
+                                                            <input type="text" id="userinput1" class="form-control"
+                                                                name="name" value="{{ $supplier->name }}">
                                                         </div>
 
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="userinput1"> البريد الالكتروني</label>
-                                                            <input type="text" id="userinput1"
-                                                                class="form-control"
-                                                                name="email">
+                                                            <input type="email" id="userinput1" class="form-control"
+                                                                name="email" value="{{ $supplier->email }}">
                                                         </div>
 
                                                     </div>
@@ -63,19 +63,16 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="userinput1"> كلمة المرور</label>
-                                                            <input type="passwrod" id="userinput1"
-                                                                class="form-control"
-                                                                placeholder="" name="password">
+                                                            <label for="userinput1"> رقم الهاتف</label>
+                                                            <input type="number" id="userinput1" class="form-control"
+                                                                placeholder="" name="mobile" value="{{ $supplier->mobile }}">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="userinput1"> تاكيد كلمة المرور</label>
-                                                            <input type="password" id="userinput1"
-                                                                class="form-control"
-                                                                placeholder=""
-                                                                name="password_confirmation">
+                                                            <label for="userinput1"> رقم التيلغرام</label>
+                                                            <input type="number" id="userinput1" class="form-control"
+                                                                placeholder="" name="telegram" value="{{ $supplier->telegram }}">
                                                         </div>
 
                                                     </div>
@@ -83,33 +80,38 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label>الصلاحيه</label>
-                                                            <select class="form-control" name="role_id">
-                                                                <optgroup label="الصلاحيه">
-                                                                    @foreach ($roles as $role)
-                                                                        <option value="{{ $role->id }}">
-                                                                            {{ $role->role }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </optgroup>
-                                                            </select>
+                                                            <label for="userinput1"> رقم الواتساب</label>
+                                                            <input type="number" id="userinput1" class="form-control"
+                                                                placeholder="" name="whatsapp" value="{{ $supplier->whatsapp }}">
                                                         </div>
+
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="mt-1 form-group">
+                                                        <div class="form-group">
                                                             <label>الحالة</label>
                                                             <select class="form-control" name="status">
                                                                 <optgroup label="الحالة">
-                                                                    <option value="1">نشط</option>
-                                                                    <option value="0">غير نشط</option>
+                                                                    <option @selected($supplier->status == 1) value="1">نشط</option>
+                                                                    <option @selected($supplier->status == 0) value="0">غير نشط</option>
                                                                 </optgroup>
                                                             </select>
                                                         </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label for="userinput1"> العنوان</label>
+                                                            <input type="text" id="userinput1" class="form-control"
+                                                                placeholder="" name="address" value="{{ $supplier->address }}">
+                                                        </div>
+
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-actions right">
-                                                <a href="{{ route('dashboard.admins.index') }}" type="button" class="mr-1 btn btn-warning">
+                                                <a href="{{ route('dashboard.suppliers.index') }}" type="button"
+                                                    class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> الغاء
                                                 </a>
                                                 <button type="submit" class="btn btn-primary">

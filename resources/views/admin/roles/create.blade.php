@@ -52,18 +52,9 @@
                                                         <div class="form-group">
                                                             <label for="projectinput1">اسم الصلاحية </label>
                                                             <input type="text" id="projectinput1" class="form-control"
-                                                                placeholder=" اسم الصلاحية  " name="role[ar]">
+                                                                placeholder=" اسم الصلاحية  " name="role">
                                                         </div>
                                                     </div>
-
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="projectinput1">اسم الصلاحية بالانجليزي </label>
-                                                            <input type="text" id="projectinput1" class="form-control"
-                                                                placeholder=" اسم الصلاحية  " name="role[en]">
-                                                        </div>
-                                                    </div>
-
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-md-12">
@@ -71,8 +62,8 @@
                                                             <label for="projectinput3"> حدد الصلاحيات </label>
                                                             <br>
                                                             <div class="row">
-                                                                @if (Config::get('app.locale') == 'ar')
-                                                                @foreach (config('permissions_ar') as $key => $value)
+
+                                                                @foreach (config('permissions') as $key => $value)
                                                                     <div class="col-3">
                                                                         <div class="form-check">
                                                                             <input name="permissions[]"
@@ -86,22 +77,7 @@
                                                                         </div>
                                                                     </div>
                                                                 @endforeach
-                                                                @else
-                                                                    @foreach (config('permissions_en') as $key => $value)
-                                                                        <div class="col-3">
-                                                                            <div class="form-check">
-                                                                                <input name="permissions[]"
-                                                                                    class="form-check-input" type="checkbox"
-                                                                                    value="{{ $key }}"
-                                                                                    id="{{ $value }}">
-                                                                                <label class="form-check-label"
-                                                                                    for="{{ $value }}">
-                                                                                    {{ $value }}
-                                                                                </label>
-                                                                            </div>
-                                                                        </div>
-                                                                    @endforeach
-                                                                @endif
+
 
                                                             </div>
                                                         </div>
@@ -114,9 +90,9 @@
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
                                                 </button>
-                                                <button type="button" class="mr-1 btn btn-warning">
+                                                <a href="{{ route('dashboard.roles.index') }}" type="button" class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> رجوع
-                                                </button>
+                                                </a>
 
                                             </div>
                                         </form>

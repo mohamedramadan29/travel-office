@@ -32,9 +32,8 @@
   @toastifyJs
   <script>
       /////// Translation --
-      let title = "{{ __('dashboard.are_you_sure') }}";
+      let title = "هل انت متاكد من حذف هذا العنصر؟";
       //////// End Translation
-
       $(document).on('click', '.delete_confirm', function(e) {
           e.preventDefault();
           form = $(this).closest('form');
@@ -47,18 +46,18 @@
           });
           swalWithBootstrapButtons.fire({
               title: title,
-              text: "You won't be able to revert this!",
+           //   text: "هل انت متاكد من حذف هذا العنصر؟",
               icon: "warning",
               showCancelButton: true,
-              confirmButtonText: "Yes, delete it!",
-              cancelButtonText: "No, cancel!",
+              confirmButtonText: "نعم حذف",
+              cancelButtonText: "لا",
               reverseButtons: true
           }).then((result) => {
               if (result.isConfirmed) {
                   form.submit();
                   swalWithBootstrapButtons.fire({
-                      title: "Deleted!",
-                      text: "Your file has been deleted.",
+                      title: "تم الحذف!",
+                      text: "تم حذف العنصر.",
                       icon: "success"
                   });
               } else if (
@@ -66,8 +65,8 @@
                   result.dismiss === Swal.DismissReason.cancel
               ) {
                   swalWithBootstrapButtons.fire({
-                      title: "Cancelled",
-                      text: "Your imaginary file is safe :)",
+                      title: "تم الالغاء",
+                      text: "تم الالغاء حذف العنصر.",
                       icon: "error"
                   });
               }

@@ -34,6 +34,7 @@
     <!-------- File Input --------->
     <link rel="stylesheet" href="{{ asset('vendor/fileinput/css/fileinput.css') }}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <!-------- End File Input ---------->
     @yield('css')
     @toastifyCss
