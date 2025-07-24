@@ -12,6 +12,8 @@ use App\Http\Controllers\dashboard\{
     UserController,
     SuppliersController,
     ClientsController,
+    PurchesInvoicesController,
+    SafesController,
 };
 use App\Http\Controllers\dashboard\auth\AuthController;
 //use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -87,6 +89,23 @@ Route::group([
             Route::get('clients/status/{id}', [ClientsController::class, 'ChangeStatus'])->name('clients.status');
         });
         ##################### End Clients Routes ######################
+
+         ##################### Start Safes Routes ####################
+         Route::group(['middleware' => 'can:safes'], function () {
+            Route::resource('safes', SafesController::class);
+            Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
+            Route::post('safes/add_balance/{id}', [SafesController::class, 'AddBalance'])->name('safes.add_balance');
+            Route::post('safes/remove_balance/{id}', [SafesController::class, 'RemoveBalance'])->name('safes.remove_balance');
+            Route::get('safes/movements/{id}',[SafesController::class,'SafeMovement'])->name('safes.movements');
+         });
+        ##################### End Safes Routes ################################
+        ##################### Start Purches Invoices Controller ###############
+        Route::group(['middleware' => 'can:purches_invoices'], function () {
+            Route::resource('purches_invoices', PurchesInvoicesController::class);
+            Route::get('purches_invoices/{type}',[PurchesInvoicesController::class, 'PurchesInvoice'])->name('purches_invoices.type');
+         //   Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
+         });
+        ##################### End Purches Invoices Controller #################
 
 
         ################# Start Categories Routes #####################

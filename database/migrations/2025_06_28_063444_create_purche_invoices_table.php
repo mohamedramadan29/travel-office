@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('type');
             $table->string('bayan_txt');
+            $table->string('referance_number')->nullable();
             $table->string('qyt')->nullable();
             $table->double('selling_price')->nullable();
             $table->double('purches_price')->nullable();
             $table->double('total_price')->nullable();
             $table->foreignId('client_id')->nullable()->references('id')->on('clients')->cascadeOnDelete();
             $table->foreignId('supplier_id')->references('id')->on('suppliers')->cascadeOnDelete();
-            $table->string('referance_number')->nullable();
             $table->string('payment_method');
             $table->string('paid');
             $table->string('remaining');

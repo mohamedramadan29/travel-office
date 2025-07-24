@@ -117,4 +117,6 @@ code[class*='language-'], pre[class*='language-'] {
     background-color: #1a2530 !important;
     color: #FFFFFF;
 }
-
+.navbar-semi-dark .navbar-header {
+    background: #2a3b4b;
+}

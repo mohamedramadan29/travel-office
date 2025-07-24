@@ -11,4 +11,7 @@ class Supplier extends Model
     public function getStatusAttribute($value){
         return $value == 1 ? 'نشط' : 'غير نشط';
     }
+    public function scopeActive($query){
+        return $query->where('status', 1);
+    }
 }
