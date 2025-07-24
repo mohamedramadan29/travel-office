@@ -17,15 +17,18 @@ return new class extends Migration
             $table->string('bayan_txt');
             $table->string('referance_number')->nullable();
             $table->string('qyt')->nullable();
-            $table->double('selling_price')->nullable();
-            $table->double('purches_price')->nullable();
-            $table->double('total_price')->nullable();
-            $table->foreignId('client_id')->nullable()->references('id')->on('clients')->cascadeOnDelete();
+            $table->double('purches_price',8,2)->nullable();
+            $table->double('total_price',8,2)->nullable();
             $table->foreignId('supplier_id')->references('id')->on('suppliers')->cascadeOnDelete();
-            $table->string('payment_method');
-            $table->string('paid');
-            $table->string('remaining');
+            $table->string('payment_method')->nullable();
+            $table->integer('safe_id')->nullable();
+            $table->double('paid',8,2)->default(0);
+            $table->double('remaining',8,2)->default(0);
             $table->foreignId('admin_id')->references('id')->on('admins')->cascadeOnDelete();
+            $table->foreignId('category_id')->nullable()->references('id')->on('categories')->cascadeOnDelete();
+            ##################################################### Not Used Untill Now ##############
+            $table->double('selling_price',8,2)->nullable();
+            $table->foreignId('client_id')->nullable()->references('id')->on('clients')->cascadeOnDelete();
             $table->timestamps();
         });
     }

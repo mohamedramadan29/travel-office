@@ -101,10 +101,11 @@ Route::group([
         ##################### End Safes Routes ################################
         ##################### Start Purches Invoices Controller ###############
         Route::group(['middleware' => 'can:purches_invoices'], function () {
+            Route::get('purches_invoices_type/{type}',[PurchesInvoicesController::class, 'PurchesInvoice'])->name('purches_invoices_type.type');
             Route::resource('purches_invoices', PurchesInvoicesController::class);
-            Route::get('purches_invoices/{type}',[PurchesInvoicesController::class, 'PurchesInvoice'])->name('purches_invoices.type');
-         //   Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
-         });
+            Route::match(['get','post'],'invoice/convert_to_official/{id}',[PurchesInvoicesController::class, 'ConvertToOfficial'])->name('convert_to_official');
+            //   Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
+        });
         ##################### End Purches Invoices Controller #################
 
 

@@ -135,23 +135,25 @@
                               </a>
                           </li>
                           @can('official_purches_invoices')
-                              <li class="{{ Route::is('dashboard.purches_invoices.type') ? 'active' : '' }}">
-                                  <a class="menu-item" href="{{ route('dashboard.purches_invoices.type', 'official') }}"
+                              <li class="{{ Route::is('dashboard.purches_invoices_type.type') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.purches_invoices_type.type', 'official') }}"
                                       data-i18n="nav.users.user_profile"> فواتير الشراء الرسمية
                                   </a>
                               </li>
                           @endcan
                           @can('interim_purches_invoices')
-                              <li class="{{ Route::is('dashboard.purches_invoices.type') ? 'active' : '' }}">
-                                  <a class="menu-item" href="{{ route('dashboard.purches_invoices.type', 'interim') }}"
+                              <li class="{{ Route::is('dashboard.purches_invoices_type.type') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.purches_invoices_type.type', 'interim') }}"
                                       data-i18n="nav.users.user_profile"> فواتير الشراء المؤقتة
                                   </a>
                               </li>
                           @endcan
-                          <li class="{{ Route::is('dashboard.purches_invoices.create') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.purches_invoices.create') }}"
-                                  data-i18n="nav.users.user_cards"> اضافة فاتورة شراء </a>
-                          </li>
+                          @can('purches_invoices_create')
+                              <li class="{{ Route::is('dashboard.purches_invoices.create') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.purches_invoices.create') }}"
+                                      data-i18n="nav.users.user_cards"> اضافة فاتورة شراء </a>
+                              </li>
+                          @endcan
                       </ul>
                   </li>
               @endcan

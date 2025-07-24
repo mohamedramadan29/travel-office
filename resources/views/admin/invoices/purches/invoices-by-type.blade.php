@@ -1,11 +1,11 @@
 @extends('admin.layouts.app')
-@section('title', ' فواتير الشراء ')
+@section('title', $type)
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> فواتير الشراء </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block"> {{ $type }} </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
@@ -14,7 +14,7 @@
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.purches_invoices.index') }}">فواتير
                                         الشراء </a>
                                 </li>
-                                <li class="breadcrumb-item active"> فواتير الشراء
+                                <li class="breadcrumb-item active"> {{ $type }}
                                 </li>
                             </ol>
                         </div>
@@ -47,7 +47,6 @@
                                                     <th> البيان </th>
                                                     <th> الرقم المرجعي </th>
                                                     <th> المورد </th>
-                                                    <th> التصنيف </th>
                                                     <th> الكمية </th>
                                                     <th> السعر الكلي </th>
                                                     <th> تاريخ الانشاء </th>
@@ -70,7 +69,6 @@
                                                         <td> {{ $invoice->bayan_txt }} </td>
                                                         <td> {{ $invoice->referance_number }} </td>
                                                         <td> {{ $invoice->supplier->name }} </td>
-                                                        <td> {{ $invoice->category->name ?? 'غير محدد' }} </td>
                                                         <td> {{ $invoice->qyt }} </td>
                                                         <td> {{ $invoice->total_price }} د.ل </td>
                                                         <td> {{ $invoice->created_at->format('Y-m-d H:i') }} </td>

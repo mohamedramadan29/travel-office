@@ -1,13 +1,13 @@
 @extends('admin.layouts.app')
 @section('title')
-    اضافة فاتورة شراء
+    تعديل فاتورة شراء
 @endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block">اضافة فاتورة شراء</h3>
+                    <h3 class="mb-0 content-header-title d-inline-block">تعديل فاتورة شراء</h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
@@ -16,7 +16,7 @@
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.purches_invoices.index') }}">فواتير
                                         الشراء</a>
                                 </li>
-                                <li class="breadcrumb-item active"><a href="#">اضافة فاتورة شراء</a>
+                                <li class="breadcrumb-item active"><a href="#">تعديل فاتورة شراء</a>
                                 </li>
                             </ol>
                         </div>
@@ -36,23 +36,25 @@
                                 <div class="card-content collapse show">
                                     <div class="card-body">
                                         @include('admin.layouts.validation_errors')
-                                        <form class="form" action="{{ route('dashboard.purches_invoices.store') }}"
+                                        <form class="form" action="{{ route('dashboard.purches_invoices.update',$invoice->id) }}"
                                             method="POST">
                                             @csrf
+                                            @method('PUT')
                                             <div class="form-body">
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label> نوع الفاتورة </label>
                                                             <select class="form-control" name="type">
+
                                                                 <optgroup label="نوع الفاتورة">
                                                                     <option
-                                                                        @if (old('type') == 'فاتورة مؤقتة') selected @endif
+                                                                        @if ($invoice->type == 'فاتورة مؤقتة') selected @endif
                                                                         value="فاتورة مؤقتة"> فاتورة مؤقتة
                                                                     </option>
                                                                     @can('official_purches_invoices')
                                                                         <option
-                                                                            @if (old('type') == 'فاتورة رسمية') selected @endif
+                                                                            @if ($invoice->type == 'فاتورة رسمية') selected @endif
                                                                             value="فاتورة رسمية"> فاتورة رسمية </option>
                                                                     @endcan
                                                                 </optgroup>
@@ -67,7 +69,7 @@
                                                             <label for="userinput1"> البيان / الوصف </label>
                                                             <input required type="text" id="userinput1"
                                                                 class="form-control" name="bayan_txt"
-                                                                value="{{ old('bayan_txt') }}">
+                                                                value="{{ $invoice->bayan_txt }}">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
@@ -75,7 +77,7 @@
                                                             <label for="userinput1"> الرقم المرجعي </label>
                                                             <input required type="text" id="userinput1"
                                                                 class="form-control" name="referance_number"
-                                                                value="{{ old('referance_number') }}">
+                                                                value="{{ $invoice->referance_number }}">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-12">
@@ -84,21 +86,21 @@
                                                             <select name="category_id" id="category_id" class="form-control">
                                                                 <option value="">اختر التصنيف </option>
                                                                 @foreach ($categories as $category)
-                                                                    <option @if (old('category_id') == $category->id) selected @endif value="{{ $category->id }}">{{ $category->name }}</option>
+                                                                    <option value="{{ $category->id }}" @if ($category->id == $invoice->category_id) selected @endif>{{ $category->name }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                @livewire('dashboard.purches-invoice-create', ['suppliers' => $suppliers, 'safes' => $safes])
+                                                @livewire('dashboard.purches-invoice-create', ['suppliers' => $suppliers, 'safes' => $safes,'invoice'=>$invoice])
                                             </div>
                                             <div class="form-actions right">
-                                                <a href="{{ route('dashboard.clients.index') }}" type="button"
+                                                <a href="{{ route('dashboard.purches_invoices.index') }}" type="button"
                                                     class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> الغاء
                                                 </a>
                                                 <button type="submit" class="btn btn-primary">
-                                                    <i class="la la-check-square-o"></i> حفظ
+                                                    <i class="la la-check-square-o"></i> تعديل الفاتورة
                                                 </button>
                                             </div>
                                         </form>
