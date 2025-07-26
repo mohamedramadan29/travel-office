@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\dashboard;
 
-use App\Http\Controllers\Controller;
-use App\Http\Traits\Message_Trait;
+use App\Models\admin\Safe;
 use Illuminate\Http\Request;
 use App\Models\admin\Supplier;
+use App\Http\Traits\Message_Trait;
+use Illuminate\Support\Facades\DB;
+use App\Models\admin\PurcheInvoice;
+use App\Http\Controllers\Controller;
+use App\Models\admin\SupplierTransaction;
 use Illuminate\Support\Facades\Validator;
 
 class SuppliersController extends Controller
@@ -16,18 +20,10 @@ class SuppliersController extends Controller
         $suppliers = Supplier::paginate(10);
         return view('admin.suppliers.index', compact('suppliers'));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('admin.suppliers.create');
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $data = $request->all();
@@ -64,28 +60,17 @@ class SuppliersController extends Controller
         $supplier->save();
       return $this->success_message('تم اضافة المورد بنجاح');
     }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $supplier = Supplier::findOrFail($id);
         return view('admin.suppliers.show', compact('supplier'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $supplier = Supplier::findOrFail($id);
         return view('admin.suppliers.edit', compact('supplier'));
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $supplier = Supplier::findOrFail($id);
@@ -124,10 +109,6 @@ class SuppliersController extends Controller
         ]);
         return $this->success_message('تم تحديث المورد بنجاح');
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $supplier = Supplier::findOrFail($id);
@@ -143,5 +124,106 @@ class SuppliersController extends Controller
         ]);
         return $this->success_message('تم تغير الحالة بنجاح');
     }
+
+    public function transactions($id){
+        $safes = Safe::active()->get();
+        $supplier = Supplier::findOrFail($id);
+        if(!$supplier){
+            abort(404);
+        }
+   // جلب جميع المعاملات
+   $transactions = SupplierTransaction::where('supplier_id', $supplier->id)
+   ->with('purchaseInvoice')->orderBy('id', 'desc')
+   ->get();
+
+// جلب إجمالي قيم الفواتير
+$total_invoices = PurcheInvoice::where('supplier_id', $supplier->id)
+   ->sum('total_price');
+
+// حساب إجمالي المدفوع (Debit)
+$total_debit = $transactions->where('type', 'debit')->sum('amount');
+$invoices = PurcheInvoice::where('supplier_id',$supplier->id)->get();
+// الرصيد المستحق = إجمالي الفواتير - إجمالي المدفوع
+$balance = $total_invoices - $total_debit; // 1000 - 800 = 200 د.ل
+        return view('admin.suppliers.transactions', compact('supplier','transactions','total_invoices','total_debit','balance','invoices','safes'));
+    }
+
+
+
+    public function AddTransaction(Request $request, $id)
+    {
+        $supplier = Supplier::findOrFail($id);
+
+        $data = $request->all();
+        $rules = [
+            'amount' => 'required|numeric|min:0.01',
+            'invoice_id' => 'required|exists:purche_invoices,id',
+            'safe_id' => 'required|exists:safes,id',
+        ];
+        $messages = [
+            'amount.required' => 'المبلغ مطلوب',
+            'amount.numeric' => 'المبلغ يجب أن يكون رقمًا',
+            'amount.min' => 'المبلغ يجب أن يكون أكبر من 0',
+            'invoice_id.required' => 'رقم الفاتورة مطلوب',
+            'invoice_id.exists' => 'الفاتورة غير موجودة',
+            'safe_id.required' => 'الخزنة مطلوبة',
+            'safe_id.exists' => 'الخزنة غير موجودة',
+        ];
+
+        $validator = Validator::make($data, $rules, $messages);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $invoice = PurcheInvoice::findOrFail($data['invoice_id']);
+        if ($invoice->supplier_id != $supplier->id) {
+            return redirect()->back()->withErrors(['invoice_id' => 'لا يمكن إضافة المعاملة لفاتورة مورد آخر']);
+        }
+
+        // حساب إجمالي المدفوع (Debit) والرصيد المستحق
+        $total_balance = SupplierTransaction::where('purchase_invoice_id', $invoice->id)
+            ->where('type', 'debit')
+            ->sum('amount');
+        $remaining_balance = $invoice->total_price - $total_balance;
+
+        // التحقق من وجود رصيد مستحق
+        if ($remaining_balance <= 0) {
+            return redirect()->back()->withErrors(['amount' => 'تم تسديد الفاتورة بالكامل']);
+        }
+
+        // التحقق من أن المبلغ المدخل مش أكبر من الرصيد المستحق
+        if ($data['amount'] > $remaining_balance) {
+            return redirect()->back()->withErrors(['amount' => 'المبلغ المدخل أكبر من الرصيد المستحق (' . $remaining_balance . ' د.ل)']);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // تسجيل المعاملة
+            $transaction = new SupplierTransaction();
+            $transaction->supplier_id = $supplier->id;
+            $transaction->amount = $data['amount'];
+            $transaction->purchase_invoice_id = $data['invoice_id'];
+            $transaction->safe_id = $data['safe_id'];
+            $transaction->type = 'debit';
+            $transaction->description = 'تسديد دفعة لفاتورة #' . $data['invoice_id'];
+            $transaction->save();
+
+            // تحديث حالة الفاتورة (اختياري)
+            $new_balance = $remaining_balance - $data['amount'];
+            $invoice->update([
+                'paid' => $total_balance + $data['amount'],
+                'remaining' => $new_balance,
+            ]);
+
+            DB::commit();
+            return $this->success_message('تم إضافة المعاملة بنجاح');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['general' => 'حدث خطأ: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+
 
 }

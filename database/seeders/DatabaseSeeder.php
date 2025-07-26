@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             SafeSeeder::class,
             SupplierSeeder::class,
             CategorySeeder::class,
+            ClientSeeder::class,
         ]);
 
     }

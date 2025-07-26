@@ -12,8 +12,11 @@ use App\Http\Controllers\dashboard\{
     UserController,
     SuppliersController,
     ClientsController,
+    ExpencesController,
     PurchesInvoicesController,
     SafesController,
+    SellingInvoicesController,
+    DoubleInvoiceController,
 };
 use App\Http\Controllers\dashboard\auth\AuthController;
 //use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -80,6 +83,8 @@ Route::group([
         Route::group(['middleware' => 'can:suppliers'], function () {
             Route::resource('suppliers', SuppliersController::class);
             Route::get('suppliers/status/{id}', [SuppliersController::class, 'ChangeStatus'])->name('suppliers.status');
+            Route::get('suppliers/transactions/{id}', [SuppliersController::class, 'transactions'])->name('suppliers.transactions');
+            Route::post('suppliers/add_transaction/{invoice_id}', [SuppliersController::class, 'AddTransaction'])->name('supplier.add_transaction');
         });
         ##################### End Suppliers Routes ######################
 
@@ -87,6 +92,8 @@ Route::group([
         Route::group(['middleware' => 'can:clients'], function () {
             Route::resource('clients', ClientsController::class);
             Route::get('clients/status/{id}', [ClientsController::class, 'ChangeStatus'])->name('clients.status');
+            Route::get('clients/transactions/{id}', [ClientsController::class, 'transactions'])->name('clients.transactions');
+            Route::post('clients/add_transaction/{invoice_id}', [ClientsController::class, 'AddTransaction'])->name('client.add_transaction');
         });
         ##################### End Clients Routes ######################
 
@@ -107,6 +114,27 @@ Route::group([
             //   Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
         });
         ##################### End Purches Invoices Controller #################
+
+           ##################### Start Selling Invoices Controller ###############
+           Route::group(['middleware' => 'can:selling_invoices'], function () {
+            Route::get('selling_invoices_type/{type}',[SellingInvoicesController::class, 'SellingInvoice'])->name('selling_invoices_type.type');
+            Route::resource('selling_invoices', SellingInvoicesController::class);
+            Route::match(['get','post'],'invoice/convert_to_official/{id}',[SellingInvoicesController::class, 'ConvertToOfficial'])->name('convert_to_official');
+            //   Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
+        });
+        ##################### End Selling Invoices Controller #################
+        ##################### Start Double Invoices Controller ###############
+        Route::group(['middleware' => 'can:double_invoices'], function () {
+            Route::get('double_invoices/create', [DoubleInvoiceController::class,'create'])->name('double_invoices.create');
+            Route::post('double_invoices/store', [DoubleInvoiceController::class,'store'])->name('double_invoices.store');
+        });
+        #################### End Double Invoices Controller ##################
+
+        ###################### Start Expences Controller ######################
+        Route::group(['middleware' => 'can:expenses'], function () {
+            Route::resource('expenses', ExpencesController::class);
+        });
+        ###################### End Expences Controller ##########################
 
 
         ################# Start Categories Routes #####################

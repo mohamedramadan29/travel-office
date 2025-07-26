@@ -157,6 +157,58 @@
                       </ul>
                   </li>
               @endcan
+              @can('selling_invoices')
+                  <li class="nav-item{{ Route::is('dashboard.selling_invoices.*') ? 'active' : '' }}"><a href="#">
+                          <i class="bi bi-receipt"></i> <span class="menu-title" data-i18n="nav.users.main"> فواتير
+                              البيع
+                          </span><span class="float-right mr-2 badge badge-info badge-pill"> {{ $SellingInvoicesCount }}
+                          </span></a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.selling_invoices.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.selling_invoices.index') }}"
+                                  data-i18n="nav.users.user_profile"> فواتير البيع
+                              </a>
+                          </li>
+                          @can('selling_invoices_create')
+                              <li class="{{ Route::is('dashboard.selling_invoices.create') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.selling_invoices.create') }}"
+                                      data-i18n="nav.users.user_cards"> اضافة فاتورة بيع </a>
+                              </li>
+                          @endcan
+                      </ul>
+                  </li>
+              @endcan
+              @can('double_invoices')
+                  <li class="nav-item{{ Route::is('dashboard.double_invoices.*') ? 'active' : '' }}"><a href="#"> <i class="bi bi-receipt"></i> <span class="menu-title" data-i18n="nav.users.main"> فواتير المزدوجة
+                          </span> </a>
+                      <ul class="menu-content">
+                          @can('add_double_invoices')
+                              <li class="{{ Route::is('dashboard.double_invoices.create') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.double_invoices.create') }}"
+                                      data-i18n="nav.users.user_cards"> اضافة فاتورة مزدوجة </a>
+                              </li>
+                          @endcan
+                      </ul>
+                  </li>
+              @endcan
+
+              @can('expenses')
+                  <li class="nav-item{{ Route::is('dashboard.expenses.*') ? 'active' : '' }}"><a href="#"> <i class="bi bi-list-ul"></i> <span class="menu-title" data-i18n="nav.users.main"> المصروفات
+                          </span> </a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.expenses.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.expenses.index') }}"
+                                  data-i18n="nav.users.user_profile"> المصروفات
+                              </a>
+                          </li>
+
+                          <li class="{{ Route::is('dashboard.expenses.create') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.expenses.create') }}"
+                                  data-i18n="nav.users.user_cards"> اضافة مصروف </a>
+                          </li>
+                      </ul>
+                  </li>
+              @endcan
 
               @can('settings')
                   <li class="nav-item{{ Route::is('dashboard.settings.*') ? 'active' : '' }}"><a href="#"><i

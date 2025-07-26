@@ -21,4 +21,12 @@ return [
     'official_selling_invoices'=>'فواتير البيع الرسمية',
     'interim_selling_invoices'=>'فواتير البيع المؤقتة',
     'safes'=>'ادارة الخزائن',
+    'safes_add_balance'=>'اضافة مبلغ الى الخزينة',
+    'safes_remove_balance'=>'سحب مبلغ من الخزينة',
+    'safes_movements'=>'حركة الخزينة',
+    'expenses'=>' ادارة المصروفات ',
+    'double_invoices'=>'ادارة الفواتير المزدوجة',
+    'add_double_invoices'=>'اضافة فاتورة مزدوجة',
+    'edit_double_invoices'=>'تعديل فاتورة مزدوجة',
+    'delete_double_invoices'=>'حذف فاتورة مزدوجة',
 ];

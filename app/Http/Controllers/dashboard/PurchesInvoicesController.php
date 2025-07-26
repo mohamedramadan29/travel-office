@@ -12,6 +12,7 @@ use App\Models\admin\PurcheInvoice;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use App\Models\admin\SupplierTransaction;
 use Illuminate\Support\Facades\Validator;
 
 class PurchesInvoicesController extends Controller
@@ -24,10 +25,6 @@ class PurchesInvoicesController extends Controller
         return view('admin.invoices.purches.index', compact('invoices'));
 
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $suppliers = Supplier::active()->get();
@@ -35,10 +32,6 @@ class PurchesInvoicesController extends Controller
         $categories = Category::active()->get();
         return view('admin.invoices.purches.create', compact('suppliers', 'safes','categories'));
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $data = $request->all();
@@ -83,6 +76,10 @@ class PurchesInvoicesController extends Controller
        if($validator->fails()){
            return redirect()->back()->withErrors($validator)->withInput();
        }
+       // التحقق من العلاقة بين total_price و paid و remaining
+    if ($data['type'] == 'فاتورة رسمية' && ($data['total_price'] != $data['paid'] + $data['remaining'])) {
+        return redirect()->back()->withErrors(['total_price' => 'السعر الكلي يجب أن يساوي مجموع المدفوع والباقي'])->withInput();
+    }
        try{
         DB::beginTransaction();
         $invoice = new PurcheInvoice;
@@ -100,6 +97,32 @@ class PurchesInvoicesController extends Controller
         $invoice->category_id = $data['category_id'];
         $invoice->admin_id = Auth::user()->id;
         $invoice->save();
+        ################################################ Add Transaction In Supplier Account ##############
+
+        if($data['type'] == 'فاتورة رسمية'){
+
+            if ($data['remaining'] > 0) {
+                SupplierTransaction::create([
+                    'supplier_id' => $data['supplier_id'],
+                    'purchase_invoice_id' => $invoice->id,
+                    'amount' => $data['remaining'],
+                    'type' => 'credit', // المبلغ المستحق للمورد   الدائن
+                    'description' => 'مبلغ مستحق من فاتورة شراء #' . $invoice->id,
+                ]);
+            }
+            if ($data['paid'] > 0) {
+               SupplierTransaction::create([
+                    'supplier_id' => $data['supplier_id'],
+                    'purchase_invoice_id' => $invoice->id,
+                    'amount' => $data['paid'],
+                    'type' => 'debit', // المبلغ المدفوع للمورد  مدين 
+                    'payment_method' => $data['payment_method'],
+                    'safe_id' => $data['safe_id'],
+                    'description' => 'دفعة لفاتورة شراء #' . $invoice->id,
+                ]);
+            }
+        }
+
         DB::commit();
         return $this->success_message(' تم اضافة الفاتورة بنجاح  ');
        }catch(\Exception $e){
@@ -107,18 +130,6 @@ class PurchesInvoicesController extends Controller
         return $this->exception_message($e);
        }
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $invoice = PurcheInvoice::findOrFail($id);
@@ -161,7 +172,7 @@ class PurchesInvoicesController extends Controller
         'referance_number.unique'=>'الرقم المرجعي موجود',
         'supplier_id.required'=>'المورد مطلوب',
         'qyt.required'=>'الكمية مطلوبة',
-       'purches_price.required' => 'سعر الشراء مطلوب',
+        'purches_price.required' => 'سعر الشراء مطلوب',
         'purches_price.numeric' => 'سعر الشراء يجب أن يكون رقمًا',
         'purches_price.min' => 'سعر الشراء يجب أن يكون 1 أو أكثر',
         'total_price.required' => 'السعر الكلي مطلوب',
@@ -176,6 +187,10 @@ class PurchesInvoicesController extends Controller
        if($validator->fails()){
            return redirect()->back()->withErrors($validator)->withInput();
        }
+       // التحقق من العلاقة بين total_price و paid و remaining
+    if ($data['type'] == 'فاتورة رسمية' && ($data['total_price'] != $data['paid'] + $data['remaining'])) {
+        return redirect()->back()->withErrors(['total_price' => 'السعر الكلي يجب أن يساوي مجموع المدفوع والباقي'])->withInput();
+    }
        try{
         DB::beginTransaction();
         $invoice->update([
@@ -192,6 +207,34 @@ class PurchesInvoicesController extends Controller
             "safe_id" => $data['safe_id'],
             "category_id" => $data['category_id'],
         ]);
+        ######################  Delete Old Transaction And Create New ########################
+        SupplierTransaction::where('purchase_invoice_id', $invoice->id)->delete();
+
+         ################################################ Add Transaction In Supplier Account ##############
+
+         if($data['type'] == 'فاتورة رسمية'){
+
+            if ($data['remaining'] > 0) {
+                SupplierTransaction::create([
+                    'supplier_id' => $data['supplier_id'],
+                    'purchase_invoice_id' => $invoice->id,
+                    'amount' => $data['remaining'],
+                    'type' => 'credit', // المبلغ المستحق للمورد
+                    'description' => 'مبلغ مستحق من فاتورة شراء #' . $invoice->id,
+                ]);
+            }
+            if ($data['paid'] > 0) {
+                SupplierTransaction::create([
+                    'supplier_id' => $data['supplier_id'],
+                    'purchase_invoice_id' => $invoice->id,
+                    'amount' => $data['paid'],
+                    'type' => 'debit', // المبلغ المدفوع للمورد
+                    'payment_method' => $data['payment_method'],
+                    'safe_id' => $data['safe_id'],
+                    'description' => 'دفعة لفاتورة شراء #' . $invoice->id,
+                ]);
+            }
+        }
         DB::commit();
         return $this->success_message(' تم تعديل الفاتورة بنجاح  ');
        }catch(\Exception $e){
@@ -199,10 +242,6 @@ class PurchesInvoicesController extends Controller
         return $this->exception_message($e);
        }
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $invoice = PurcheInvoice::findOrFail($id);

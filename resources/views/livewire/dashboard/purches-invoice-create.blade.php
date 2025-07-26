@@ -39,7 +39,7 @@
                 <div class="supplier-info-item"
                     style="font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-phone"></i>
-                    <div><还不 ><strong>رقم الهاتف:</strong> <span id="purchase_supplier_phone">{{ $supplier_mobile }}</span></div>
+                    <div><strong>رقم الهاتف:</strong> <span id="purchase_supplier_phone">{{ $supplier_mobile }}</span></div>
                 </div>
                 <div class="supplier-info-item"
                     style="font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">

@@ -70,6 +70,10 @@
                                                                         href="{{ route('dashboard.clients.edit', $client->id) }}"><i
                                                                             class="la la-edit"></i> تعديل </a>
                                                                     <a class="dropdown-item"
+                                                                        href="{{ route('dashboard.clients.transactions', $client->id) }}"><i
+                                                                            class="la la-edit"></i> كشف حساب العميل
+                                                                        </a>
+                                                                    <a class="dropdown-item"
                                                                         href="{{ route('dashboard.clients.status', $client->id) }}"><i
                                                                             class="la la-edit"></i> تعديل الحالة </a>
                                                                     <form
