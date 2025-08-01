@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->foreignId('category_id')->references('id')->on('expence_categories')->cascadeOnDelete();
+            $table->string('title')->nullable();
             $table->double('price',8,2)->default(0);
             $table->longText('description')->nullable();
             $table->foreignId('safe_id')->nullable()->references('id')->on('safes')->nullOnDelete();

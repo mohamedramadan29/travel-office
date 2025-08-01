@@ -18,4 +18,7 @@ class Expense extends Model
     {
         return date('d/m/Y h:i A', strtotime($value));
     }
+    public function category(){
+        return $this->belongsTo(ExpenceCategory::class,'category_id');
+    }
 }

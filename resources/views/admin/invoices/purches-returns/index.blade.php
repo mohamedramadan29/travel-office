@@ -1,20 +1,19 @@
 @extends('admin.layouts.app')
-@section('title', ' فواتير البيع ')
+@section('title', ' فواتير الارجاع للشراء ')
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> فواتير البيع </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block"> فواتير الارجاع للشراء </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.selling_invoices.index') }}">فواتير
-                                        البيع </a>
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.purches_invoices_return.index') }}">  فواتير الارجاع للشراء  </a>
                                 </li>
-                                <li class="breadcrumb-item active"> فواتير البيع
+                                <li class="breadcrumb-item active"> فواتير الارجاع
                                 </li>
                             </ol>
                         </div>
@@ -30,12 +29,6 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            @can('selling_invoices_create')
-                                <div class="card-header">
-                                    <a href="{{ route('dashboard.selling_invoices.create') }}" class="btn btn-primary"> اضافة
-                                        فاتورة </a>
-                                </div>
-                            @endcan
                             <div class="card-content collapse show">
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -43,13 +36,14 @@
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th> العميل </th>
+                                                    <th> نوع الفاتورة </th>
                                                     <th> البيان </th>
                                                     <th> الرقم المرجعي </th>
                                                     <th> المورد </th>
                                                     <th> التصنيف </th>
                                                     <th> الكمية </th>
                                                     <th> السعر الكلي </th>
+                                                    <th> السعر الارجاع  </th>
                                                     <th> تاريخ الانشاء </th>
                                                     <th> العمليات </th>
                                                 </tr>
@@ -59,7 +53,8 @@
                                                     <tr>
                                                         <th scope="row">{{ $loop->iteration }}</th>
                                                         <td>
-                                                            {{ $invoice->client->name }}
+                                                                <span class="badge badge-pill badge-warning">
+                                                                     فاتورة ارجاع  </span>
                                                         </td>
                                                         <td> {{ $invoice->bayan_txt }} </td>
                                                         <td> {{ $invoice->referance_number }} </td>
@@ -67,6 +62,7 @@
                                                         <td> {{ $invoice->category->name ?? 'غير محدد' }} </td>
                                                         <td> {{ $invoice->qyt }} </td>
                                                         <td> {{ $invoice->total_price }} د.ل </td>
+                                                        <td> {{ $invoice->return_price }} د.ل </td>
                                                         <td> {{ $invoice->created_at->format('Y-m-d H:i') }} </td>
                                                         <td>
                                                             <div class="dropdown float-md-left">
@@ -76,32 +72,14 @@
                                                                     aria-expanded="false"> العمليات </button>
                                                                 <div class="dropdown-menu"
                                                                     aria-labelledby="dropdownBreadcrumbButton">
-                                                                    @can('selling_invoices_edit')
-                                                                        <a class="dropdown-item"
-                                                                            href="{{ route('dashboard.selling_invoices.edit', $invoice->id) }}"><i
+                                                                    @can('purches_invoices_return')
+                                                                        {{-- <a class="dropdown-item"
+                                                                            href="{{ route('dashboard.purches_invoices_return.edit', $invoice->id) }}"><i
                                                                                 class="la la-edit"></i> تعديل
-                                                                        </a>
+                                                                        </a> --}}
                                                                     @endcan
-                                                                    @can('selling_invoices_return')
-                                                                        @if ($invoice->return_status == 'not_returned')
-                                                                            <a class="dropdown-item"
-                                                                                href="{{ route('dashboard.selling_return_invoice', $invoice->id) }}"><i
-                                                                                    class="la la-edit"></i> ارجاع
-                                                                            </a>
-                                                                        @endif
-                                                                    @endcan
-                                                                    @can('selling_invoices_edit')
-                                                                        @if ($invoice->type == 'فاتورة مؤقتة')
-                                                                            <a class="dropdown-item"
-                                                                                href="{{ route('dashboard.convert_to_official', $invoice->id) }}"><i
-                                                                                    class="la la-edit"></i> تحويل الي فاتورة
-                                                                                رسمية
-                                                                            </a>
-                                                                        @endif
-                                                                    @endcan
-                                                                    @can('selling_invoices_delete')
                                                                         <form
-                                                                            action="{{ route('dashboard.selling_invoices.destroy', $invoice->id) }}"
+                                                                            action="{{ route('dashboard.purches_invoices_return.destroy', $invoice->id) }}"
                                                                             method="post">
                                                                             @csrf
                                                                             @method('delete')
@@ -109,7 +87,6 @@
                                                                                 class="dropdown-item delete_confirm"><i
                                                                                     class="la la-trash"></i> حذف </button>
                                                                         </form>
-                                                                    @endcan
 
                                                                 </div>
                                                             </div>

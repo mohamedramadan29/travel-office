@@ -97,6 +97,8 @@ class DoubleInvoiceController extends Controller
             $invoice->payment_method = $data['payment_method'];
             $invoice->safe_id = $data['safe_id'];
             $invoice->category_id = $data['category_id'];
+            $invoice->admin_id = Auth::user()->id;
+            $invoice->status = 'sold';
             $invoice->save();
             ################################################ Add Transaction In Supplier Account ##############
 
@@ -145,7 +147,7 @@ class DoubleInvoiceController extends Controller
              ############################################# Add Transction To Client #############################
         if($data['selling_remaining'] > 0) {
             ClientTransaction::create([
-                'customer_id' => $data['client_id'],
+                'client_id' => $data['client_id'],
                 'sale_invoice_id' => $sale_invoice->id,
                 'amount' => $data['selling_remaining'],
                 'type' => 'debit', // المبلغ المستحق من العميل  مدين
@@ -154,7 +156,7 @@ class DoubleInvoiceController extends Controller
         }
         if ($data['selling_paid'] > 0) {
             ClientTransaction::create([
-                'customer_id' => $data['client_id'],
+                'client_id' => $data['client_id'],
                 'sale_invoice_id' => $sale_invoice->id,
                 'amount' => $data['selling_paid'],
                 'type' => 'credit', // المبلغ المدفوع من العميل  دائن

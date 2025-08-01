@@ -53,7 +53,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th> العنوان  </th>
+                                                    <th> التصنيف   </th>
                                                     <th> المبلغ </th>
                                                     <th> الخزينة  </th>
                                                     <th> تاريخ الانشاء </th>
@@ -64,7 +64,7 @@
                                                 @forelse ($expenses as $expense)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
-                                                        <td>{{ $expense->title }}</td>
+                                                        <td>{{ $expense->category->name ?? 'غير محدد' }}</td>
                                                         <td>{{ $expense->price }}</td>
                                                         <td>
                                                          {{ $expense->safe->name }}

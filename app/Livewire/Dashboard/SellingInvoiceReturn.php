@@ -7,15 +7,16 @@ use App\Models\admin\Safe;
 use App\Models\admin\Client;
 use App\Models\admin\Supplier;
 use App\Models\admin\PurcheInvoice;
-
-class SellingInvoiceCreate extends Component
+class SellingInvoiceReturn extends Component
 {
+
 
     public $suppliers,$safes,$categories,$clients,$client_id,$client_mobile,$client_whatsapp;
     public $client_email,$client_address,$supplier_id,$supplier_mobile,$supplier_whatsapp;
     public $supplier_email,$supplier_address,$qyt = 1,$selling_price = 0;
     public $total_price = 0,$paid = 0,$remaining = 0;
     public $payment_method,$safe_id,$invoice,$referance_number,$referance_error,$bayan_txt,$category_id,$selling_invoice;
+    public $return_price;
 
 
     public $purchesInvoices;
@@ -41,6 +42,7 @@ class SellingInvoiceCreate extends Component
             $this->remaining = $this->selling_invoice->remaining;
             $this->payment_method = $this->selling_invoice->payment_method;
             $this->safe_id = $this->selling_invoice->safe_id;
+            $this->return_price = $this->selling_invoice->total_price;
         } else {
             // إذا لم تكن هناك فاتورة (وضع الإضافة)، استخدم القيم القديمة أو الافتراضية
             $this->referance_number = old('referance_number');
@@ -193,9 +195,8 @@ class SellingInvoiceCreate extends Component
         $this->supplier_address = '';
     }
 
-
     public function render()
     {
-        return view('livewire.dashboard.selling-invoice-create');
+        return view('livewire.dashboard.selling-invoice-return');
     }
 }

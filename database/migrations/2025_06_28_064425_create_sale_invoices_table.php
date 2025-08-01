@@ -28,6 +28,7 @@ return new class extends Migration
             $table->foreignId('admin_id')->nullable()->references('id')->on('admins')->nullOnDelete();
             $table->foreignId('category_id')->nullable()->references('id')->on('categories')->nullOnDelete();
             $table->foreignId('client_id')->nullable()->references('id')->on('clients')->nullOnDelete();
+            $table->string('return_status')->default('not_returned');
             $table->timestamps();
         });
     }

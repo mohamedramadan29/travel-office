@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\admin\Expense;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\Message_Trait;
+use App\Models\admin\ExpenceCategory;
 use Illuminate\Support\Facades\Validator;
 
 class ExpencesController extends Controller
@@ -17,8 +18,7 @@ class ExpencesController extends Controller
      */
     public function index()
     {
-        $expenses = Expense::paginate(10);
-
+        $expenses = Expense::orderBy('id','DESC')->paginate(10);
         return view('admin.expenses.index',compact('expenses'));
     }
 
@@ -28,7 +28,8 @@ class ExpencesController extends Controller
     public function create()
     {
         $safes = Safe::active()->get();
-        return view('admin.expenses.create',compact('safes'));
+        $categories = ExpenceCategory::where('status',1)->get();
+        return view('admin.expenses.create',compact('safes','categories'));
     }
 
     /**
@@ -38,14 +39,16 @@ class ExpencesController extends Controller
     {
         $data = $request->all();
         $rules = [
-            'title'=>'required|string',
+            'category_id'=>'required|exists:expence_categories,id',
             'price'=>'required|min:1',
             'safe_id'=>'required|exists:safes,id',
             'description'=>'nullable|string',
         ];
         $messages = [
-            'title.required'=>'العنوان مطلوب',
+            'category_id.required'=>'التصنيف مطلوب',
+            'category_id.exists'=>'التصنيف غير موجود',
             'price.required'=>'السعر مطلوب',
+            'price.min'=>'السعر يجب ان يكون اكبر من 1',
             'safe_id.required'=>'الخزينة مطلوبة',
             'safe_id.exists'=>'الخزينة غير موجودة',
         ];
@@ -55,7 +58,7 @@ class ExpencesController extends Controller
         }
 
         $expense = new Expense();
-        $expense->title = $data['title'];
+        $expense->category_id = $data['category_id'];
         $expense->price = $data['price'];
         $expense->safe_id = $data['safe_id'];
         $expense->description = $data['description'];
@@ -79,7 +82,8 @@ class ExpencesController extends Controller
     {
         $expense = Expense::findOrFail($id);
         $safes = Safe::active()->get();
-        return view('admin.expenses.edit',compact('expense','safes'));
+        $categories = ExpenceCategory::where('status',1)->get();
+        return view('admin.expenses.edit',compact('expense','safes','categories'));
     }
 
     /**
@@ -89,14 +93,16 @@ class ExpencesController extends Controller
     {
         $data = $request->all();
         $rules = [
-            'title'=>'required|string',
+            'category_id'=>'required|exists:expence_categories,id',
             'price'=>'required|min:1',
             'safe_id'=>'required|exists:safes,id',
             'description'=>'nullable|string',
         ];
         $messages = [
-            'title.required'=>'العنوان مطلوب',
+            'category_id.required'=>'التصنيف مطلوب',
+            'category_id.exists'=>'التصنيف غير موجود',
             'price.required'=>'السعر مطلوب',
+            'price.min'=>'السعر يجب ان يكون اكبر من 1',
             'safe_id.required'=>'الخزينة مطلوبة',
             'safe_id.exists'=>'الخزينة غير موجودة',
         ];
@@ -106,7 +112,7 @@ class ExpencesController extends Controller
         }
 
         $expense = Expense::findOrFail($id);
-        $expense->title = $data['title'];
+        $expense->category_id = $data['category_id'];
         $expense->price = $data['price'];
         $expense->safe_id = $data['safe_id'];
         $expense->description = $data['description'];

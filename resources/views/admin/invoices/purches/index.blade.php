@@ -97,6 +97,14 @@
                                                                             </a>
                                                                         @endif
                                                                     @endcan
+                                                                    @can('purches_invoices_return')
+                                                                        @if ($invoice->type == 'فاتورة رسمية' && $invoice->return_status=='not_returned')
+                                                                            <a class="dropdown-item"
+                                                                                href="{{ route('dashboard.return_invoice', $invoice->id) }}"><i
+                                                                                    class="la la-edit"></i> ارجاع الفاتورة
+                                                                            </a>
+                                                                        @endif
+                                                                    @endcan
                                                                     @can('purches_invoices_delete')
                                                                         <form
                                                                             action="{{ route('dashboard.purches_invoices.destroy', $invoice->id) }}"

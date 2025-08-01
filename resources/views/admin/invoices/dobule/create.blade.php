@@ -83,10 +83,6 @@
                                                 @livewire('dashboard.double-invoice-create', ['suppliers' => $suppliers, 'safes' => $safes,'categories'=>$categories,'clients'=>$clients])
                                             </div>
                                             <div class="form-actions right">
-                                                <a href="{{ route('dashboard.clients.index') }}" type="button"
-                                                    class="mr-1 btn btn-warning">
-                                                    <i class="ft-x"></i> الغاء
-                                                </a>
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
                                                 </button>

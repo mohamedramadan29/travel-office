@@ -1,22 +1,22 @@
 @extends('admin.layouts.app')
 
-@section('title', ' اضافة قسم  ')
+@section('title', ' اضافة تصنيف  ')
 
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> الاقسام </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block"> التصنيفات </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.categories.index') }}"> الاقسام
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.categories.index') }}"> التصنيفات
                                     </a>
                                 </li>
-                                <li class="breadcrumb-item active"><a href="#"> اضافة القسم </a>
+                                <li class="breadcrumb-item active"><a href="#"> اضافة التصنيف </a>
                                 </li>
                             </ol>
                         </div>
@@ -31,16 +31,8 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title" id="basic-layout-form"> اضافة قسم  </h4>
-                                    <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
-                                    <div class="heading-elements">
-                                        <ul class="mb-0 list-inline">
-                                            <li><a data-action="collapse"><i class="ft-minus"></i></a></li>
-                                            <li><a data-action="reload"><i class="ft-rotate-cw"></i></a></li>
-                                            <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
-                                            <li><a data-action="close"><i class="ft-x"></i></a></li>
-                                        </ul>
-                                    </div>
+                                    <h4 class="card-title" id="basic-layout-form"> اضافة تصنيف  </h4>
+
                                 </div>
                                 <div class="card-content collapse show">
                                     <div class="card-body">
@@ -52,8 +44,8 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="projectinput1"> اسم القسم </label>
-                                                            <input type="text" id="projectinput1" class="form-control"
+                                                            <label for="projectinput1"> اسم التصنيف </label>
+                                                            <input required type="text" id="projectinput1" class="form-control"
                                                                 placeholder="  " name="name"
                                                                 value="{{ old('name') }}">
                                                         </div>
@@ -61,9 +53,9 @@
 
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="projectinput1"> حالة القسم </label>
-                                                            <select name="status" id="" class="form-control">
-                                                                <option value="" selected disabled> -- حالة القسم --
+                                                            <label for="projectinput1"> حالة التصنيف </label>
+                                                            <select required name="status" id="" class="form-control">
+                                                                <option value="" selected disabled> -- حالة التصنيف --
                                                                 </option>
                                                                 <option value="1"
                                                                     {{ old('status') == 1 ? 'selected' : '' }}> مفعل

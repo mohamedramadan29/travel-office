@@ -1,13 +1,13 @@
 @extends('admin.layouts.app')
 @section('title')
-    تعديل فاتورة شراء
+     ارجاع فاتورة الشراء
 @endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block">تعديل فاتورة شراء</h3>
+                    <h3 class="mb-0 content-header-title d-inline-block">  ارجاع فاتورة الشراء  </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
@@ -16,7 +16,7 @@
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.purches_invoices.index') }}">فواتير
                                         الشراء</a>
                                 </li>
-                                <li class="breadcrumb-item active"><a href="#">تعديل فاتورة شراء</a>
+                                <li class="breadcrumb-item active"><a href="#"> ارجاع فاتورة شراء</a>
                                 </li>
                             </ol>
                         </div>
@@ -36,16 +36,16 @@
                                 <div class="card-content collapse show">
                                     <div class="card-body">
                                         @include('admin.layouts.validation_errors')
-                                        <form class="form" action="{{ route('dashboard.purches_invoices.update',$invoice->id) }}"
+                                        <form class="form" action="{{ route('dashboard.return_invoice',$invoice->id) }}"
                                             method="POST">
                                             @csrf
-                                            @method('PUT')
+
                                             <div class="form-body">
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label> نوع الفاتورة </label>
-                                                            <select class="form-control" name="type" id="invoiceType">
+                                                            <select disabled readonly class="form-control" name="type" id="invoiceType">
                                                                 <optgroup label="نوع الفاتورة">
                                                                     <option
                                                                         @if ($invoice->type == 'فاتورة مؤقتة') selected @endif
@@ -81,20 +81,20 @@
                                                         // Run on select change
                                                         invoiceTypeSelect.addEventListener('change', toggleNoteVisibility);
                                                     });
-                                                </script> 
+                                                </script>
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="userinput1"> البيان / الوصف </label>
                                                             <input required type="text" id="userinput1"
-                                                                class="form-control" name="bayan_txt"
+                                                                class="form-control" name="bayan_txt" disabled readonly
                                                                 value="{{ $invoice->bayan_txt }}">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="userinput1"> الرقم المرجعي </label>
-                                                            <input required type="text" id="userinput1"
+                                                            <input required type="text" id="userinput1" disabled readonly
                                                                 class="form-control" name="referance_number"
                                                                 value="{{ $invoice->referance_number }}">
                                                         </div>
@@ -102,7 +102,7 @@
                                                     <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label for="category_id"> التصنيف  </label>
-                                                            <select name="category_id" id="category_id" class="form-control">
+                                                            <select name="category_id" id="category_id" class="form-control" disabled readonly>
                                                                 <option value="">اختر التصنيف </option>
                                                                 @foreach ($categories as $category)
                                                                     <option value="{{ $category->id }}" @if ($category->id == $invoice->category_id) selected @endif>{{ $category->name }}</option>
@@ -111,7 +111,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                @livewire('dashboard.purches-invoice-create', ['suppliers' => $suppliers, 'safes' => $safes,'invoice'=>$invoice])
+                                                @livewire('dashboard.purches-invoice-return', ['suppliers' => $suppliers, 'safes' => $safes,'invoice'=>$invoice])
                                             </div>
                                             <div class="form-actions right">
                                                 <a href="{{ route('dashboard.purches_invoices.index') }}" type="button"
@@ -119,7 +119,7 @@
                                                     <i class="ft-x"></i> الغاء
                                                 </a>
                                                 <button type="submit" class="btn btn-primary">
-                                                    <i class="la la-check-square-o"></i> تعديل الفاتورة
+                                                    <i class="la la-check-square-o"></i> ارجاع الفاتورة
                                                 </button>
                                             </div>
                                         </form>

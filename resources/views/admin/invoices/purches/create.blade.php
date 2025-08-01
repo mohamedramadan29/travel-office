@@ -44,7 +44,7 @@
                                                     <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label> نوع الفاتورة </label>
-                                                            <select class="form-control" name="type">
+                                                            <select class="form-control" name="type" id="invoiceType">
                                                                 <optgroup label="نوع الفاتورة">
                                                                     <option
                                                                         @if (old('type') == 'فاتورة مؤقتة') selected @endif
@@ -57,10 +57,30 @@
                                                                     @endcan
                                                                 </optgroup>
                                                             </select>
-                                                            <span> الفاتورة المؤقتة غير نهائية ولا تؤثر على المخزون </span>
+                                                            <span id="temporaryInvoiceNote"> الفاتورة المؤقتة غير نهائية ولا
+                                                                تؤثر على المخزون </span>
                                                         </div>
                                                     </div>
                                                 </div>
+
+                                                <script>
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        const invoiceTypeSelect = document.getElementById('invoiceType');
+                                                        const temporaryInvoiceNote = document.getElementById('temporaryInvoiceNote');
+
+                                                        function toggleNoteVisibility() {
+                                                            if (invoiceTypeSelect.value === 'فاتورة رسمية') {
+                                                                temporaryInvoiceNote.style.display = 'none';
+                                                            } else {
+                                                                temporaryInvoiceNote.style.display = 'block';
+                                                            }
+                                                        }
+                                                        // Run on page load
+                                                        toggleNoteVisibility();
+                                                        // Run on select change
+                                                        invoiceTypeSelect.addEventListener('change', toggleNoteVisibility);
+                                                    });
+                                                </script>
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
@@ -80,11 +100,15 @@
                                                     </div>
                                                     <div class="col-md-12">
                                                         <div class="form-group">
-                                                            <label for="category_id"> التصنيف  </label>
-                                                            <select name="category_id" id="category_id" class="form-control">
+                                                            <label for="category_id"> التصنيف </label>
+                                                            <select name="category_id" id="category_id"
+                                                                class="form-control">
                                                                 <option value="">اختر التصنيف </option>
                                                                 @foreach ($categories as $category)
-                                                                    <option @if (old('category_id') == $category->id) selected @endif value="{{ $category->id }}">{{ $category->name }}</option>
+                                                                    <option
+                                                                        @if (old('category_id') == $category->id) selected @endif
+                                                                        value="{{ $category->id }}">{{ $category->name }}
+                                                                    </option>
                                                                 @endforeach
                                                             </select>
                                                         </div>

@@ -17,6 +17,9 @@ use App\Http\Controllers\dashboard\{
     SafesController,
     SellingInvoicesController,
     DoubleInvoiceController,
+    ExpencesCategoriesController,
+    PurchesInvoiceReturnController,
+    SellingInvoicesReturnController,
 };
 use App\Http\Controllers\dashboard\auth\AuthController;
 //use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -111,18 +114,32 @@ Route::group([
             Route::get('purches_invoices_type/{type}',[PurchesInvoicesController::class, 'PurchesInvoice'])->name('purches_invoices_type.type');
             Route::resource('purches_invoices', PurchesInvoicesController::class);
             Route::match(['get','post'],'invoice/convert_to_official/{id}',[PurchesInvoicesController::class, 'ConvertToOfficial'])->name('convert_to_official');
+            Route::match(['get','post'],'invoice/return/{id}',[PurchesInvoicesController::class, 'ReturnInvoice'])->name('return_invoice');
             //   Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
         });
         ##################### End Purches Invoices Controller #################
+
+          ##################### Start Purches Invoices Return Controller ###############
+          Route::group(['middleware' => 'can:purches_invoices_return'], function () {
+            Route::resource('purches_invoices_return', PurchesInvoiceReturnController::class);
+        });
+        ##################### End Purches Invoices Return  Controller #################
 
            ##################### Start Selling Invoices Controller ###############
            Route::group(['middleware' => 'can:selling_invoices'], function () {
             Route::get('selling_invoices_type/{type}',[SellingInvoicesController::class, 'SellingInvoice'])->name('selling_invoices_type.type');
             Route::resource('selling_invoices', SellingInvoicesController::class);
             Route::match(['get','post'],'invoice/convert_to_official/{id}',[SellingInvoicesController::class, 'ConvertToOfficial'])->name('convert_to_official');
+            Route::match(['get','post'],'invoice/return/{id}',[SellingInvoicesController::class, 'ReturnInvoice'])->name('selling_return_invoice');
             //   Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
         });
         ##################### End Selling Invoices Controller #################
+          ##################### Start Selling Invoices Return Controller ###############
+          Route::group(['middleware' => 'can:selling_invoices_return'], function () {
+            Route::resource('selling_invoices_return', SellingInvoicesReturnController::class);
+        });
+        ##################### End Selling Invoices Return  Controller #################
+
         ##################### Start Double Invoices Controller ###############
         Route::group(['middleware' => 'can:double_invoices'], function () {
             Route::get('double_invoices/create', [DoubleInvoiceController::class,'create'])->name('double_invoices.create');
@@ -135,6 +152,12 @@ Route::group([
             Route::resource('expenses', ExpencesController::class);
         });
         ###################### End Expences Controller ##########################
+
+        ###################### Start Expences Categories Controller ######################
+        Route::group(['middleware' => 'can:expenses_categories'], function () {
+            Route::resource('expenses_categories', ExpencesCategoriesController::class);
+        });
+        ###################### End Expences Categories Controller ##########################
 
 
         ################# Start Categories Routes #####################

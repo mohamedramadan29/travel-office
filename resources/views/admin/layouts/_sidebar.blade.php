@@ -46,19 +46,20 @@
               @endcan
               @can('categories')
                   <li class="nav-item {{ Route::is('dashboard.categories.*') ? 'active' : '' }}"><a href="#"> <i
-                              class="bi bi-bookmarks-fill"></i> <span class="menu-title" data-i18n="nav.role.main"> الاقسام
+                              class="bi bi-bookmarks-fill"></i> <span class="menu-title" data-i18n="nav.role.main">
+                              التصنيفات
                           </span><span class="float-right mr-2 badge badge-info badge-pill"> {{ $CategoriesCount }} </span>
                       </a>
                       <ul class="menu-content">
                           <li class="{{ Route::is('dashboard.categories.index') ? 'active' : '' }}">
                               <a class="menu-item" href="{{ route('dashboard.categories.index') }}"
                                   data-i18n="nav.role.index">
-                                  جميع الاقسام </a>
+                                  جميع التصنيفات </a>
                           </li>
                           <li class="{{ Route::is('dashboard.categories.create') ? 'active' : '' }}">
                               <a class="menu-item" href="{{ route('dashboard.categories.create') }}"
                                   data-i18n="nav.templates.vert.classic_menu"> <i class="la la-plus"></i> <span
-                                      class="menu-title"> اضافة قسم جديد </a>
+                                      class="menu-title"> اضافة تصنيف جديد </a>
                           </li>
                       </ul>
                   </li>
@@ -148,6 +149,13 @@
                                   </a>
                               </li>
                           @endcan
+                          @can('purches_invoices_return')
+                              <li class="{{ Route::is('dashboard.purches_invoices_return.index') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.purches_invoices_return.index') }}"
+                                      data-i18n="nav.users.user_profile"> فواتير الارجاع
+                                  </a>
+                              </li>
+                          @endcan
                           @can('purches_invoices_create')
                               <li class="{{ Route::is('dashboard.purches_invoices.create') ? 'active' : '' }}">
                                   <a class="menu-item" href="{{ route('dashboard.purches_invoices.create') }}"
@@ -169,6 +177,14 @@
                                   data-i18n="nav.users.user_profile"> فواتير البيع
                               </a>
                           </li>
+                          @can('selling_invoices_return')
+                          <li class="{{ Route::is('dashboard.selling_invoices_return.index') ? 'active' : '' }}">
+                            <a class="menu-item" href="{{ route('dashboard.selling_invoices_return.index') }}"
+                                data-i18n="nav.users.user_profile"> فواتير الارجاع
+                            </a>
+                        </li>
+                        @endcan
+
                           @can('selling_invoices_create')
                               <li class="{{ Route::is('dashboard.selling_invoices.create') ? 'active' : '' }}">
                                   <a class="menu-item" href="{{ route('dashboard.selling_invoices.create') }}"
@@ -179,7 +195,9 @@
                   </li>
               @endcan
               @can('double_invoices')
-                  <li class="nav-item{{ Route::is('dashboard.double_invoices.*') ? 'active' : '' }}"><a href="#"> <i class="bi bi-receipt"></i> <span class="menu-title" data-i18n="nav.users.main"> فواتير المزدوجة
+                  <li class="nav-item{{ Route::is('dashboard.double_invoices.*') ? 'active' : '' }}"><a href="#">
+                          <i class="bi bi-receipt"></i> <span class="menu-title" data-i18n="nav.users.main"> فواتير
+                              المزدوجة
                           </span> </a>
                       <ul class="menu-content">
                           @can('add_double_invoices')
@@ -192,10 +210,19 @@
                   </li>
               @endcan
 
+
               @can('expenses')
-                  <li class="nav-item{{ Route::is('dashboard.expenses.*') ? 'active' : '' }}"><a href="#"> <i class="bi bi-list-ul"></i> <span class="menu-title" data-i18n="nav.users.main"> المصروفات
+                  <li class="nav-item{{ Route::is('dashboard.expenses.*') ? 'active' : '' }}"><a href="#"> <i
+                              class="bi bi-list-ul"></i> <span class="menu-title" data-i18n="nav.users.main"> المصروفات
                           </span> </a>
                       <ul class="menu-content">
+                          @can('expenses_categories')
+                              <li class="{{ Route::is('dashboard.expenses_categories.index') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.expenses_categories.index') }}"
+                                      data-i18n="nav.users.user_profile"> تصنيفات المصروفات
+                                  </a>
+                              </li>
+                          @endcan
                           <li class="{{ Route::is('dashboard.expenses.index') ? 'active' : '' }}">
                               <a class="menu-item" href="{{ route('dashboard.expenses.index') }}"
                                   data-i18n="nav.users.user_profile"> المصروفات

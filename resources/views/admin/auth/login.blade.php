@@ -13,7 +13,7 @@
                             <div class="m-0 card border-grey border-lighten-3">
                                 <div class="border-0 card-header">
                                     <div class="text-center card-title">
-                                        <img src="{{ asset('assets/admin') }}/images/logo/logo-dark.png"
+                                        <img width="140px" src="{{ asset($setting->logo) }}"
                                             alt="branding logo">
                                     </div>
                                     <h6 class="pt-2 text-center card-subtitle line-on-side text-muted font-small-3">
@@ -44,14 +44,14 @@
                                                 </div>
                                                 <div class="help-block font-small-3"></div>
                                             </fieldset>
-                                            <fieldset>
+                                            {{-- <fieldset>
                                                 {!! NoCaptcha::display() !!}
                                                 @if ($errors->has('g-recaptcha-response'))
                                                     <span class="help-block">
                                                         <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
                                                     </span>
                                                 @endif
-                                            </fieldset>
+                                            </fieldset> --}}
                                             <br>
                                             <div class="form-group row">
                                                 <div class="text-center col-md-6 col-12 text-md-left">

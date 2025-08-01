@@ -1,5 +1,5 @@
 body{
-    font-family: "Zain", serif;
+    font-family: "Tajawal", serif;
 }
 a:focus {
   outline : none;
@@ -966,7 +966,7 @@ select.form-control {
 .header-navbar {
   padding : 0;
   min-height : 5rem;
-  font-family : "Zain", serif;
+  font-family : "Tajawal", serif;
   -webkit-transition : 300ms ease all;
      -moz-transition : 300ms ease all;
        -o-transition : 300ms ease all;
@@ -1755,7 +1755,7 @@ select.form-control {
 
 .breadcrumb {
   font-size : 1rem;
-  font-family : "Zain", serif;
+  font-family : "Tajawal", serif;
   background-color : transparent;
   padding : 0 0rem 0.75rem 0;
 }

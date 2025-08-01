@@ -44,10 +44,13 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="projectinput1"> العنوان   </label>
-                                                            <input type="text" id="projectinput1" class="form-control"
-                                                                placeholder="  " name="title"
-                                                                value="{{ old('title') }}">
+                                                            <label for="projectinput1"> حدد  تصنيف المصروف    </label>
+                                                            <select name="category_id" id="" class="form-control">
+                                                                <option value="" selected disabled> -- حدد -- </option>
+                                                                @foreach ($categories as $category)
+                                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">

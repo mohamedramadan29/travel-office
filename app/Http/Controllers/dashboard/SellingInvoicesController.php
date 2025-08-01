@@ -12,6 +12,8 @@ use App\Http\Traits\Message_Trait;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\admin\ClientTransaction;
+use App\Models\admin\PurcheInvoice;
+use App\Models\admin\SaleInvoiceReturn;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,7 +22,7 @@ class SellingInvoicesController extends Controller
   use Message_Trait;
     public function index()
     {
-        $invoices = SaleInvoice::paginate(10);
+        $invoices = SaleInvoice::orderBy('id','DESC')->paginate(10);
         return view('admin.invoices.selling.index', compact('invoices'));
     }
 
@@ -36,7 +38,9 @@ class SellingInvoicesController extends Controller
         if($clients->count() == 0){
             return redirect()->route('dashboard.clients.create');
         }
-        return view('admin.invoices.selling.create', compact('suppliers', 'safes','categories','clients'));
+        $purchesInvoices = PurcheInvoice::where('status','available')->where('type','فاتورة رسمية')->get();
+
+        return view('admin.invoices.selling.create', compact('suppliers', 'safes','categories','clients','purchesInvoices'));
     }
 
     /**
@@ -97,6 +101,9 @@ class SellingInvoicesController extends Controller
         $invoice->category_id = $data['category_id'];
         $invoice->admin_id = Auth::user()->id;
         $invoice->save();
+        $purchesInvoice = PurcheInvoice::where('referance_number', $data['referance_number'])->first();
+        $purchesInvoice->status = 'sold';
+        $purchesInvoice->save();
         ############################################# Add Transction To Client #############################
         if($data['remaining'] > 0) {
             ClientTransaction::create([
@@ -214,7 +221,7 @@ class SellingInvoicesController extends Controller
         ############################################# Add Transction To Client #############################
         if ($data['remaining'] > 0) {
             ClientTransaction::create([
-                'customer_id' => $data['client_id'],
+                'client_id' => $data['client_id'],
                 'sale_invoice_id' => $invoice->id,
                 'amount' => $data['remaining'],
                 'type' => 'debit',
@@ -223,7 +230,7 @@ class SellingInvoicesController extends Controller
         }
         if ($data['paid'] > 0) {
             ClientTransaction::create([
-                'customer_id' => $data['client_id'],
+                'client_id' => $data['client_id'],
                 'sale_invoice_id' => $invoice->id,
                 'amount' => $data['paid'],
                 'type' => 'credit',
@@ -252,5 +259,58 @@ class SellingInvoicesController extends Controller
         } catch (\Exception $e) {
             return $this->exception_message($e);
         }
+    }
+
+    public function ReturnInvoice(Request $request,$id){
+        $selling_invoice = SaleInvoice::findOrFail($id);
+        $suppliers = Supplier::active()->get();
+        $safes = Safe::active()->get();
+        $categories = Category::active()->get();
+        $clients = Client::active()->get();
+        if($request->isMethod('post')){
+            try{
+                $data = $request->all();
+                DB::beginTransaction();
+                 ####### Start Add Sellign Return Invoice
+                 $returnSelling = new SaleInvoiceReturn();
+                 $returnSelling->bayan_txt = $selling_invoice['bayan_txt'];
+                 $returnSelling->referance_number = $selling_invoice['referance_number'];
+                 $returnSelling->supplier_id = $selling_invoice['supplier_id'];
+                 $returnSelling->client_id = $selling_invoice['client_id'];
+                 $returnSelling->qyt = $selling_invoice['qyt'];
+                 $returnSelling->selling_price = $selling_invoice['selling_price'];
+                 $returnSelling->total_price = $selling_invoice['total_price'];
+                 $returnSelling->paid = $selling_invoice['paid'];
+                 $returnSelling->remaining = $selling_invoice['remaining'];
+                 $returnSelling->payment_method = $selling_invoice['payment_method'];
+                 $returnSelling->safe_id = $selling_invoice['safe_id'];
+                 $returnSelling->category_id = $selling_invoice['category_id'];
+                 $returnSelling->admin_id =Auth::guard('admin')->id();
+                 $returnSelling->sale_invoice_id = $selling_invoice['id'];
+                 $returnSelling->return_price = $data['return_price'];
+                 $returnSelling->save();
+                 ############ Update Selling Invoice Status
+                 $selling_invoice->return_status = 'returned';
+                 $selling_invoice->save();
+                 ###################################
+                ############################################# Add Transction To Client #############################
+                ClientTransaction::create([
+                    'client_id' => $selling_invoice['client_id'],
+                    'sale_invoice_id' => $selling_invoice->id,
+                    'amount' => $data['return_price'],
+                    'type' => 'debit', // المبلغ المدفوع من العميل  دائن
+                    'payment_method' => $selling_invoice['payment_method'],
+                    'safe_id' => $selling_invoice['safe_id'],
+                    'description' => 'إرجاع لفاتورة بيع #' . $selling_invoice->id,
+                ]);
+                 DB::commit();
+                 return to_route('dashboard.selling_invoices_return.index');
+            }catch(\Exception $e){
+                dd($e->getMessage());
+                DB::rollBack();
+                return $this->exception_message($e);
+            }
+        }
+        return view('admin.invoices.selling.return', compact('selling_invoice','suppliers','safes','categories','clients'));
     }
 }

@@ -66,7 +66,7 @@ class ClientsController extends Controller
         $client->status = $data['status'];
         $client->address = $data['address'];
         $client->save();
-      return $this->success_message('تم اضافة المورد بنجاح');
+      return $this->success_message('تم اضافة العميل بنجاح');
     }
 
     /**
@@ -126,7 +126,7 @@ class ClientsController extends Controller
             'status' => $data['status'],
             'address' => $data['address'],
         ]);
-        return $this->success_message('تم تحديث المورد بنجاح');
+        return $this->success_message('تم تحديث العميل بنجاح');
     }
 
     /**
@@ -136,7 +136,7 @@ class ClientsController extends Controller
     {
         $client = Client::findOrFail($id);
         $client->delete();
-        return $this->success_message('تم حذف المورد بنجاح');
+        return $this->success_message('تم حذف العميل بنجاح');
     }
 
     public function ChangeStatus($id){

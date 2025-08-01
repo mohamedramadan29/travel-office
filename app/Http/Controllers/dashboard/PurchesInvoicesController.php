@@ -12,6 +12,7 @@ use App\Models\admin\PurcheInvoice;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use App\Models\admin\PurcheInvoiceReturn;
 use App\Models\admin\SupplierTransaction;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,7 +22,7 @@ class PurchesInvoicesController extends Controller
     use Message_Trait;
     public function index()
     {
-        $invoices = PurcheInvoice::paginate(10);
+        $invoices = PurcheInvoice::orderBy('id','DESC')->paginate(10);
         return view('admin.invoices.purches.index', compact('invoices'));
 
     }
@@ -115,7 +116,7 @@ class PurchesInvoicesController extends Controller
                     'supplier_id' => $data['supplier_id'],
                     'purchase_invoice_id' => $invoice->id,
                     'amount' => $data['paid'],
-                    'type' => 'debit', // المبلغ المدفوع للمورد  مدين 
+                    'type' => 'debit', // المبلغ المدفوع للمورد  مدين
                     'payment_method' => $data['payment_method'],
                     'safe_id' => $data['safe_id'],
                     'description' => 'دفعة لفاتورة شراء #' . $invoice->id,
@@ -256,13 +257,13 @@ class PurchesInvoicesController extends Controller
     public function PurchesInvoice($type){
         if($type == 'official'){
             $type = 'فواتير شراء رسمية';
-            $invoices = PurcheInvoice::where('type','فاتورة رسمية')->paginate(10);
+            $invoices = PurcheInvoice::where('type','فاتورة رسمية')->orderBy('id','DESC')->paginate(10);
         }elseif($type == 'interim'){
             $type = 'فواتير شراء  مؤقتة';
-            $invoices = PurcheInvoice::where('type','فاتورة مؤقتة')->paginate(10);
+            $invoices = PurcheInvoice::where('type','فاتورة مؤقتة')->orderBy('id','DESC')->paginate(10);
         }else{
             $type = 'فواتير شراء  مؤقتة';
-            $invoices = PurcheInvoice::paginate(10);
+            $invoices = PurcheInvoice::orderBy('id','DESC')->paginate(10);
         }
         return view('admin.invoices.purches.invoices-by-type', compact('invoices','type'));
     }
@@ -283,5 +284,59 @@ class PurchesInvoicesController extends Controller
         }
        // return Redirect()->back()->withInput()->withErrors(' يجب اكمال جميع بيانات الفاتورة ');
        return to_route('dashboard.purches_invoices.edit',$invoice->id)->withErrors(' يجب اكمال جميع بيانات الفاتورة ');
+    }
+
+    public function ReturnInvoice(Request $request,$id){
+
+        $invoice = PurcheInvoice::findOrFail($id);
+        $suppliers = Supplier::active()->get();
+        $safes = Safe::active()->get();
+        $categories = Category::active()->get();
+        $admin_id = Auth::guard('admin')->id();
+        if($request->isMethod('post')){
+            try{
+
+
+        $data = $request->all();
+        DB::beginTransaction();
+        $returnInvoice = new PurcheInvoiceReturn();
+        $returnInvoice->create([
+            'purche_invoice_id'=>$invoice->id,
+            'type'=>$invoice->type,
+            'bayan_txt'=>$invoice->bayan_txt,
+            'referance_number'=>$invoice->referance_number,
+            'qyt'=>$invoice->qyt,
+            'purches_price'=>$invoice->purches_price,
+            'total_price'=>$invoice->total_price,
+            'supplier_id'=>$invoice->supplier_id,
+            'payment_method'=>$invoice->payment_method,
+            'safe_id'=>$invoice->safe_id,
+            'paid'=>$invoice->paid,
+            'remaining'=>$invoice->remaining,
+            'admin_id'=>$admin_id,
+            'category_id'=>$invoice->category_id,
+            'return_price'=>$data['return_price'],
+        ]);
+        ########### Update Invoice Return Status ########
+
+        $invoice->return_status = 'returned';
+        $invoice->save();
+
+        ################################################ Add Transaction In Supplier Account ##############
+        SupplierTransaction::create([
+            'supplier_id' => $invoice->supplier_id,
+            'purchase_invoice_id' => $invoice->id,
+            'amount' => $data['return_price'],
+            'type' => 'debit',
+            'description' => 'مبلغ مستحق من فاتورة رجوع #' . $invoice->id,
+        ]);
+        DB::commit();
+        return to_route('dashboard.purches_invoices_return.index');
+    }catch(\Exception $e){
+        return $this->exception_message($e);
+    }
+      //  return $this->success_message(' تم ارجاع الفاتورة بنجاح ');
+        }
+        return view('admin.invoices.purches.return',compact('invoice','suppliers','safes','categories'));
     }
 }

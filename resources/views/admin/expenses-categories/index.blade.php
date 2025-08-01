@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('title', ' التصنيفات ')
+@section('title', ' تصنيفات المصروفات ')
 @section('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.min.css">
     {{-- <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.2/css/buttons.dataTables.min.css"> --}}
@@ -17,13 +17,13 @@
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> ادارة التصنيفات </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block"> ادارة تصنيفات المصروفات </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item active"> ادارة التصنيفات
+                                <li class="breadcrumb-item active"> ادارة تصنيفات المصروفات
                                 </li>
                             </ol>
                         </div>
@@ -41,7 +41,8 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <a href="{{ route('dashboard.categories.create') }}" class="btn btn-primary"> اضافة تصنيف جديد
+                                <a href="{{ route('dashboard.expenses_categories.create') }}" class="btn btn-primary"> اضافة
+                                    تصنيف جديد
                                 </a>
                             </div>
                             <div class="card-content collapse show">
@@ -50,8 +51,7 @@
                                     @include('admin.layouts.toaster_success')
 
                                     <div class="table-responsive">
-                                        <table
-                                            class="table table-striped table-bordered column-rendering">
+                                        <table class="table table-striped table-bordered column-rendering">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
@@ -67,7 +67,7 @@
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $category->name }}</td>
                                                         <td>
-                                                            @if($category->status == 1)
+                                                            @if ($category->status == 1)
                                                                 <span class="badge badge-success">مفعل</span>
                                                             @else
                                                                 <span class="badge badge-danger">غير مفعل</span>
@@ -75,7 +75,19 @@
                                                         </td>
                                                         <td>{{ $category->created_at }}</td>
                                                         <td>
-                                                            @include('admin.categories.actions', ['category' => $category])
+                                                            <a href="{{ route('dashboard.expenses_categories.edit', $category->id) }}"
+                                                                class="btn btn-primary btn-sm"> تعديل </a>
+
+                                                            <form
+                                                                action="{{ route('dashboard.expenses_categories.destroy', $category->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit"
+                                                                    class="delete_confirm btn btn-danger btn-sm"> حذف
+                                                                </button>
+                                                            </form>
+
                                                         </td>
                                                     </tr>
                                                 @empty

@@ -32,13 +32,12 @@
                             <div class="card">
                                 <div class="card-header">
                                     <h4 class="card-title" id="basic-layout-form"> تعديل التصنيف </h4>
-
                                 </div>
                                 <div class="card-content collapse show">
                                     <div class="card-body">
                                         @include('admin.layouts.validation_errors')
                                         <form class="form" method="POST"
-                                            action="{{ route('dashboard.categories.update', $category->id) }}">
+                                            action="{{ route('dashboard.expenses_categories.update', $category->id) }}">
                                             @csrf
                                             @method('PUT')
                                             <input type="hidden" name="id" value="{{ $category->id }}">
@@ -47,7 +46,7 @@
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="projectinput1"> اسم التصنيف </label>
-                                                            <input required type="text" id="projectinput1" class="form-control"
+                                                            <input type="text" id="projectinput1" class="form-control"
                                                                 placeholder="  " name="name"
                                                                 value="{{ $category->name }}">
                                                         </div>
@@ -73,7 +72,7 @@
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
                                                 </button>
-                                                <a href="{{ route('dashboard.categories.index') }}" type="button" class="mr-1 btn btn-warning">
+                                                <a href="{{ route('dashboard.expenses_categories.index') }}" type="button" class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> رجوع
                                                 </a>
 

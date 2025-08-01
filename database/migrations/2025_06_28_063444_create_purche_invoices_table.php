@@ -30,6 +30,7 @@ return new class extends Migration
             $table->double('selling_price',8,2)->nullable();
             $table->foreignId('client_id')->nullable()->references('id')->on('clients')->nullOnDelete();
             $table->string('status')->default('available');
+            $table->string('return_status')->default('not_returned');
             $table->timestamps();
         });
     }

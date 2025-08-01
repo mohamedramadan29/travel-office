@@ -23,6 +23,9 @@
   <!-------- File Input --------->
   <script src="{{ asset('vendor/fileinput/js/fileinput.min.js') }}"></script>
   <script src="{{ asset('vendor/fileinput/themes/bs5/theme.min.js') }}"></script>
+
+  <script src="{{ asset('assets/admin/') }}/vendors/js/forms/select/select2.full.min.js" type="text/javascript"></script>
+  <script src="{{ asset('assets/admin/') }}/js/scripts/forms/select/form-select2.js" type="text/javascript"></script>
   @if (Config::get('app.locale') == 'ar')
       <script src="{{ asset('vendor/fileinput/js/locales/LANG.js') }}"></script>
       <script src="{{ asset('vendor/fileinput/js/locales/ar.js') }}"></script>
@@ -89,3 +92,22 @@
       });
   </script>
   <!-- End File Input -->
+
+  <script>
+    document.addEventListener('livewire:init', function () {
+        $('.select2').select2();
+
+        // إعادة تهيئة Select2 بعد تحديثات Livewire
+        Livewire.on('commit', ({ component, commit, respond, succeed, fail }) => {
+            succeed(({ snapshot, effect }) => {
+                setTimeout(() => {
+                    $('.select2').each(function () {
+                        if (!$(this).hasClass('select2-hidden-accessible')) {
+                            $(this).select2();
+                        }
+                    });
+                }, 0);
+            });
+        }); 
+    });
+    </script>

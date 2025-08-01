@@ -8,11 +8,12 @@ use App\Models\admin\Admin;
 use App\Models\admin\Client;
 use App\Models\admin\Setting;
 use App\Models\admin\Category;
-use App\Models\admin\PurcheInvoice;
-use App\Models\admin\SaleInvoice;
 use App\Models\admin\Supplier;
+use App\Models\admin\SaleInvoice;
+use App\Models\admin\PurcheInvoice;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use App\Models\admin\PurcheInvoiceReturn;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -78,6 +79,12 @@ class ViewServiceProvider extends ServiceProvider
                 return SaleInvoice::count();
             });
         }
+        ######## Purches Invoices Return Count
+        if (!Cache::has('PurchesInvoicesReturnCount')) {
+            Cache::remember('PurchesInvoicesReturnCount', 60, function () {
+                return PurcheInvoiceReturn::count();
+            });
+        }
         view()->share([
             'AdminCount' => Cache::get('AdminCount'),
             'PermissionsCount' => Cache::get('PermissionsCount'),
@@ -87,6 +94,7 @@ class ViewServiceProvider extends ServiceProvider
             'SafesCount' => Cache::get('SafesCount'),
             'PurchesInvoicesCount'=>Cache::get('PurchesInvoicesCount'),
             'SellingInvoicesCount'=>Cache::get('SellingInvoicesCount'),
+            'PurchesInvoicesReturnCount'=>Cache::get('PurchesInvoicesReturnCount'),
         ]);
 
 

@@ -7,8 +7,8 @@
                         href="#"><i class="ft-menu font-large-1"></i></a></li>
                 <li class="mr-auto nav-item">
                     <a class="navbar-brand" href="{{ route('dashboard.welcome') }}">
-                        <img class="brand-logo" alt="{{ $setting->site_name }}"
-                            src={{ asset($setting->logo) }}>
+                        {{-- <img class="brand-logo" alt="{{ $setting->site_name }}"
+                            src={{ asset($setting->logo) }}> --}}
                         <h3 class="brand-text">{{ $setting->site_name }}</h3>
                     </a>
                 </li>
@@ -48,7 +48,7 @@
 
                         </div>
                     </li>
-{{-- 
+{{--
                     <li class="dropdown dropdown-notification nav-item">
                         <a class="nav-link nav-link-label" href="#" data-toggle="dropdown"><i
                                 class="ficon ft-bell"></i>

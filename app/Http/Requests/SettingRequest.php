@@ -33,7 +33,7 @@ class SettingRequest extends FormRequest
             'youtube_url'=> 'nullable|url|max:255',
             'favicon'=> 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'logo'=> 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'meta_description.*'=> 'nullable|string|min:20|max:160',
+        //    'meta_description.*'=> 'nullable|string|min:20|max:160',
             'site_copyright.*'=> 'required|string|max:255',
             'promotion_video_url'=> 'nullable|url|max:255',
         ];

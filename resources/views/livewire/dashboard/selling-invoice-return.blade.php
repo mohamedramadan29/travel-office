@@ -5,12 +5,11 @@
                 <label for="userinput1"> الرقم المرجعي </label>
 
                 @if($this->selling_invoice)
-                <input readonly required wire:model.live='referance_number' type="text" id="userinput1" class="form-control" name="referance_number"
+                <input readonly disabled required wire:model.live='referance_number' type="text" id="userinput1" class="form-control" name="referance_number"
                     value="{{ old('referance_number') }}">
-
                 @else
-                <div class="form-group"> 
-                    <select wire:model.live='referance_number' name="referance_number" id=""
+                <div class="form-group">
+                    <select wire:model.live='referance_number' name="referance_number" id="" disabled readonly
                         class="form-control">
                         <option value="">اختر الرقم المرجعي</option>
                         @foreach ($purchesInvoices as $purcheinvoice)
@@ -35,7 +34,7 @@
             <div class="form-group">
                 <label for="userinput1"> البيان / الوصف </label>
                 <input required wire:model.live='bayan_txt' type="text" id="userinput1" class="form-control" name="bayan_txt"
-                    value="{{ old('bayan_txt') }}">
+                    value="{{ old('bayan_txt') }}" disabled readonly>
                 @error('bayan_txt')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -44,7 +43,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="category_id"> التصنيف </label>
-                <select name="category_id" id="category_id" class="form-control" wire:model.live="category_id">
+                <select name="category_id" id="category_id" class="form-control" wire:model.live="category_id" disabled readonly>
                     <option value="">اختر التصنيف </option>
                     @foreach ($categories as $category)
                         <option value="{{ $category->id }}">
@@ -61,7 +60,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="qyt"> الكمية </label>
-                <input wire:model.live="qyt" type="number" id="qyt" class="form-control" name="qyt"
+                <input wire:model.live="qyt" type="number" id="qyt" class="form-control" name="qyt" disabled readonly
                     min="1">
                 @error('qyt')
                     <span class="text-danger">{{ $message }}</span>
@@ -71,7 +70,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="selling_price"> سعر البيع </label>
-                <input wire:model.live="selling_price" type="number" step="0.01" min="0" id="selling_price"
+                <input wire:model.live="selling_price" type="number" step="0.01" min="0" id="selling_price" disabled readonly
                     class="form-control" name="selling_price">
                 @error('selling_price')
                     <span class="text-danger">{{ $message }}</span>
@@ -85,7 +84,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="client_id"> العميل </label>
-                <select name="client_id" id="client_id" class="form-control" wire:model.live="client_id" wire:change="getClientInfo">
+                <select name="client_id" id="client_id" class="form-control" wire:model.live="client_id" disabled readonly wire:change="getClientInfo">
                     <option value="">اختر العميل</option>
                     @foreach ($clients as $client)
                         <option value="{{ $client->id }}">{{ $client->name }}</option>
@@ -138,7 +137,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="supplier_id"> المورد </label>
-                <select name="supplier_id" id="supplier_id" class="form-control" wire:model.live="supplier_id">
+                <select name="supplier_id" id="supplier_id" class="form-control" wire:model.live="supplier_id" disabled readonly>
                     <option value="">اختر المورد</option>
                     @foreach ($suppliers as $supplier)
                         <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
@@ -190,7 +189,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="payment_method"> طريقة الدفع </label>
-                <select name="payment_method" id="payment_method" class="form-control" wire:model.live="payment_method">
+                <select name="payment_method" id="payment_method" class="form-control" wire:model.live="payment_method" disabled readonly>
                     <option value="">اختر طريقة الدفع</option>
                     <option value="نقدا">نقدا</option>
                     <option value="شيك">شيك</option>
@@ -204,7 +203,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="safe_id"> الخزينة </label>
-                <select name="safe_id" id="safe_id" class="form-control" wire:model.live="safe_id">
+                <select name="safe_id" id="safe_id" class="form-control" wire:model.live="safe_id" disabled readonly>
                     <option value="">اختر الخزينة</option>
                     @foreach ($safes as $safe)
                         <option value="{{ $safe->id }}">{{ $safe->name }}</option>
@@ -218,7 +217,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="paid"> المدفوع (د.ل) </label>
-                <input min="0" max="{{ $total_price }}" wire:model.live="paid" type="number"
+                <input min="0" max="{{ $total_price }}" wire:model.live="paid" type="number" disabled readonly
                     id="paid" class="form-control" name="paid">
                 <span>اتركه صفرًا للدفع لاحقًا</span>
                 @error('paid')
@@ -229,7 +228,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="remaining"> الباقي (د.ل) </label>
-                <input wire:model.live="remaining" readonly type="number" id="remaining" class="form-control"
+                <input wire:model.live="remaining" readonly type="number" id="remaining" class="form-control" disabled readonly
                     name="remaining">
                 @error('remaining')
                     <span class="text-danger">{{ $message }}</span>
@@ -239,9 +238,23 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="total_price"> السعر الكلي (د.ل) </label>
-                <input wire:model.live="total_price" readonly type="number" id="total_price" class="form-control"
+                <input wire:model.live="total_price" readonly type="number" id="total_price" class="form-control" disabled readonly
                     name="total_price">
                 @error('total_price')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <h4 class="card-title" id="basic-layout-colored-form-control"><strong> بيانات الارجاع  </strong></h4>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="return_price"> سعر الارجاع  (د.ل) </label>
+                <input wire:model.live="return_price" type="number" id="return_price" class="form-control" name="return_price">
+                @error('return_price')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
