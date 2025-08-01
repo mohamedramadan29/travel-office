@@ -115,7 +115,6 @@ Route::group([
             Route::resource('purches_invoices', PurchesInvoicesController::class);
             Route::match(['get','post'],'invoice/convert_to_official/{id}',[PurchesInvoicesController::class, 'ConvertToOfficial'])->name('convert_to_official');
             Route::match(['get','post'],'invoice/return/{id}',[PurchesInvoicesController::class, 'ReturnInvoice'])->name('return_invoice');
-            //   Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
         });
         ##################### End Purches Invoices Controller #################
 
@@ -130,7 +129,7 @@ Route::group([
             Route::get('selling_invoices_type/{type}',[SellingInvoicesController::class, 'SellingInvoice'])->name('selling_invoices_type.type');
             Route::resource('selling_invoices', SellingInvoicesController::class);
             Route::match(['get','post'],'invoice/convert_to_official/{id}',[SellingInvoicesController::class, 'ConvertToOfficial'])->name('convert_to_official');
-            Route::match(['get','post'],'invoice/return/{id}',[SellingInvoicesController::class, 'ReturnInvoice'])->name('selling_return_invoice');
+            Route::match(['get','post'],'selling_invoice/return/{id}',[SellingInvoicesController::class, 'ReturnInvoice'])->name('selling_return_invoice');
             //   Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
         });
         ##################### End Selling Invoices Controller #################
