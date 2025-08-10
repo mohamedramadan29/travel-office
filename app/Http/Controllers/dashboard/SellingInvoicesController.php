@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\dashboard;
 
+use Mpdf\Mpdf;
 use App\Models\admin\Safe;
 use App\Models\admin\Client;
 use Illuminate\Http\Request;
@@ -10,11 +11,12 @@ use App\Models\admin\Supplier;
 use App\Models\admin\SaleInvoice;
 use App\Http\Traits\Message_Trait;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
-use App\Models\admin\ClientTransaction;
 use App\Models\admin\PurcheInvoice;
-use App\Models\admin\SaleInvoiceReturn;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\SellingInvoicesExport;
+use App\Models\admin\ClientTransaction;
+use App\Models\admin\SaleInvoiceReturn;
 use Illuminate\Support\Facades\Validator;
 
 class SellingInvoicesController extends Controller
@@ -38,14 +40,13 @@ class SellingInvoicesController extends Controller
         if($clients->count() == 0){
             return redirect()->route('dashboard.clients.create');
         }
-        $purchesInvoices = PurcheInvoice::where('status','available')->where('type','فاتورة رسمية')->get();
+        $purchesInvoices = PurcheInvoice::where('status','available')->get();
+        //dd($purchesInvoices);
 
         return view('admin.invoices.selling.create', compact('suppliers', 'safes','categories','clients','purchesInvoices'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
         $data = $request->all();
@@ -133,18 +134,14 @@ class SellingInvoicesController extends Controller
        }
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(string $id)
     {
         $invoice = SaleInvoice::findOrFail($id);
         return view('admin.invoices.selling.show', compact('invoice'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(string $id)
     {
         $selling_invoice = SaleInvoice::findOrFail($id);
@@ -155,9 +152,6 @@ class SellingInvoicesController extends Controller
         return view('admin.invoices.selling.edit', compact('selling_invoice','suppliers','safes','categories','clients'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
 
@@ -247,9 +241,7 @@ class SellingInvoicesController extends Controller
        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(string $id)
     {
         try {
@@ -313,4 +305,99 @@ class SellingInvoicesController extends Controller
         }
         return view('admin.invoices.selling.return', compact('selling_invoice','suppliers','safes','categories','clients'));
     }
+
+    public function InterimInvoices(){
+        $invoices = PurcheInvoice::where('status','sold')->where('type','فاتورة مؤقتة')->latest()->paginate(10);
+        $query = $invoices->map(function ($invoice){
+            $selling_invoice = SaleInvoice::where('referance_number',$invoice->referance_number)->first();
+           // $invoice->selling_invoice = $selling_invoice;
+            $invoice->client = $selling_invoice->client->name;
+            return $invoice;
+        });
+    //    dd($query);
+        return view('admin.invoices.selling.interim',compact('invoices'));
+    }
+
+        ########################################### Generate All Selling Invoices  Pdf ##########################################
+        public function SellingInvoicesPdf(){
+            $invoices = SaleInvoice::latest()->get();
+            // إعداد محتوى HTML
+            $html = '
+            <html lang="ar" dir="rtl">
+            <head>
+                <style>
+                    body {
+                        font-family: "Cairo", sans-serif; /* اختر خط يدعم اللغة العربية */
+                        text-align: right; /* محاذاة النصوص لليمين */
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    th, td {
+                        border: 1px solid #000;
+                        padding: 8px;
+                        text-align: right; /* لمحاذاة النصوص داخل الجدول */
+                    }
+                    th {
+                        background-color: #f2f2f2; /* لون خلفية للرأس */
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>تقرير عن فواتير البيع </h1>
+
+                <table>
+                    <thead>
+                        <tr>
+                           <th> العميل </th>
+                            <th> البيان </th>
+                            <th> الرقم المرجعي </th>
+                            <th> المورد </th>
+                            <th> التصنيف </th>
+                            <th> الكمية </th>
+                            <th> السعر الكلي </th>
+                            <th> تاريخ الانشاء </th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+            // تعبئة البيانات داخل الجدول
+            foreach ($invoices as $invoice) {
+
+                $html .= '
+                        <tr>
+                            <td>' . $invoice->client->name . '</td>
+                            <td>' . $invoice->bayan_txt . '</td>
+                            <td>' . $invoice->referance_number . '</td>
+                            <td>' . $invoice->supplier->name . '</td>
+                            <td>' . $invoice->category->name . '</td>
+                            <td>' . $invoice->qyt . '</td>
+                            <td>' . number_format($invoice->total_price, 2) . ' دينار</td>
+                            <td>' . $invoice->created_at->format('Y-m-d H:i') . '</td>
+                        </tr>';
+            }
+            $html .= '
+                    </tbody>
+                </table>
+            </body>
+            </html>';
+
+            // إعداد mPDF
+            $mpdf = new Mpdf([
+                'default_font' => 'Cairo', // خط يدعم اللغة العربية
+            ]);
+
+            // تحميل المحتوى إلى ملف PDF
+            $mpdf->WriteHTML($html);
+            // توليد ملف PDF وإرساله للتنزيل
+            return $mpdf->Output('تقرير عن فواتير البيع.pdf', 'I'); // 'I' لعرض الملف في المتصفح
+
+        }
+
+        ######################################### Generate Selling Invoices Excel ############################
+
+        public function SellingInvoicesExcel(){
+            return (new SellingInvoicesExport())->download('SellingInvoices.xlsx');
+        }
 }

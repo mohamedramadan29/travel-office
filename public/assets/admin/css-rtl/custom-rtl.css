@@ -120,3 +120,8 @@ code[class*='language-'], pre[class*='language-'] {
 .navbar-semi-dark .navbar-header {
     background: #2a3b4b;
 }
+
+
+.main-menu.menu-dark .navigation > li ul li > a {
+    padding: 8px 25px 8px 8px;
+}

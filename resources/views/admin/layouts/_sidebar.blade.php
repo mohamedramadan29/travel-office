@@ -177,13 +177,20 @@
                                   data-i18n="nav.users.user_profile"> فواتير البيع
                               </a>
                           </li>
+                          <li class="{{ Route::is('dashboard.selling_invoices.interim') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.selling_invoices.interim') }}"
+                                  data-i18n="nav.users.user_profile"> فواتير شراء مؤقتة تم بيعها <span
+                                      class="float-right badge badge-info badge-pill">
+                                      {{ $PurchesInvoicesInterim }}</span>
+                              </a>
+                          </li>
                           @can('selling_invoices_return')
-                          <li class="{{ Route::is('dashboard.selling_invoices_return.index') ? 'active' : '' }}">
-                            <a class="menu-item" href="{{ route('dashboard.selling_invoices_return.index') }}"
-                                data-i18n="nav.users.user_profile"> فواتير الارجاع
-                            </a>
-                        </li>
-                        @endcan
+                              <li class="{{ Route::is('dashboard.selling_invoices_return.index') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.selling_invoices_return.index') }}"
+                                      data-i18n="nav.users.user_profile"> فواتير الارجاع
+                                  </a>
+                              </li>
+                          @endcan
 
                           @can('selling_invoices_create')
                               <li class="{{ Route::is('dashboard.selling_invoices.create') ? 'active' : '' }}">
@@ -233,6 +240,45 @@
                               <a class="menu-item" href="{{ route('dashboard.expenses.create') }}"
                                   data-i18n="nav.users.user_cards"> اضافة مصروف </a>
                           </li>
+                      </ul>
+                  </li>
+              @endcan
+              @can('reports')
+                  <li class="nav-item{{ Route::is('dashboard.reports.*') ? 'active' : '' }}"><a href="#"> <i
+                              class="bi bi-bar-chart-line-fill"></i> <span class="menu-title" data-i18n="nav.users.main">
+                              التقارير
+                          </span> </a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.reports.expenses_report') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.reports.expenses_report') }}"
+                                  data-i18n="nav.users.user_profile"> تقارير المصروفات
+                              </a>
+                          </li>
+                          <li class="{{ Route::is('dashboard.reports.PurchesInvoicesReport') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.reports.PurchesInvoicesReport') }}"
+                                  data-i18n="nav.users.user_profile"> تقارير فواتير الشراء
+                              </a>
+                          </li>
+                          <li class="{{ Route::is('dashboard.reports.SalesInvoicesReport') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.reports.SalesInvoicesReport') }}"
+                                  data-i18n="nav.users.user_profile"> تقارير فواتير البيع
+                              </a>
+                          </li>
+                      </ul>
+                  </li>
+              @endcan
+              @can('reports')
+                  <li class="nav-item{{ Route::is('dashboard.reports.*') ? 'active' : '' }}"><a href="#"> <i
+                              class="bi bi-wallet-fill"></i> <span class="menu-title" data-i18n="nav.users.main">
+                              قائمة الدخل
+                          </span> </a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.reports.income_report') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.reports.income_report') }}"
+                                  data-i18n="nav.users.user_profile"> قائمة الدخل
+                              </a>
+                          </li>
+
                       </ul>
                   </li>
               @endcan

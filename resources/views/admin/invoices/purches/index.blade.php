@@ -32,8 +32,10 @@
                         <div class="card">
                             @can('purches_invoices_create')
                                 <div class="card-header">
-                                    <a href="{{ route('dashboard.purches_invoices.create') }}" class="btn btn-primary"> اضافة
+                                    <a href="{{ route('dashboard.purches_invoices.create') }}" class="btn btn-primary btn-sm"> اضافة
                                         فاتورة </a>
+                                        <a href="{{ route('dashboard.purches_invoices.pdf') }}" class="btn btn-info btn-sm"> استخراج ملف Pdf </a>
+                                        <a href="{{ route('dashboard.purches_invoices.excel') }}" class="btn btn-warning btn-sm"> استخراج ملف Excel </a>
                                 </div>
                             @endcan
                             <div class="card-content collapse show">
@@ -91,7 +93,7 @@
                                                                     @can('purches_invoices_edit')
                                                                         @if ($invoice->type == 'فاتورة مؤقتة')
                                                                             <a class="dropdown-item"
-                                                                                href="{{ route('dashboard.convert_to_official', $invoice->id) }}"><i
+                                                                                href="{{ route('dashboard.convert_to_official_purches', $invoice->id) }}"><i
                                                                                     class="la la-edit"></i> تحويل الي فاتورة
                                                                                 رسمية
                                                                             </a>

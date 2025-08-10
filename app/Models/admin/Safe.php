@@ -19,4 +19,7 @@ class Safe extends Model
     public function scopeActive($query){
         return $query->where('status', 1);
     }
+    public function SafeStatus($value){
+        return $value == 1 ? 'نشط' : 'غير نشط';
+    }
 }

@@ -41,8 +41,14 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <a href="{{ route('dashboard.safes.create') }}" class="btn btn-primary"> اضافة خزينة جديدة
+                                <a href="{{ route('dashboard.safes.create') }}" class="btn btn-primary btn-sm"> اضافة خزينة جديدة
                                 </a>
+                                <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
+                                href="{{ route('dashboard.safes.pdf') }}">
+                                استخراج ملف Pdf </a>
+                                <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
+                                href="{{ route('dashboard.safes.excel') }}"> استخراج
+                                    ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">

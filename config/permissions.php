@@ -20,6 +20,7 @@ return [
     'selling_invoices_create'=>' اضافة فاتورة بيع',
     'selling_invoices_edit'=>' تعديل فاتورة بيع',
     'selling_invoices_delete'=>' حذف فاتورة بيع',
+    'selling_invoices_interim'=>'فواتير شراء مؤقتة تم بيعها',
     'official_selling_invoices'=>'فواتير البيع الرسمية',
     'interim_selling_invoices'=>'فواتير البيع المؤقتة',
     'safes'=>'ادارة الخزائن',

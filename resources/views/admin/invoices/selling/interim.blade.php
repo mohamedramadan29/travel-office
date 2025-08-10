@@ -1,17 +1,20 @@
 @extends('admin.layouts.app')
-@section('title', 'الموظفين ')
+@section('title', ' فواتير شراء مؤقتة تم بيعها  ')
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> ادارة الموظفين </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block"> فواتير شراء مؤقتة تم بيعها </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item active"> ادارة الموظفين
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.selling_invoices.index') }}">فواتير
+                                        البيع </a>
+                                </li>
+                                <li class="breadcrumb-item active"> فواتير شراء مؤقتة تم بيعها
                                 </li>
                             </ol>
                         </div>
@@ -27,15 +30,12 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header">
-                                <a href="{{ route('dashboard.admins.create') }}" class="btn btn-primary btn-sm"> اضافة موظف </a>
-                                <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
-                                href="{{ route('dashboard.admins.pdf') }}">
-                                استخراج ملف Pdf </a>
-                                <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
-                                href="{{ route('dashboard.admins.excel') }}"> استخراج
-                                    ملف Excel </a>
-                            </div>
+                            @can('selling_invoices_create')
+                                <div class="card-header">
+                                    <a href="{{ route('dashboard.selling_invoices.create') }}" class="btn btn-primary"> اضافة
+                                        فاتورة </a>
+                                </div>
+                            @endcan
                             <div class="card-content collapse show">
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -43,23 +43,31 @@
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th> الاسم </th>
-                                                    <th> البريد الالكتروني </th>
-                                                    <th> الصلاحيات </th>
-                                                    <th> الحالة </th>
+                                                    <th> العميل </th>
+                                                    <th> البيان </th>
+                                                    <th> الرقم المرجعي </th>
+                                                    <th> المورد </th>
+                                                    <th> التصنيف </th>
+                                                    <th> الكمية </th>
+                                                    <th> السعر الكلي </th>
                                                     <th> تاريخ الانشاء </th>
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ($admins as $admin)
+                                                @forelse ($invoices as $invoice)
                                                     <tr>
                                                         <th scope="row">{{ $loop->iteration }}</th>
-                                                        <td> {{ $admin->name }} </td>
-                                                        <td> {{ $admin->email }} </td>
-                                                        <td> {{ $admin->role->role }} </td>
-                                                        <td> <span class="badge badge-pill badge-{{ $admin->status == 'نشط' ? 'success' : 'danger' }}">{{ $admin->status }}</span> </td>
-                                                        <td> {{ $admin->created_at->format('Y-m-d') }} </td>
+                                                        <td>
+                                                            {{ $invoice->client}}
+                                                        </td>
+                                                        <td> {{ $invoice->bayan_txt }} </td>
+                                                        <td> {{ $invoice->referance_number }} </td>
+                                                        <td> {{ $invoice->supplier->name }} </td>
+                                                        <td> {{ $invoice->category->name ?? 'غير محدد' }} </td>
+                                                        <td> {{ $invoice->qyt }} </td>
+                                                        <td> {{ $invoice->total_price }} د.ل </td>
+                                                        <td> {{ $invoice->created_at->format('Y-m-d H:i') }} </td>
                                                         <td>
                                                             <div class="dropdown float-md-left">
                                                                 <button class="px-2 btn btn-primary dropdown-toggle"
@@ -67,19 +75,17 @@
                                                                     data-toggle="dropdown" aria-haspopup="true"
                                                                     aria-expanded="false"> العمليات </button>
                                                                 <div class="dropdown-menu"
-                                                                    aria-labelledby="dropdownBreadcrumbButton"><a
-                                                                        class="dropdown-item"
-                                                                        href="{{ route('dashboard.admins.edit', $admin->id) }}"><i
-                                                                            class="la la-edit"></i> تعديل </a>
-                                                                    <a class="dropdown-item"
-                                                                        href="{{ route('dashboard.admins.status', $admin->id) }}"><i
-                                                                            class="la la-edit"></i> تعديل الحالة  </a>
-                                                                            <form action="{{ route('dashboard.admins.destroy', $admin->id) }}" method="post">
-                                                                                @csrf
-                                                                                @method('delete')
-                                                                                <button type="submit" class="dropdown-item delete_confirm"><i
-                                                                                    class="la la-trash"></i> حذف </button>
-                                                                            </form>
+                                                                    aria-labelledby="dropdownBreadcrumbButton">
+                                                                    @can('selling_invoices_edit')
+                                                                        @if ($invoice->type == 'فاتورة مؤقتة')
+                                                                            <a class="dropdown-item"
+                                                                                href="{{ route('dashboard.convert_to_official_purches', $invoice->id) }}"><i
+                                                                                    class="la la-edit"></i> تحويل الي
+                                                                                رسمية
+                                                                            </a>
+                                                                        @endif
+                                                                    @endcan
+
 
                                                                 </div>
                                                             </div>
@@ -90,7 +96,7 @@
                                                 @endforelse
                                             </tbody>
                                         </table>
-                                        {{ $admins->links() }}
+                                        {{ $invoices->links() }}
                                     </div>
                                 </div>
 

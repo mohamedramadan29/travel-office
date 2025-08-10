@@ -32,8 +32,10 @@
                         <div class="card">
                             @can('selling_invoices_create')
                                 <div class="card-header">
-                                    <a href="{{ route('dashboard.selling_invoices.create') }}" class="btn btn-primary"> اضافة
+                                    <a href="{{ route('dashboard.selling_invoices.create') }}" class="btn btn-primary btn-sm"> اضافة
                                         فاتورة </a>
+                                        <a href="{{ route('dashboard.selling_invoices.pdf') }}" class="btn btn-info btn-sm"> استخراج ملف Pdf </a>
+                                        <a href="{{ route('dashboard.selling_invoices.excel') }}" class="btn btn-warning btn-sm"> استخراج ملف Excel </a>
                                 </div>
                             @endcan
                             <div class="card-content collapse show">

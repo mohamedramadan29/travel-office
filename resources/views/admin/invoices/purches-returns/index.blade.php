@@ -29,6 +29,10 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
+                            <div class="card-header">
+                                    <a href="{{ route('dashboard.purches_invoices_return.pdf') }}" class="btn btn-info btn-sm"> استخراج ملف Pdf </a>
+                                    <a href="{{ route('dashboard.purches_invoices_return.excel') }}" class="btn btn-warning btn-sm"> استخراج ملف Excel </a>
+                            </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">
                                     <div class="table-responsive">

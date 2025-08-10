@@ -41,8 +41,14 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <a href="{{ route('dashboard.categories.create') }}" class="btn btn-primary"> اضافة تصنيف جديد
+                                <a href="{{ route('dashboard.categories.create') }}" class="btn btn-primary btn-sm"> اضافة تصنيف جديد
                                 </a>
+                                <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
+                                href="{{ route('dashboard.categories.pdf') }}">
+                                استخراج ملف Pdf </a>
+                            <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
+                                href="{{ route('dashboard.categories.excel') }}"> استخراج
+                                    ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">

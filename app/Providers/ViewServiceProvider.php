@@ -12,6 +12,7 @@ use App\Models\admin\Supplier;
 use App\Models\admin\SaleInvoice;
 use App\Models\admin\PurcheInvoice;
 use Illuminate\Support\Facades\Cache;
+use App\Models\admin\SaleInvoiceReturn;
 use Illuminate\Support\ServiceProvider;
 use App\Models\admin\PurcheInvoiceReturn;
 
@@ -85,6 +86,20 @@ class ViewServiceProvider extends ServiceProvider
                 return PurcheInvoiceReturn::count();
             });
         }
+        ######## Selling Invoices Return Count
+        if (!Cache::has('SellingInvoicesReturnCount')) {
+            Cache::remember('SellingInvoicesReturnCount', 60, function () {
+                return SaleInvoiceReturn::count();
+            });
+        }
+        ########  Selling Invoices Interim
+        if (!Cache::has('PurchesInvoicesInterim')) {
+            Cache::remember('PurchesInvoicesInterim', 60, function () {
+                return PurcheInvoice::where('status','sold')->where('type','فاتورة مؤقتة')->count();
+
+            });
+        }
+
         view()->share([
             'AdminCount' => Cache::get('AdminCount'),
             'PermissionsCount' => Cache::get('PermissionsCount'),
@@ -95,6 +110,8 @@ class ViewServiceProvider extends ServiceProvider
             'PurchesInvoicesCount'=>Cache::get('PurchesInvoicesCount'),
             'SellingInvoicesCount'=>Cache::get('SellingInvoicesCount'),
             'PurchesInvoicesReturnCount'=>Cache::get('PurchesInvoicesReturnCount'),
+            'SellingInvoicesReturnCount'=>Cache::get('SellingInvoicesReturnCount'),
+            'PurchesInvoicesInterim'=>Cache::get('PurchesInvoicesInterim'),
         ]);
 
 

@@ -29,6 +29,12 @@
                         <div class="card">
                             <div class="card-header">
                                 <a href="{{ route('dashboard.clients.create') }}" class="btn btn-primary"> اضافة عميل </a>
+                                <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
+                                href="{{ route('dashboard.clients.pdf') }}">
+                                استخراج ملف Pdf </a>
+                            <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
+                                href="{{ route('dashboard.clients.excel') }}"> استخراج
+                                    ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">

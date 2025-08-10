@@ -105,10 +105,10 @@
                                                                 class="form-control">
                                                                 <option value="" disabled selected> -- حدد الحالة --
                                                                 </option>
-                                                                <option {{ $admin->status == 'active' ? 'selected' : '' }}
+                                                                <option {{ $admin->status == 1 ? 'selected' : '' }}
                                                                     value="1">فعال</option>
                                                                 <option
-                                                                    {{ $admin->status == 'inactive' ? 'selected' : '' }}
+                                                                    {{ $admin->status == 0 ? 'selected' : '' }}
                                                                     value="0">غير فعال</option>
                                                             </select>
                                                         </div>

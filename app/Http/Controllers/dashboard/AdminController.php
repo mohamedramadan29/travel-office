@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\dashboard;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\AdminRequest;
-use App\Http\Services\Auth\Dashboard\RoleService;
-use App\Http\Services\Dashboard\AdminService;
-use App\Http\Traits\Message_Trait;
+use Mpdf\Mpdf;
 use App\Models\admin\Role;
+use App\Models\admin\Admin;
 use Illuminate\Http\Request;
+use App\Exports\AdminsExport;
+use App\Http\Traits\Message_Trait;
+use App\Http\Requests\AdminRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Services\Dashboard\AdminService;
+use App\Http\Services\Auth\Dashboard\RoleService;
 
 class AdminController extends Controller
 {
@@ -86,5 +89,81 @@ class AdminController extends Controller
             return $this->Error_message(' لم يتم الحذف بنجاح ، الرجاء المحاولة مرة اخرى ');
         }
         return $this->Success_message('تم الحذف بنجاح');
+    }
+
+    ########################################### Generate Admins Pdf ##########################################
+    public function AdminsPdf(){
+        $admins = Admin::latest()->get();
+        // إعداد محتوى HTML
+        $html = '
+        <html lang="ar" dir="rtl">
+        <head>
+            <style>
+                body {
+                    font-family: "Cairo", sans-serif; /* اختر خط يدعم اللغة العربية */
+                    text-align: right; /* محاذاة النصوص لليمين */
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: right; /* لمحاذاة النصوص داخل الجدول */
+                }
+                th {
+                    background-color: #f2f2f2; /* لون خلفية للرأس */
+                }
+            </style>
+        </head>
+        <body>
+            <h1>تقرير عن العملاء </h1>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th> الاسم </th>
+                        <th> البريد الالكتروني </th>
+                        <th> الصلاحيات </th>
+                        <th> الحالة </th>
+                        <th> تاريخ الانشاء </th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+        // تعبئة البيانات داخل الجدول
+        foreach ($admins as $admin) {
+            $html .= '
+                    <tr>
+                        <td>' . $admin->name . '</td>
+                        <td>' . $admin->email . '</td>
+                        <td>' . $admin->role->role . '</td>
+                        <td>' . $admin->status . '</td>
+                        <td>' . $admin->created_at->format('Y-m-d') . '</td>
+                    </tr>';
+        }
+        $html .= '
+                </tbody>
+            </table>
+        </body>
+        </html>';
+
+        // إعداد mPDF
+        $mpdf = new Mpdf([
+            'default_font' => 'Cairo', // خط يدعم اللغة العربية
+        ]);
+
+        // تحميل المحتوى إلى ملف PDF
+        $mpdf->WriteHTML($html);
+        // توليد ملف PDF وإرساله للتنزيل
+        return $mpdf->Output('تقرير عن الموظفين.pdf', 'I'); // 'I' لعرض الملف في المتصفح
+
+    }
+
+    ######################################### Generate Clients Excel ############################
+
+    public function AdminsExcel(){
+        return (new AdminsExport())->download('Admins.xlsx');
     }
 }

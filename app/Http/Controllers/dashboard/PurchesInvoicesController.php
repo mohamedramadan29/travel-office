@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\dashboard;
 
+use Mpdf\Mpdf;
 use App\Models\admin\Safe;
 use Illuminate\Http\Request;
 use App\Models\admin\Category;
@@ -11,10 +12,12 @@ use Illuminate\Support\Facades\DB;
 use App\Models\admin\PurcheInvoice;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\PurchesInvoicesExport;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\admin\PurcheInvoiceReturn;
 use App\Models\admin\SupplierTransaction;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\PurchesInvoicesExportType;
 
 class PurchesInvoicesController extends Controller
 {
@@ -338,5 +341,172 @@ class PurchesInvoicesController extends Controller
       //  return $this->success_message(' تم ارجاع الفاتورة بنجاح ');
         }
         return view('admin.invoices.purches.return',compact('invoice','suppliers','safes','categories'));
+    }
+
+
+    ########################################### Generate All Purches Invoices  Pdf ##########################################
+    public function PurchesInvoicesPdf(){
+        $invoices = PurcheInvoice::latest()->get();
+        // إعداد محتوى HTML
+        $html = '
+        <html lang="ar" dir="rtl">
+        <head>
+            <style>
+                body {
+                    font-family: "Cairo", sans-serif; /* اختر خط يدعم اللغة العربية */
+                    text-align: right; /* محاذاة النصوص لليمين */
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: right; /* لمحاذاة النصوص داخل الجدول */
+                }
+                th {
+                    background-color: #f2f2f2; /* لون خلفية للرأس */
+                }
+            </style>
+        </head>
+        <body>
+            <h1>تقرير عن فواتير الشراء </h1>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th> نوع الفاتورة </th>
+                        <th> البيان </th>
+                        <th> الرقم المرجعي </th>
+                        <th> المورد </th>
+                        <th> التصنيف </th>
+                        <th> الكمية </th>
+                        <th> السعر الكلي </th>
+                        <th> تاريخ الانشاء </th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+        // تعبئة البيانات داخل الجدول
+        foreach ($invoices as $invoice) {
+
+            $html .= '
+                    <tr>
+                        <td>' . $invoice->type . '</td>
+                        <td>' . $invoice->bayan_txt . '</td>
+                        <td>' . $invoice->referance_number . '</td>
+                        <td>' . $invoice->supplier->name . '</td>
+                        <td>' . $invoice->category->name . '</td>
+                        <td>' . $invoice->qyt . '</td>
+                        <td>' . number_format($invoice->total_price, 2) . ' دينار</td>
+                        <td>' . $invoice->created_at->format('Y-m-d H:i') . '</td>
+                    </tr>';
+        }
+        $html .= '
+                </tbody>
+            </table>
+        </body>
+        </html>';
+
+        // إعداد mPDF
+        $mpdf = new Mpdf([
+            'default_font' => 'Cairo', // خط يدعم اللغة العربية
+        ]);
+
+        // تحميل المحتوى إلى ملف PDF
+        $mpdf->WriteHTML($html);
+        // توليد ملف PDF وإرساله للتنزيل
+        return $mpdf->Output('تقرير عن فواتير الشراء.pdf', 'I'); // 'I' لعرض الملف في المتصفح
+
+    }
+
+    ######################################### Generate Purches Invoices Excel ############################
+
+    public function PurchesInvoicesExcel(){
+        return (new PurchesInvoicesExport())->download('PurchesInvoices.xlsx');
+    }
+
+     ########################################### Generate Purches Invoices Pdf By Type  ##########################################
+     public function PurchesInvoicesPdfType($type){
+        $invoices = PurcheInvoice::latest()->where('type',$type)->get();
+        // إعداد محتوى HTML
+        $html = '
+        <html lang="ar" dir="rtl">
+        <head>
+            <style>
+                body {
+                    font-family: "Cairo", sans-serif; /* اختر خط يدعم اللغة العربية */
+                    text-align: right; /* محاذاة النصوص لليمين */
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: right; /* لمحاذاة النصوص داخل الجدول */
+                }
+                th {
+                    background-color: #f2f2f2; /* لون خلفية للرأس */
+                }
+            </style>
+        </head>
+        <body>
+            <h1>تقرير عن العملاء </h1>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th> نوع الفاتورة </th>
+                        <th> البيان </th>
+                        <th> الرقم المرجعي </th>
+                        <th> المورد </th>
+                        <th> التصنيف </th>
+                        <th> الكمية </th>
+                        <th> السعر الكلي </th>
+                        <th> تاريخ الانشاء </th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+        // تعبئة البيانات داخل الجدول
+        foreach ($invoices as $invoice) {
+
+            $html .= '
+                    <tr>
+                        <td>' . $invoice->type . '</td>
+                        <td>' . $invoice->bayan_txt . '</td>
+                        <td>' . $invoice->referance_number . '</td>
+                        <td>' . $invoice->supplier->name . '</td>
+                        <td>' . $invoice->category->name . '</td>
+                        <td>' . $invoice->qyt . '</td>
+                        <td>' . number_format($invoice->total_price, 2) . ' دينار</td>
+                        <td>' . $invoice->created_at->format('Y-m-d H:i') . '</td>
+                    </tr>';
+        }
+        $html .= '
+                </tbody>
+            </table>
+        </body>
+        </html>';
+
+        // إعداد mPDF
+        $mpdf = new Mpdf([
+            'default_font' => 'Cairo', // خط يدعم اللغة العربية
+        ]);
+
+        // تحميل المحتوى إلى ملف PDF
+        $mpdf->WriteHTML($html);
+        // توليد ملف PDF وإرساله للتنزيل
+        return $mpdf->Output('تقرير عن فواتير الشراء.pdf', 'I'); // 'I' لعرض الملف في المتصفح
+
+    }
+
+    ######################################### Generate Purches Invoices Excel By Type ############################
+
+    public function PurchesInvoicesExcelType($type){
+        return (new PurchesInvoicesExportType($type))->download('PurchesInvoices.xlsx');
     }
 }

@@ -32,8 +32,15 @@
                         <div class="card">
                             @can('purches_invoices_create')
                                 <div class="card-header">
-                                    <a href="{{ route('dashboard.purches_invoices.create') }}" class="btn btn-primary"> اضافة
+                                    <a href="{{ route('dashboard.purches_invoices.create') }}" class="btn btn-primary btn-sm"> اضافة
                                         فاتورة </a>
+                                    @if ($type == 'فواتير شراء  مؤقتة')
+                                        <a href="{{ route('dashboard.purches_invoices.pdf.type', 'فاتورة مؤقتة') }}" class="btn btn-info btn-sm"> استخراج ملف Pdf </a>
+                                        <a href="{{ route('dashboard.purches_invoices.excel.type', 'فاتورة مؤقتة') }}" class="btn btn-warning btn-sm"> استخراج ملف Excel </a>
+                                    @elseif($type == 'فواتير شراء رسمية')
+                                        <a href="{{ route('dashboard.purches_invoices.pdf.type', 'فاتورة رسمية') }}" class="btn btn-info btn-sm"> استخراج ملف Pdf </a>
+                                        <a href="{{ route('dashboard.purches_invoices.excel.type', 'فاتورة رسمية') }}" class="btn btn-warning btn-sm"> استخراج ملف Excel </a>
+                                    @endif
                                 </div>
                             @endcan
                             <div class="card-content collapse show">

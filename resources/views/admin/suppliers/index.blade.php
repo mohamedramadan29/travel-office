@@ -27,8 +27,14 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header">
-                                <a href="{{ route('dashboard.suppliers.create') }}" class="btn btn-primary"> اضافة مورد </a>
+                            <div class="card-header d-flex align-items-center">
+                                <a href="{{ route('dashboard.suppliers.create') }}" class="btn btn-primary btn-sm"> اضافة مورد </a>
+                                <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
+                                    href="{{ route('dashboard.suppliers.pdf') }}">
+                                    استخراج ملف Pdf </a>
+                                <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
+                                    href="{{ route('dashboard.suppliers.excel') }}"> استخراج
+                                        ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">
@@ -59,7 +65,7 @@
                                                         </td>
                                                         <td> {{ $supplier->created_at->format('Y-m-d') }} </td>
                                                         <td>
-                                                            <div class="dropdown float-md-left">
+                                                            <div class="dropdown float-md-right">
                                                                 <button class="px-2 btn btn-primary dropdown-toggle"
                                                                     id="dropdownBreadcrumbButton" type="button"
                                                                     data-toggle="dropdown" aria-haspopup="true"

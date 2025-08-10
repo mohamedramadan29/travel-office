@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\dashboard;
 
+use Mpdf\Mpdf;
 use App\Models\admin\Safe;
 use Illuminate\Http\Request;
 use App\Models\admin\Expense;
-use App\Http\Controllers\Controller;
+use App\Exports\ExpencesExport;
 use App\Http\Traits\Message_Trait;
+use App\Http\Controllers\Controller;
 use App\Models\admin\ExpenceCategory;
 use Illuminate\Support\Facades\Validator;
 
@@ -129,4 +131,78 @@ class ExpencesController extends Controller
         $expense->delete();
         return $this->success_message('تم حذف المصروف بنجاح');
     }
+
+           ########################################### Generate Expenses Pdf ##########################################
+           public function ExpensesPdf(){
+            $expenses = Expense::orderBy('id','DESC')->get();
+            // إعداد محتوى HTML
+            $html = '
+            <html lang="ar" dir="rtl">
+            <head>
+                <style>
+                    body {
+                        font-family: "Cairo", sans-serif; /* اختر خط يدعم اللغة العربية */
+                        text-align: right; /* محاذاة النصوص لليمين */
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    th, td {
+                        border: 1px solid #000;
+                        padding: 8px;
+                        text-align: right; /* لمحاذاة النصوص داخل الجدول */
+                    }
+                    th {
+                        background-color: #f2f2f2; /* لون خلفية للرأس */
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>تقرير عن  التصنيفات  </h1>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th> التصنيف   </th>
+                            <th> المبلغ </th>
+                            <th> الخزينة  </th>
+                            <th> تاريخ الانشاء </th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+            // تعبئة البيانات داخل الجدول
+            foreach ($expenses as $expense) {
+                $html .= '
+                        <tr>
+                            <td>' . $expense->category->name . '</td>
+                            <td>' . number_format($expense->price, 2) . ' دينار</td>
+                            <td>' . $expense->safe->name . '</td>
+                            <td>' . $expense->created_at . '</td>
+                        </tr>';
+            }
+            $html .= '
+                    </tbody>
+                </table>
+            </body>
+            </html>';
+
+            // إعداد mPDF
+            $mpdf = new Mpdf([
+                'default_font' => 'Cairo', // خط يدعم اللغة العربية
+            ]);
+
+            // تحميل المحتوى إلى ملف PDF
+            $mpdf->WriteHTML($html);
+            // توليد ملف PDF وإرساله للتنزيل
+            return $mpdf->Output('تقرير عن المصروفات.pdf', 'I'); // 'I' لعرض الملف في المتصفح
+
+        }
+
+        ######################################### Generate Clients Excel ############################
+
+        public function ExpencesExcel(){
+            return (new ExpencesExport())->download('Expences.xlsx');
+        }
 }

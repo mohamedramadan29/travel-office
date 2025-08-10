@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('client_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->references('id')->on('clients')->cascadeOnDelete();
-            $table->foreignId('sale_invoice_id')->references('id')->on('sale_invoices')->cascadeOnDelete();
+            $table->foreignId('sale_invoice_id')->nullable()->references('id')->on('sale_invoices')->cascadeOnDelete();
             $table->double('amount',8,2);
             $table->enum('type',['credit', 'debit']); // credit (مدفوع من العميل), debit (مستحق من العميل)
             $table->string('payment_method')->nullable();

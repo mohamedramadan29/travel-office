@@ -21,7 +21,7 @@ class SellingInvoiceCreate extends Component
     public $purchesInvoices;
     public function mount($selling_invoice = null)
     {
-        $this->purchesInvoices = PurcheInvoice::where('status','available')->where('return_status','not_returned')->where('type','فاتورة رسمية')->get();
+        $this->purchesInvoices = PurcheInvoice::where('status','available')->get();
         $this->selling_invoice = $selling_invoice;
 
         // جلب بيانات الموردين والخزائن
@@ -86,16 +86,19 @@ class SellingInvoiceCreate extends Component
     public function checkReferanceNumber($referance_number)
     {
        // dd($referance_number);
-        $invoice = PurcheInvoice::where('referance_number', $referance_number)->where('type','فاتورة رسمية')->first();
+        $invoice = PurcheInvoice::where('referance_number', $referance_number)->first();
 
         if (!$invoice) {
             $this->referance_error = 'رقم الفاتورة غير موجود';
         }
         elseif($invoice->client_id){
             $this->referance_error = 'رقم الفاتورة مرتبط بالعميل';
-        }elseif($invoice->type == 'فاتورة مؤقتة'){
-            $this->referance_error = ' الفاتورة مؤقتة وغير رسمية الي الان  ';
-        }else {
+        }
+        // elseif($invoice->type == 'فاتورة مؤقتة'){
+        //  //   $this->referance_error = ' الفاتورة مؤقتة وغير رسمية الي الان  ';
+        // }
+
+        else {
             $this->referance_error = '';
             $this->invoice = $invoice;
             $this->bayan_txt = $invoice->bayan_txt;

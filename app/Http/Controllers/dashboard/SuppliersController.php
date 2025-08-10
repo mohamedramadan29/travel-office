@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\dashboard;
 
+use App\Exports\SuppliersExport;
 use App\Models\admin\Safe;
 use Illuminate\Http\Request;
 use App\Models\admin\Supplier;
@@ -11,7 +12,7 @@ use App\Models\admin\PurcheInvoice;
 use App\Http\Controllers\Controller;
 use App\Models\admin\SupplierTransaction;
 use Illuminate\Support\Facades\Validator;
-
+use Mpdf\Mpdf;
 class SuppliersController extends Controller
 {
   use Message_Trait;
@@ -131,20 +132,20 @@ class SuppliersController extends Controller
         if(!$supplier){
             abort(404);
         }
-   // جلب جميع المعاملات
-   $transactions = SupplierTransaction::where('supplier_id', $supplier->id)
-   ->with('purchaseInvoice')->orderBy('id', 'desc')
-   ->get();
+        // جلب جميع المعاملات
+        $transactions = SupplierTransaction::where('supplier_id', $supplier->id)
+        ->with('purchaseInvoice')->orderBy('id', 'desc')
+        ->get();
 
-// جلب إجمالي قيم الفواتير
-$total_invoices = PurcheInvoice::where('supplier_id', $supplier->id)
-   ->sum('total_price');
+        // جلب إجمالي قيم الفواتير
+        $total_invoices = PurcheInvoice::where('supplier_id', $supplier->id)
+        ->sum('total_price');
 
-// حساب إجمالي المدفوع (Debit)
-$total_debit = $transactions->where('type', 'debit')->sum('amount');
-$invoices = PurcheInvoice::where('supplier_id',$supplier->id)->get();
-// الرصيد المستحق = إجمالي الفواتير - إجمالي المدفوع
-$balance = $total_invoices - $total_debit; // 1000 - 800 = 200 د.ل
+        // حساب إجمالي المدفوع (Debit)
+        $total_debit = $transactions->where('type', 'debit')->sum('amount');
+        $invoices = PurcheInvoice::where('supplier_id',$supplier->id)->get();
+        // الرصيد المستحق = إجمالي الفواتير - إجمالي المدفوع
+        $balance = $total_invoices - $total_debit; // 1000 - 800 = 200 د.ل
         return view('admin.suppliers.transactions', compact('supplier','transactions','total_invoices','total_debit','balance','invoices','safes'));
     }
 
@@ -222,6 +223,84 @@ $balance = $total_invoices - $total_debit; // 1000 - 800 = 200 د.ل
             DB::rollBack();
             return redirect()->back()->withErrors(['general' => 'حدث خطأ: ' . $e->getMessage()])->withInput();
         }
+    }
+
+    ########################################### Generate Suppliers Pdf ##########################################
+    public function SuppliersPdf(){
+        $suppliers = Supplier::latest()->get();
+        // إعداد محتوى HTML
+        $html = '
+        <html lang="ar" dir="rtl">
+        <head>
+            <style>
+                body {
+                    font-family: "Cairo", sans-serif; /* اختر خط يدعم اللغة العربية */
+                    text-align: right; /* محاذاة النصوص لليمين */
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: right; /* لمحاذاة النصوص داخل الجدول */
+                }
+                th {
+                    background-color: #f2f2f2; /* لون خلفية للرأس */
+                }
+            </style>
+        </head>
+        <body>
+            <h1>تقرير عن الموردين</h1>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th> الاسم </th>
+                        <th> رقم الهاتف </th>
+                        <th> رقم التيلغرام </th>
+                        <th> رقم الواتساب </th>
+                        <th> الحالة </th>
+                        <th> تاريخ الانشاء </th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+        // تعبئة البيانات داخل الجدول
+        foreach ($suppliers as $supplier) {
+            $html .= '
+                    <tr>
+                        <td>' . $supplier->name . '</td>
+                        <td>' . $supplier->mobile . '</td>
+                        <td>' . $supplier->telegram . '</td>
+                        <td>' . $supplier->whatsapp . '</td>
+                        <td>' . $supplier->status . '</td>
+                        <td>' . $supplier->created_at->format('Y-m-d') . '</td>
+                    </tr>';
+        }
+        $html .= '
+                </tbody>
+            </table>
+        </body>
+        </html>';
+
+        // إعداد mPDF
+        $mpdf = new Mpdf([
+            'default_font' => 'Cairo', // خط يدعم اللغة العربية
+        ]);
+
+        // تحميل المحتوى إلى ملف PDF
+        $mpdf->WriteHTML($html);
+        // توليد ملف PDF وإرساله للتنزيل
+        return $mpdf->Output('تقرير عن الموردين.pdf', 'I'); // 'I' لعرض الملف في المتصفح
+
+    }
+
+    ######################################### Generate Suppliers Excel ############################
+
+    public function SuppliersExcel(){
+        return (new SuppliersExport())->download('Suppliers.xlsx');
     }
 
 

@@ -60,8 +60,10 @@
                                                 <tr>
                                                     <th> # </th>
                                                     <th> الرقم المرجعي </th>
-                                                    <th>النوع</th>
-                                                    <th>المبلغ (د.ل)</th>
+                                                    {{-- <th>النوع</th>
+                                                    <th>المبلغ (د.ل)</th> --}}
+                                                    <th> دائن (مدفوع) </th>
+                                                    <th> مدين (مستحق) </th>
                                                     <th>طريقة الدفع</th>
                                                     <th>الوصف</th>
                                                     <th>التاريخ</th>
@@ -73,7 +75,7 @@
                                                         <td> {{ $loop->iteration }} </td>
                                                         <td>{{ $transaction->saleInvoice->referance_number ?? 'غير مرتبط' }}
                                                         </td>
-                                                        <td>
+                                                        {{-- <td>
                                                             @if ($transaction->type == 'debit')
                                                                 <span class="badge badge-pill badge-danger">مدين (مستحق من
                                                                     العميل)</span>
@@ -82,8 +84,26 @@
                                                                     (مدفوع)
                                                                 </span>
                                                             @endif
+                                                        </td> --}}
+                                                        {{-- <td>{{ $transaction->amount }}</td> --}}
+                                                        <td>
+                                                            <span class="text-success">
+                                                                <strong>
+                                                                    @if ($transaction->type == 'credit')
+                                                                        {{ $transaction->amount }}
+                                                                    @endif
+                                                                </strong>
+                                                            </span>
                                                         </td>
-                                                        <td>{{ $transaction->amount }}</td>
+                                                        <td>
+                                                            <span class="text-danger">
+                                                                <strong>
+                                                                    @if ($transaction->type == 'debit')
+                                                                        {{ $transaction->amount }}
+                                                                    @endif
+                                                                </strong>
+                                                            </span>
+                                                        </td>
                                                         <td>{{ $transaction->payment_method ?? '-' }}</td>
                                                         <td>{{ $transaction->description }}</td>
                                                         <td>{{ $transaction->created_at->format('Y-m-d') }}</td>

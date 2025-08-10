@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\dashboard;
 
+use Mpdf\Mpdf;
 use App\Models\admin\Safe;
+use App\Exports\SafesExport;
 use Illuminate\Http\Request;
 use App\Http\Traits\Message_Trait;
 use App\Models\admin\SafeMovement;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 
 class SafesController extends Controller
@@ -191,6 +192,81 @@ class SafesController extends Controller
     public function SafeMovement($id){
         $safe = Safe::with('movements')->findOrFail($id);
         return view('admin.safes.movements',compact('safe'));
+    }
+
+
+    ########################################### Generate Safes Pdf ##########################################
+    public function SafesPdf(){
+        $safes = Safe::latest()->get();
+        // إعداد محتوى HTML
+        $html = '
+        <html lang="ar" dir="rtl">
+        <head>
+            <style>
+                body {
+                    font-family: "Cairo", sans-serif; /* اختر خط يدعم اللغة العربية */
+                    text-align: right; /* محاذاة النصوص لليمين */
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: right; /* لمحاذاة النصوص داخل الجدول */
+                }
+                th {
+                    background-color: #f2f2f2; /* لون خلفية للرأس */
+                }
+            </style>
+        </head>
+        <body>
+            <h1>تقرير عن العملاء </h1>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th> الاسم </th>
+                        <th> الرصيد الحالي  </th>
+                        <th> الحالة </th>
+                        <th> تاريخ الانشاء </th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+        // تعبئة البيانات داخل الجدول
+        foreach ($safes as $safe) {
+            $html .= '
+                    <tr>
+                        <td>' . $safe->name . '</td>
+                        <td>' . number_format($safe->balance,2) . ' دينار </td>
+                        <td>' . $safe->SafeStatus($safe->status)  . '</td>
+                        <td>' . $safe->created_at . '</td>
+                    </tr>';
+        }
+        $html .= '
+                </tbody>
+            </table>
+        </body>
+        </html>';
+
+        // إعداد mPDF
+        $mpdf = new Mpdf([
+            'default_font' => 'Cairo', // خط يدعم اللغة العربية
+        ]);
+
+        // تحميل المحتوى إلى ملف PDF
+        $mpdf->WriteHTML($html);
+        // توليد ملف PDF وإرساله للتنزيل
+        return $mpdf->Output('تقرير عن الموظفين.pdf', 'I'); // 'I' لعرض الملف في المتصفح
+
+    }
+
+    ######################################### Generate Safes Excel ############################
+
+    public function SafesExcel(){
+        return (new SafesExport())->download('Safes.xlsx');
     }
 
 }

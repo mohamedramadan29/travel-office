@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "anhskohbo/no-captcha": "^3.6",
+        "carlos-meneses/laravel-mpdf": "^2.1",
         "codezero/laravel-unique-translation": "^4.3",
         "cviebrock/eloquent-sluggable": "^11.0",
         "ichtrojan/laravel-otp": "^2.0",
@@ -15,6 +16,7 @@
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
         "livewire/livewire": "^3.6",
+        "maatwebsite/excel": "^3.1",
         "mcamara/laravel-localization": "^2.2",
         "predis/predis": "^2.0",
         "redot/laravel-toastify": "^1.0",

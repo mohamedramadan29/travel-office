@@ -30,4 +30,5 @@ class PurcheInvoice extends Model
     {
         return $this->hasMany(SupplierTransaction::class);
     }
+
 }
