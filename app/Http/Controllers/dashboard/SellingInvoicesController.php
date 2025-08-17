@@ -290,7 +290,7 @@ class SellingInvoicesController extends Controller
                     'client_id' => $selling_invoice['client_id'],
                     'sale_invoice_id' => $selling_invoice->id,
                     'amount' => $data['return_price'],
-                    'type' => 'debit', // المبلغ المدفوع من العميل  دائن
+                    'type' => 'credit', // المبلغ المدفوع من العميل  دائن
                     'payment_method' => $selling_invoice['payment_method'],
                     'safe_id' => $selling_invoice['safe_id'],
                     'description' => 'إرجاع لفاتورة بيع #' . $selling_invoice->id,
@@ -311,7 +311,7 @@ class SellingInvoicesController extends Controller
         $query = $invoices->map(function ($invoice){
             $selling_invoice = SaleInvoice::where('referance_number',$invoice->referance_number)->first();
            // $invoice->selling_invoice = $selling_invoice;
-            $invoice->client = $selling_invoice->client->name;
+            $invoice->client = $selling_invoice->client->name ?? 'لا يوجد';
             return $invoice;
         });
     //    dd($query);

@@ -31,7 +31,7 @@
                 </div>
             </div>
             <div class="content-body">
-                <!-- Bordered striped start --> 
+                <!-- Bordered striped start -->
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
@@ -55,16 +55,24 @@
                                                             </thead>
                                                             <tbody>
                                                                 <tr>
-                                                                    <td> <strong> {{ number_format($expensesTotal, 2) }} </strong> دينار</td>
-                                                                    <td> <strong> {{ number_format($purchesInvoicesTotal, 2) }} </strong> دينار</td>
-                                                                    <td> <strong> {{ number_format($saleInvoicesTotal, 2) }} </strong> دينار</td>
+                                                                    <td> <strong> {{ number_format($expensesTotal, 2) }}
+                                                                        </strong> دينار</td>
                                                                     <td> <strong>
-                                                                        @if ($totalIncome >= 0)
-                                                                            <span class="text-success"> {{ number_format($totalIncome, 2) }} </span>
-                                                                        @else
-                                                                            <span class="text-danger"> {{ number_format($totalIncome, 2) }} </span>
-                                                                        @endif
-                                                                         </strong> دينار</td>
+                                                                            {{ number_format($purchesInvoicesTotal, 2) }}
+                                                                        </strong> دينار</td>
+                                                                    <td> <strong> {{ number_format($saleInvoicesTotal, 2) }}
+                                                                        </strong> دينار</td>
+                                                                    <td> <strong>
+                                                                            @if ($totalIncome >= 0)
+                                                                                <span class="text-success">
+                                                                                    {{ number_format($totalIncome, 2) }}
+                                                                                </span>
+                                                                            @else
+                                                                                <span class="text-danger">
+                                                                                    {{ number_format($totalIncome, 2) }}
+                                                                                </span>
+                                                                            @endif
+                                                                        </strong> دينار</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -86,21 +94,39 @@
                                                             <tbody>
                                                                 @forelse ($monthlyReport as $report)
                                                                     <tr>
-                                                                        <td> <strong> {{ $report->month }} </strong> </td>
-                                                                        <td> <strong> {{ number_format($report->expenses_total, 2) }} </strong> دينار</td>
-                                                                        <td> <strong> {{ number_format($report->purchases_total, 2) }} </strong> دينار</td>
-                                                                        <td> <strong> {{ number_format($report->sales_total, 2) }} </strong> دينار</td>
+                                                                        <td>
+                                                                            <strong>
+                                                                                <a
+                                                                                    href="{{ route('dashboard.reports.income_report.monthly', $report->month) }}">
+                                                                                    {{ $report->month }}
+                                                                                </a>
+                                                                            </strong>
+                                                                        </td>
                                                                         <td> <strong>
-                                                                            @if ($report->income >= 0)
-                                                                                <span class="text-success"> {{ number_format($report->income, 2) }} </span>
-                                                                            @else
-                                                                                <span class="text-danger"> {{ number_format($report->income, 2) }} </span>
-                                                                            @endif
-                                                                        </strong> دينار</td>
+                                                                                {{ number_format($report->expenses_total, 2) }}
+                                                                            </strong> دينار</td>
+                                                                        <td> <strong>
+                                                                                {{ number_format($report->purchases_total, 2) }}
+                                                                            </strong> دينار</td>
+                                                                        <td> <strong>
+                                                                                {{ number_format($report->sales_total, 2) }}
+                                                                            </strong> دينار</td>
+                                                                        <td> <strong>
+                                                                                @if ($report->income >= 0)
+                                                                                    <span class="text-success">
+                                                                                        {{ number_format($report->income, 2) }}
+                                                                                    </span>
+                                                                                @else
+                                                                                    <span class="text-danger">
+                                                                                        {{ number_format($report->income, 2) }}
+                                                                                    </span>
+                                                                                @endif
+                                                                            </strong> دينار</td>
                                                                     </tr>
                                                                 @empty
                                                                     <tr>
-                                                                        <td colspan="5" class="text-center">لا توجد بيانات شهرية</td>
+                                                                        <td colspan="5" class="text-center">لا توجد
+                                                                            بيانات شهرية</td>
                                                                     </tr>
                                                                 @endforelse
                                                             </tbody>

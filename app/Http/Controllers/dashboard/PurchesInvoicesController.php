@@ -330,7 +330,7 @@ class PurchesInvoicesController extends Controller
             'supplier_id' => $invoice->supplier_id,
             'purchase_invoice_id' => $invoice->id,
             'amount' => $data['return_price'],
-            'type' => 'debit',
+            'type' => 'credit',
             'description' => 'مبلغ مستحق من فاتورة رجوع #' . $invoice->id,
         ]);
         DB::commit();

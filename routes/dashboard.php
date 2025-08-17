@@ -218,6 +218,7 @@ Route::group([
         Route::group(['middleware' => 'can:reports','prefix'=>'reports','as'=>'reports.'], function () {
             Route::controller(IncomeReportController::class)->group(function(){
                 Route::get('income-report','IncomeReport')->name('income_report');
+                Route::get('income-report/{month}','IncomeReportMonthly')->name('income_report.monthly');
             });
         });
         ################# End Income Report Controller ##################

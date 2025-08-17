@@ -32,7 +32,7 @@
                             <div class="card-header">
                                 <button style="margin-right: 3px" type="button" class="btn btn-primary btn-sm"
                                 data-toggle="modal" data-target="#addtransaction{{ $supplier->id }}">
-                                <i class="bi bi-plus"></i>  اضافة دفعة الي المورد 
+                                <i class="bi bi-plus"></i>  اضافة دفعة الي المورد
                             </button>
                             @include('admin.suppliers._add_transaction', ['supplier' => $supplier])
                             </div>
@@ -56,7 +56,7 @@
                                     @endif
                                     <hr>
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped">
+                                        {{-- <table class="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
                                                     <th> # </th>
@@ -95,7 +95,59 @@
                                                     </tr>
                                                 @endforelse
                                             </tbody>
+                                        </table> --}}
+
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>الرقم المرجعي</th>
+                                                    <th>دائن (مدفوع)</th>
+                                                    <th>مدين (مستحق)</th>
+                                                    <th>طريقة الدفع</th>
+                                                    <th>الوصف</th>
+                                                    <th>التاريخ</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($transactions as $transaction)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $transaction->purchaseInvoice->referance_number ?? 'غير مرتبط' }}</td>
+                                                        <td>
+                                                            <span class="text-success">
+                                                                <strong>
+                                                                    @if ($transaction->type == 'debit')
+                                                                        {{ number_format($transaction->amount, 2) }}
+                                                                    @else
+                                                                        -
+                                                                    @endif
+                                                                </strong>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="text-danger">
+                                                                <strong>
+                                                                    @if ($transaction->type == 'credit')
+                                                                        {{ number_format($transaction->amount, 2) }}
+                                                                    @else
+                                                                        -
+                                                                    @endif
+                                                                </strong>
+                                                            </span>
+                                                        </td>
+                                                        <td>{{ $transaction->payment_method ?? '-' }}</td>
+                                                        <td>{{ $transaction->description ?? 'غير محدد' }}</td>
+                                                        <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="7" class="text-center">لا يوجد معاملات</td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
                                         </table>
+                                        
                                         <hr>
 
                                         {{-- {{ $transactions->links() }} --}}

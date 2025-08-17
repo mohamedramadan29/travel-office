@@ -101,13 +101,17 @@
                                                                     @endforeach
                                                                 @endif
                                                             </tbody>
+
+                                                            @if(isset($total))
                                                             <tfoot>
                                                                 <tr>
                                                                     <td colspan="2" class="text-center">إجمالي المصروفات</td>
                                                                     <td colspan="2"> <span class="badge badge-pill badge-danger"> {{ number_format($total, 2) }} دينار</span></td>
                                                                 </tr>
                                                             </tfoot>
+                                                            @endif
                                                         </table>
+
                                                     </div>
                                                 </div>
                                             </div>
