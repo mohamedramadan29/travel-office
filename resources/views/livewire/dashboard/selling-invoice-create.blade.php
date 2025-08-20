@@ -9,7 +9,7 @@
                     value="{{ old('referance_number') }}">
 
                 @else
-                <div class="form-group"> 
+                <div class="form-group">
                     <select wire:model.live='referance_number' name="referance_number" id=""
                         class="form-control">
                         <option value="">اختر الرقم المرجعي</option>
@@ -189,6 +189,18 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
+                <label for="paid"> المدفوع (د.ل) </label>
+                <input min="0" max="{{ $total_price }}" wire:model.live="paid" type="number"
+                    id="paid" class="form-control" name="paid">
+                <span>اتركه صفرًا للدفع لاحقًا</span>
+                @error('paid')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
+        @if($paid > 0)
+        <div class="col-md-6">
+            <div class="form-group">
                 <label for="payment_method"> طريقة الدفع </label>
                 <select name="payment_method" id="payment_method" class="form-control" wire:model.live="payment_method">
                     <option value="">اختر طريقة الدفع</option>
@@ -215,17 +227,7 @@
                 @enderror
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="paid"> المدفوع (د.ل) </label>
-                <input min="0" max="{{ $total_price }}" wire:model.live="paid" type="number"
-                    id="paid" class="form-control" name="paid">
-                <span>اتركه صفرًا للدفع لاحقًا</span>
-                @error('paid')
-                    <span class="text-danger">{{ $message }}</span>
-                @enderror
-            </div>
-        </div>
+        @endif
         <div class="col-md-6">
             <div class="form-group">
                 <label for="remaining"> الباقي (د.ل) </label>

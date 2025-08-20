@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\admin\PurcheInvoice;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\admin\SafeTransaction;
 use App\Exports\SellingInvoicesExport;
 use App\Models\admin\ClientTransaction;
 use App\Models\admin\SaleInvoiceReturn;
@@ -61,9 +62,14 @@ class SellingInvoicesController extends Controller
                 'total_price' => 'required|numeric|min:1',
                 'paid' => 'required',
                 'remaining' => 'required',
-                'payment_method' => 'required',
-                'safe_id' => 'required',
+                // 'payment_method' => 'required',
+                // 'safe_id' => 'required',
             ];
+            // لو المدفوع أكبر من صفر أضف القواعد
+            if (!empty($data['paid']) && $data['paid'] > 0) {
+                $rules['payment_method'] = 'required';
+                $rules['safe_id'] = 'required';
+            }
        $messages = [
         'bayan_txt.required'=>'البيان / الوصف مطلوب',
         'referance_number.required'=>'الرقم المرجعي مطلوب',
@@ -126,6 +132,26 @@ class SellingInvoicesController extends Controller
                 'description' => 'دفعة لفاتورة بيع #' . $invoice->id,
             ]);
         }
+        if($data['paid'] > 0){
+            ############################################# Start Add Transaction To Safe ############################
+            $safeTransaction = new SafeTransaction();
+            $safeTransaction->safe_id = $data['safe_id'];
+            $safeTransaction->sale_invoice_id = $invoice->id;
+            $safeTransaction->amount = $data['paid'];
+            $safeTransaction->type = 'deposit';
+            $safeTransaction->payment_method = $data['payment_method'];
+            $safeTransaction->description = ' اضافة دفعة من العميل [ ' . $invoice->client->name . ' ]' . ' من فاتورة بيع الرقم المرجعي :  ' . $invoice->referance_number;
+            $safeTransaction->save();
+            ############################################ End Add Transaction To Safe ###############################
+            ################## Update Safe Balance #########
+            $safe = Safe::findOrFail($data['safe_id']);
+            $oldSafeBalance =  $safe->balance;
+            $newSafeBalance = $oldSafeBalance + $data['paid'];
+            $safe->update([
+                'balance' => $newSafeBalance,
+            ]);
+            ################ End Update Safe Balance ########
+           }
         DB::commit();
         return $this->success_message(' تم اضافة فاتورة بيع بنجاح  ');
        }catch(\Exception $e){
@@ -345,8 +371,10 @@ class SellingInvoicesController extends Controller
                 </style>
             </head>
             <body>
-                <h1>تقرير عن فواتير البيع </h1>
-
+            <div style="text-align:center; margin:auto;display:block">
+                <img  src="' . url('assets/admin/images/logo.png') . '" style="width:120px;" alt="Logo">
+                <h4>   تقرير عن  فواتير البيع   </h4>
+                </div>
                 <table>
                     <thead>
                         <tr>

@@ -10,6 +10,9 @@ use App\Exports\ExpencesExport;
 use App\Http\Traits\Message_Trait;
 use App\Http\Controllers\Controller;
 use App\Models\admin\ExpenceCategory;
+use App\Models\admin\SafeTransaction;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 
 class ExpencesController extends Controller
@@ -56,15 +59,39 @@ class ExpencesController extends Controller
         ];
         $validator = Validator::make($data,$rules,$messages);
         if($validator->fails()){
-            return Redirect()->back()->withErrors($validator);
+            return Redirect()->back()->withErrors($validator)->withInput();
         }
-
+        $safe = Safe::findOrFail($data['safe_id']);
+        $oldSafeBalance =  $safe->balance;
+        $newSafeBalance = $oldSafeBalance - $data['price'];
+        if($newSafeBalance < 0){
+            return Redirect()->back()->withErrors(['الرصيد غير كافٍ لاتمام العملية'])->withInput();
+        }
+        DB::beginTransaction();
         $expense = new Expense();
         $expense->category_id = $data['category_id'];
         $expense->price = $data['price'];
         $expense->safe_id = $data['safe_id'];
         $expense->description = $data['description'];
         $expense->save();
+        ############################################# Start Add Transaction To Safe ############################
+        $safeTransaction = new SafeTransaction();
+        $safeTransaction->safe_id = $data['safe_id'];
+        $safeTransaction->expense_category_id = $data['category_id'];
+        $safeTransaction->amount = $data['price'];
+        $safeTransaction->type = 'withdraw';
+        $safeTransaction->description = ' دفعة من المصروف [ ' . $expense->category->name . ' ]' . ' من المصروف رقم :  ' . $expense->id;
+        $safeTransaction->save();
+        ############################################ End Add Transaction To Safe ###############################
+        ################## Update Safe Balance #########
+        $safe = Safe::findOrFail($data['safe_id']);
+        $oldSafeBalance =  $safe->balance;
+        $newSafeBalance = $oldSafeBalance - $data['price'];
+        $safe->update([
+            'balance' => $newSafeBalance,
+        ]);
+        DB::commit();
+        ################ End Update Safe Balance ########
         return $this->success_message('تم اضافة المصروف بنجاح');
     }
 

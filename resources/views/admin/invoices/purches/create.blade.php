@@ -36,6 +36,14 @@
                                 <div class="card-content collapse show">
                                     <div class="card-body">
                                         @include('admin.layouts.validation_errors')
+                                        @php
+                                        $type = request()->type;
+                                        if($type == 'official') {
+                                            $type = 'فاتورة رسمية';
+                                        } else {
+                                            $type = 'فاتورة مؤقتة';
+                                        }
+                                        @endphp
                                         <form class="form" action="{{ route('dashboard.purches_invoices.store') }}"
                                             method="POST">
                                             @csrf
@@ -44,6 +52,7 @@
                                                     <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label> نوع الفاتورة </label>
+
                                                             <select class="form-control" name="type" id="invoiceType">
                                                                 <optgroup label="نوع الفاتورة">
                                                                     <option
@@ -52,7 +61,7 @@
                                                                     </option>
                                                                     @can('official_purches_invoices')
                                                                         <option
-                                                                            @if (old('type') == 'فاتورة رسمية') selected @endif
+                                                                            @if (old('type',$type) == 'فاتورة رسمية') selected @endif
                                                                             value="فاتورة رسمية"> فاتورة رسمية </option>
                                                                     @endcan
                                                                 </optgroup>

@@ -17,6 +17,7 @@ use App\Http\Controllers\dashboard\{
     SafesController,
     SellingInvoicesController,
     DoubleInvoiceController,
+    EmployeeSalaryController,
     ExpencesCategoriesController,
     IncomeReportController,
     PurchesInvoiceReturnController,
@@ -222,6 +223,13 @@ Route::group([
             });
         });
         ################# End Income Report Controller ##################
+        #################### Start Employee Salary #####################
+        Route::group(['middleware' => 'can:expenses'], function () {
+            Route::resource('employee_salary', EmployeeSalaryController::class);
+            Route::get('employee_salary/pdf/report',[EmployeeSalaryController::class,'EmployeeSalaryPdf'])->name('employee_salary.pdf');
+            Route::get('employee_salary/excel/report',[EmployeeSalaryController::class,'EmployeeSalaryExcel'])->name('employee_salary.excel');
+        });
+        #################### End Employee Salary #######################
 
     });
 });

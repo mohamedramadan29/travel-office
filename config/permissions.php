@@ -36,4 +36,5 @@ return [
     'expenses_categories_create'=>' اضافة تصنيف مصروفات',
     'expenses_categories_edit'=>' تعديل تصنيف مصروفات',
     'expenses_categories_delete'=>' حذف تصنيف مصروفات',
+    'employee_salary'=>'ادارة الراتب',
 ];

@@ -69,7 +69,11 @@
                                                         <td> {{ $invoice->total_price }} د.ل </td>
                                                         <td> {{ $invoice->created_at->format('Y-m-d H:i') }} </td>
                                                         <td>
-                                                            <div class="dropdown float-md-left">
+                                                            <a class="btn btn-primary btn-sm"
+                                                                href="{{ route('dashboard.selling_invoices_return.show', $invoice->id) }}"><i
+                                                                    class="la la-eye"></i> مشاهدة الفاتورة
+                                                            </a>
+                                                            {{-- <div class="dropdown float-md-left">
                                                                 <button class="px-2 btn btn-primary dropdown-toggle"
                                                                     id="dropdownBreadcrumbButton" type="button"
                                                                     data-toggle="dropdown" aria-haspopup="true"
@@ -78,11 +82,11 @@
                                                                     aria-labelledby="dropdownBreadcrumbButton">
                                                                     @can('selling_invoices_edit')
                                                                         <a class="dropdown-item"
-                                                                            href="{{ route('dashboard.selling_invoices.edit', $invoice->id) }}"><i
-                                                                                class="la la-edit"></i> تعديل
+                                                                            href="{{ route('dashboard.selling_invoices_return.show', $invoice->id) }}"><i
+                                                                                class="la la-eye"></i> مشاهدة الفاتورة
                                                                         </a>
                                                                     @endcan
-                                                                    @can('selling_invoices_return')
+                                                                    {{-- @can('selling_invoices_return')
                                                                         @if ($invoice->return_status == 'not_returned')
                                                                             <a class="dropdown-item"
                                                                                 href="{{ route('dashboard.selling_return_invoice', $invoice->id) }}"><i
@@ -109,10 +113,10 @@
                                                                                 class="dropdown-item delete_confirm"><i
                                                                                     class="la la-trash"></i> حذف </button>
                                                                         </form>
-                                                                    @endcan
+                                                                    @endcan --}}
 
-                                                                </div>
-                                                            </div>
+                                                            {{-- </div> --}}
+                                                            {{-- </div> --}}
                                                         </td>
                                                     </tr>
                                                 @empty

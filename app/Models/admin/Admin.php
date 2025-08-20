@@ -50,4 +50,6 @@ class Admin extends Authenticatable
         return $value == 1 ? 'نشط' : 'غير نشط';
     }
 
+
+
 }

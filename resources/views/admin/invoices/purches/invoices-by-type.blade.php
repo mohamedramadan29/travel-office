@@ -32,8 +32,13 @@
                         <div class="card">
                             @can('purches_invoices_create')
                                 <div class="card-header">
+                                    @if ($type == 'فواتير شراء  مؤقتة')
                                     <a href="{{ route('dashboard.purches_invoices.create') }}" class="btn btn-primary btn-sm"> اضافة
                                         فاتورة </a>
+                                    @elseif($type == 'فواتير شراء رسمية')
+                                    <a href="{{ route('dashboard.purches_invoices.create','type=official') }}" class="btn btn-primary btn-sm"> اضافة
+                                        فاتورة </a>
+                                    @endif
                                     @if ($type == 'فواتير شراء  مؤقتة')
                                         <a href="{{ route('dashboard.purches_invoices.pdf.type', 'فاتورة مؤقتة') }}" class="btn btn-info btn-sm"> استخراج ملف Pdf </a>
                                         <a href="{{ route('dashboard.purches_invoices.excel.type', 'فاتورة مؤقتة') }}" class="btn btn-warning btn-sm"> استخراج ملف Excel </a>

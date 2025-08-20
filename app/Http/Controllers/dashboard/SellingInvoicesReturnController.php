@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers\dashboard;
 
+use App\Models\admin\Safe;
+use App\Models\admin\Client;
+use Illuminate\Http\Request;
+use App\Models\admin\Category;
+use App\Models\admin\Supplier;
+use App\Models\admin\SaleInvoice;
 use App\Http\Controllers\Controller;
 use App\Models\admin\SaleInvoiceReturn;
-use Illuminate\Http\Request;
 
 class SellingInvoicesReturnController extends Controller
 {
@@ -38,7 +43,13 @@ class SellingInvoicesReturnController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $selling_invoice = SaleInvoice::findOrFail($id);
+        $suppliers = Supplier::active()->get();
+        $safes = Safe::active()->get();
+        $categories = Category::active()->get();
+        $clients = Client::active()->get();
+        $invoice = SaleInvoiceReturn::findOrFail($id);
+        return view('admin.invoices.selling-returns.view',compact('invoice','selling_invoice','suppliers','safes','categories','clients'));
     }
 
     /**

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\admin\PurcheInvoice;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\admin\SafeTransaction;
 use App\Exports\PurchesInvoicesExport;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\admin\PurcheInvoiceReturn;
@@ -51,17 +52,27 @@ class PurchesInvoicesController extends Controller
                 'qyt' => 'required',
                 'purches_price' => 'required',
                 'total_price' => 'required',
-                'paid' => 'required',
+                'paid' => 'required|numeric|min:0',
                 'remaining' => 'required',
-                'payment_method' => 'required',
-                'safe_id' => 'required',
+                // 'payment_method' => 'required|if:paid,>',
+                // 'safe_id' => 'required|if:paid,>',
             ];
+             // لو المدفوع أكبر من صفر أضف القواعد
+                if (!empty($data['paid']) && $data['paid'] > 0) {
+                    $rules['payment_method'] = 'required';
+                    $rules['safe_id'] = 'required';
+                }
         }else{
             $rules = [
                 'bayan_txt'=>'required',
                 'referance_number'=>'required|unique:purche_invoices,referance_number',
                 'supplier_id' => 'required',
             ];
+            // لو المدفوع أكبر من صفر أضف القواعد
+            if (!empty($data['paid']) && $data['paid'] > 0) {
+                $rules['payment_method'] = 'required';
+                $rules['safe_id'] = 'required';
+            }
         }
        $messages = [
         'bayan_txt.required'=>'البيان / الوصف مطلوب',
@@ -96,15 +107,14 @@ class PurchesInvoicesController extends Controller
         $invoice->total_price = $data['total_price'];
         $invoice->paid = $data['paid'];
         $invoice->remaining = $data['remaining'];
-        $invoice->payment_method = $data['payment_method'];
-        $invoice->safe_id = $data['safe_id'];
+        $invoice->payment_method = $data['payment_method']??null;
+        $invoice->safe_id = $data['safe_id']??null;
         $invoice->category_id = $data['category_id'];
         $invoice->admin_id = Auth::user()->id;
         $invoice->save();
         ################################################ Add Transaction In Supplier Account ##############
 
-        if($data['type'] == 'فاتورة رسمية'){
-
+        //if($data['type'] == 'فاتورة رسمية'){
             if ($data['remaining'] > 0) {
                 SupplierTransaction::create([
                     'supplier_id' => $data['supplier_id'],
@@ -125,8 +135,28 @@ class PurchesInvoicesController extends Controller
                     'description' => 'دفعة لفاتورة شراء #' . $invoice->id,
                 ]);
             }
-        }
+   //     }
 
+   if($data['paid'] > 0){
+    ############################################# Start Add Transaction To Safe ############################
+    $safeTransaction = new SafeTransaction();
+    $safeTransaction->safe_id = $data['safe_id'];
+    $safeTransaction->purchase_invoice_id = $invoice->id;
+    $safeTransaction->amount = $data['paid'];
+    $safeTransaction->type = 'withdraw';
+    $safeTransaction->payment_method = $data['payment_method'];
+    $safeTransaction->description = ' اضافة دفعة الي المورد [ ' . $invoice->supplier->name . ' ]' . ' من فاتورة شراء الرقم المرجعي :  ' . $invoice->referance_number;
+    $safeTransaction->save();
+    ############################################ End Add Transaction To Safe ###############################
+    ################## Update Safe Balance #########
+    $safe = Safe::findOrFail($data['safe_id']);
+    $oldSafeBalance =  $safe->balance;
+    $newSafeBalance = $oldSafeBalance - $data['paid'];
+    $safe->update([
+        'balance' => $newSafeBalance,
+    ]);
+    ################ End Update Safe Balance ########
+   }
         DB::commit();
         return $this->success_message(' تم اضافة الفاتورة بنجاح  ');
        }catch(\Exception $e){
@@ -371,7 +401,10 @@ class PurchesInvoicesController extends Controller
             </style>
         </head>
         <body>
-            <h1>تقرير عن فواتير الشراء </h1>
+          <div style="text-align:center; margin:auto;display:block">
+            <img  src="' . url('assets/admin/images/logo.png') . '" style="width:120px;" alt="Logo">
+            <h4>   تقرير عن  فواتير الشراء   </h4>
+            </div>
 
             <table>
                 <thead>
@@ -454,8 +487,10 @@ class PurchesInvoicesController extends Controller
             </style>
         </head>
         <body>
-            <h1>تقرير عن العملاء </h1>
-
+          <div style="text-align:center; margin:auto;display:block">
+            <img  src="' . url('assets/admin/images/logo.png') . '" style="width:120px;" alt="Logo">
+            <h4>   تقرير عن  فواتير الشراء   </h4>
+            </div>
             <table>
                 <thead>
                     <tr>

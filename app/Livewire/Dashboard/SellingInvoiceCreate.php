@@ -139,7 +139,7 @@ class SellingInvoiceCreate extends Component
 
     public function calculateRemaining()
     {
-        $this->paid = $this->paid ?? 0; // التأكد من أن paid ليس null
+        $this->paid = (int) ($this->paid ?? 0); // التأكد من أن paid ليس null
         $this->remaining = ($this->paid > $this->total_price) ? 0 : $this->total_price - $this->paid;
     }
 

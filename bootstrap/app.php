@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if(request()->is('*/dashboard/*')){
                 return route('dashboard.login.show');
             }else{
-                return route('login');
+                return route('dashboard.login.show');
             }
         });
         $middleware->redirectUsersTo(function(){

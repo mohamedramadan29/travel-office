@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('client_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->references('id')->on('clients')->cascadeOnDelete();
-            $table->foreignId('sale_invoice_id')->nullable()->references('id')->on('sale_invoices')->cascadeOnDelete();
+            $table->integer('sale_invoice_id')->nullable();
             $table->double('amount',8,2);
             $table->enum('type',['credit', 'debit']); // credit (مدفوع من العميل), debit (مستحق من العميل)
             $table->string('payment_method')->nullable();
-            $table->integer('safe_id')->nullable()->references('id')->on('safes')->nullOnDelete();
+            $table->integer('safe_id')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
         });

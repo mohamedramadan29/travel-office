@@ -11,6 +11,7 @@ use App\Models\admin\SaleInvoice;
 use App\Http\Traits\Message_Trait;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\admin\SafeTransaction;
 use App\Models\admin\ClientTransaction;
 use Illuminate\Support\Facades\Validator;
 
@@ -222,7 +223,6 @@ class ClientsController extends Controller
             }
 
         }
-
         try {
             DB::beginTransaction();
             // تسجيل المعاملة
@@ -245,6 +245,23 @@ class ClientsController extends Controller
                 'remaining' => $new_balance,
             ]);
             }
+                 ############################################# Start Add Transaction To Safe ############################
+                 $safeTransaction = new SafeTransaction();
+                 $safeTransaction->safe_id = $data['safe_id'];
+                 $safeTransaction->client_id = $client->id;
+                 $safeTransaction->amount = $data['amount'];
+                 $safeTransaction->type = 'deposit';
+                 $safeTransaction->description = ' اضافة دفعة من  العميل  [ ' . $client->name . ' ]';
+                 $safeTransaction->save();
+                 ############################################ End Add Transaction To Safe ###############################
+                 ################## Update Safe Balance #########
+                 $safe = Safe::findOrFail($data['safe_id']);
+                 $oldSafeBalance =  $safe->balance;
+                 $newSafeBalance = $oldSafeBalance + $data['amount'];
+                 $safe->balance = $newSafeBalance;
+                 $safe->save();
+                 ################ End Update Safe Balance ########
+
             DB::commit();
             return $this->success_message('تم إضافة المعاملة بنجاح');
         } catch (\Exception $e) {
@@ -280,8 +297,10 @@ class ClientsController extends Controller
             </style>
         </head>
         <body>
-            <h1>تقرير عن العملاء </h1>
-
+        <div style="text-align:center; margin:auto;display:block">
+            <img  src="' . url('assets/admin/images/logo.png') . '" style="width:120px;" alt="Logo">
+            <h4>تقرير عن العملاء </h4>
+        </div>
             <table>
                 <thead>
                     <tr>

@@ -105,8 +105,10 @@ class CategoryController extends Controller
                 </style>
             </head>
             <body>
-                <h1>تقرير عن  التصنيفات  </h1>
-
+            <div style="text-align:center; margin:auto;display:block">
+            <img  src="' . url('assets/admin/images/logo.png') . '" style="width:120px;" alt="Logo">
+            <h4>   تقرير عن  التصنيفات   </h4>
+            </div>
                 <table>
                     <thead>
                         <tr>

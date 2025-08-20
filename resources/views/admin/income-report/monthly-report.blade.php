@@ -90,6 +90,10 @@
                                                         <td colspan="2" class="text-center">لا توجد مصروفات حسب الفئات</td>
                                                     </tr>
                                                 @endforelse
+                                                <tr>
+                                                    <th style="font-size:18px; font-weight:bold">الرواتب</th>
+                                                    <td style="font-size:16px; font-weight:bold">{{ number_format($mothlySalaryTotal, 2) }} دينار</td>
+                                                </tr>
 
                                                 <!-- صافي الأرباح والخسائر -->
                                                 <tr>

@@ -235,6 +235,13 @@
                                   data-i18n="nav.users.user_profile"> المصروفات
                               </a>
                           </li>
+                          {{-- @can('employee_salary') --}}
+                              <li class="{{ Route::is('dashboard.employee_salary.index') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.employee_salary.index') }}"
+                                      data-i18n="nav.users.user_profile"> ادارة رواتب الموظفين 
+                                  </a>
+                              </li>
+                          {{-- @endcan --}}
 
                           <li class="{{ Route::is('dashboard.expenses.create') ? 'active' : '' }}">
                               <a class="menu-item" href="{{ route('dashboard.expenses.create') }}"

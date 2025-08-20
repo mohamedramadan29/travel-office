@@ -53,21 +53,19 @@
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th> الخزينة </th>
                                                     <th> نوع العملية </th>
                                                     <th>  المبلغ </th>
-                                                    <th> الموظف  </th>
+                                                    <th>  الوصف </th>
                                                     <th> تاريخ العملية </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ( $safe->movements as $movement)
+                                                @forelse ( $safeTransactions as $movement)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
-                                                        <td>{{ $movement->safe->name }}</td>
-                                                        <td>{{ $movement->movment_type }}</td>
-                                                        <td>{{ $movement->amount }} دينار </td>
-                                                        <td>{{ $movement->admin->name }}</td>
+                                                        <td>{{ $movement->type == 'withdraw' ? 'سحب' : 'إيداع' }}</td>
+                                                        <td>{{ $movement->type == 'withdraw' ? '-' : '+' }} {{ $movement->amount }} دينار </td>
+                                                        <td>{{ $movement->description }}</td>
                                                         <td>{{ $movement->created_at }}</td>
                                                     </tr>
                                                 @empty

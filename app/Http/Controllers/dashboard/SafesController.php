@@ -11,6 +11,8 @@ use App\Models\admin\SafeMovement;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\admin\SafeTransaction;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 
 class SafesController extends Controller
@@ -142,19 +144,20 @@ class SafesController extends Controller
         DB::beginTransaction();
         ########## Add Balance
 
+        ############################################# Start Add Transaction To Safe ############################
+        $safeTransaction = new SafeTransaction();
+        $safeTransaction->safe_id = $id;
+        $safeTransaction->amount = $data['amount'];
+        $safeTransaction->type = 'deposit';
+        $safeTransaction->description = ' اضافة رصيد عام الي الخزينة  ';
+        $safeTransaction->save();
+        ############################################ End Add Transaction To Safe ###############################
+        ################## Update Safe Balance #########
         $safe->update([
             'balance' => $current_balance + $data['amount'],
         ]);
-
-        ######### Add Safe Movement
-        $safe_movement = new SafeMovement();
-        $safe_movement->safe_id = $safe->id;
-        $safe_movement->amount = $data['amount'];
-        $safe_movement->admin_id = Auth::user()->id;
-        $safe_movement->movment_type = 'deposit';
-        $safe_movement->save();
         DB::commit();
-
+        ################ End Update Safe Balance ########
         return $this->success_message('تم اضافة الرصيد بنجاح');
     }
 
@@ -173,25 +176,33 @@ class SafesController extends Controller
         if($validator->fails()){
             return Redirect()->back()->withErrors($validator);
         }
+        ########## Check If Safe Have Amount Or Not
+        if($current_balance < $data['amount']){
+            return Redirect()->back()->withErrors('الرصيد الحالي غير كافٍ');
+        }
         DB::beginTransaction();
+
+        ############################################# Start Add Transaction To Safe ############################
+        $safeTransaction = new SafeTransaction();
+        $safeTransaction->safe_id = $id;
+        $safeTransaction->amount = $data['amount'];
+        $safeTransaction->type = 'withdraw';
+        $safeTransaction->description = ' ازالة رصيد عام من الخزينة  ';
+        $safeTransaction->save();
+        ############################################ End Add Transaction To Safe ###############################
+        ################## Update Safe Balance #########
         $safe->update([
             'balance' => $current_balance - $data['amount'],
         ]);
-
-        ######### Add Safe Movement
-        $safe_movement = new SafeMovement();
-        $safe_movement->safe_id = $safe->id;
-        $safe_movement->amount = $data['amount'];
-        $safe_movement->admin_id = Auth::user()->id;
-        $safe_movement->movment_type = 'withdraw';
-        $safe_movement->save();
         DB::commit();
+        ################ End Update Safe Balance ########
         return $this->success_message('تم ازالة الرصيد بنجاح');
     }
 
     public function SafeMovement($id){
-        $safe = Safe::with('movements')->findOrFail($id);
-        return view('admin.safes.movements',compact('safe'));
+        $safe = Safe::findOrFail($id);
+        $safeTransactions = SafeTransaction::where('safe_id',$id)->get();
+        return view('admin.safes.movements',compact('safe','safeTransactions'));
     }
 
 
@@ -222,7 +233,10 @@ class SafesController extends Controller
             </style>
         </head>
         <body>
-            <h1>تقرير عن العملاء </h1>
+          <div style="text-align:center; margin:auto;display:block">
+            <img  src="' . url('assets/admin/images/logo.png') . '" style="width:120px;" alt="Logo">
+            <h4>   تقرير عن  الخزائن   </h4>
+            </div>
 
             <table>
                 <thead>

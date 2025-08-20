@@ -10,6 +10,7 @@ use App\Http\Traits\Message_Trait;
 use Illuminate\Support\Facades\DB;
 use App\Models\admin\PurcheInvoice;
 use App\Http\Controllers\Controller;
+use App\Models\admin\SafeTransaction;
 use App\Models\admin\SupplierTransaction;
 use Illuminate\Support\Facades\Validator;
 use Mpdf\Mpdf;
@@ -154,69 +155,94 @@ class SuppliersController extends Controller
     public function AddTransaction(Request $request, $id)
     {
         $supplier = Supplier::findOrFail($id);
-
         $data = $request->all();
         $rules = [
             'amount' => 'required|numeric|min:0.01',
-            'invoice_id' => 'required|exists:purche_invoices,id',
+          //  'invoice_id' => 'nullable|exists:purche_invoices,id',
             'safe_id' => 'required|exists:safes,id',
         ];
         $messages = [
             'amount.required' => 'المبلغ مطلوب',
             'amount.numeric' => 'المبلغ يجب أن يكون رقمًا',
             'amount.min' => 'المبلغ يجب أن يكون أكبر من 0',
-            'invoice_id.required' => 'رقم الفاتورة مطلوب',
-            'invoice_id.exists' => 'الفاتورة غير موجودة',
-            'safe_id.required' => 'الخزنة مطلوبة',
-            'safe_id.exists' => 'الخزنة غير موجودة',
+          //  'invoice_id.exists' => 'الفاتورة غير موجودة',
+
+          'safe_id.required'=>' من فضلك حدد الخزينة  ',
+           'safe_id.exists' => 'الخزنة غير موجودة',
         ];
 
         $validator = Validator::make($data, $rules, $messages);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-
-        $invoice = PurcheInvoice::findOrFail($data['invoice_id']);
-        if ($invoice->supplier_id != $supplier->id) {
-            return redirect()->back()->withErrors(['invoice_id' => 'لا يمكن إضافة المعاملة لفاتورة مورد آخر']);
+        $safe = Safe::findOrFail($data['safe_id']);
+        $oldSafeBalance =  $safe->balance;
+        $newSafeBalance = $oldSafeBalance - $data['amount'];
+        if($newSafeBalance < 0){
+            return redirect()->back()->withErrors(['amount' => ' رصيد الخزينة غير كافي لتسديد الدفعة الي المورد  ']);
         }
-
-        // حساب إجمالي المدفوع (Debit) والرصيد المستحق
+        if( isset($data['invoice_id']) && $data['invoice_id'] !=null){
+            $invoice = PurcheInvoice::findOrFail($data['invoice_id']);
+            if ($invoice->supplier_id != $supplier->id) {
+                return redirect()->back()->withErrors(['invoice_id' => 'لا يمكن إضافة المعاملة لفاتورة مورد آخر']);
+            }
+            // حساب إجمالي المدفوع (Debit) والرصيد المستحق
         $total_balance = SupplierTransaction::where('purchase_invoice_id', $invoice->id)
-            ->where('type', 'debit')
-            ->sum('amount');
-        $remaining_balance = $invoice->total_price - $total_balance;
+        ->where('type', 'debit')
+        ->sum('amount');
+    $remaining_balance = $invoice->total_price - $total_balance;
 
-        // التحقق من وجود رصيد مستحق
-        if ($remaining_balance <= 0) {
-            return redirect()->back()->withErrors(['amount' => 'تم تسديد الفاتورة بالكامل']);
+    // التحقق من وجود رصيد مستحق
+    if ($remaining_balance <= 0) {
+        return redirect()->back()->withErrors(['amount' => 'تم تسديد الفاتورة بالكامل']);
+    }
+
+    // التحقق من أن المبلغ المدخل مش أكبر من الرصيد المستحق
+    if ($data['amount'] > $remaining_balance) {
+        return redirect()->back()->withErrors(['amount' => 'المبلغ المدخل أكبر من الرصيد المستحق (' . $remaining_balance . ' د.ل)']);
+    }
         }
 
-        // التحقق من أن المبلغ المدخل مش أكبر من الرصيد المستحق
-        if ($data['amount'] > $remaining_balance) {
-            return redirect()->back()->withErrors(['amount' => 'المبلغ المدخل أكبر من الرصيد المستحق (' . $remaining_balance . ' د.ل)']);
-        }
+
 
         try {
             DB::beginTransaction();
-
             // تسجيل المعاملة
             $transaction = new SupplierTransaction();
             $transaction->supplier_id = $supplier->id;
             $transaction->amount = $data['amount'];
-            $transaction->purchase_invoice_id = $data['invoice_id'];
+            $transaction->purchase_invoice_id = isset($data['invoice_id']) ? $data['invoice_id'] : null;
             $transaction->safe_id = $data['safe_id'];
             $transaction->type = 'debit';
-            $transaction->description = 'تسديد دفعة لفاتورة #' . $data['invoice_id'];
+            $transaction->description = isset($data['invoice_id']) && $data['invoice_id']
+            ? 'تسديد دفعة لفاتورة #' . $data['invoice_id']
+            : 'تسديد دفعة عامة';
             $transaction->save();
 
+            if(isset($data['invoice_id']) && $data['invoice_id'] !=null){
             // تحديث حالة الفاتورة (اختياري)
             $new_balance = $remaining_balance - $data['amount'];
             $invoice->update([
                 'paid' => $total_balance + $data['amount'],
                 'remaining' => $new_balance,
             ]);
-
+            }
+            ############################################# Start Add Transaction To Safe ############################
+            $safeTransaction = new SafeTransaction();
+            $safeTransaction->safe_id = $data['safe_id'];
+            $safeTransaction->supplier_id = $supplier->id;
+            $safeTransaction->amount = $data['amount'];
+            $safeTransaction->type = 'withdraw';
+            $safeTransaction->description = ' اضافة دفعة الي المورد [ ' . $supplier->name . ' ]';
+            $safeTransaction->save();
+            ############################################ End Add Transaction To Safe ###############################
+            ################## Update Safe Balance #########
+            $safe = Safe::findOrFail($data['safe_id']);
+            $oldSafeBalance =  $safe->balance;
+            $newSafeBalance = $oldSafeBalance - $data['amount'];
+            $safe->balance = $newSafeBalance;
+            $safe->save();
+            ################ End Update Safe Balance ########
             DB::commit();
             return $this->success_message('تم إضافة المعاملة بنجاح');
         } catch (\Exception $e) {
@@ -228,14 +254,15 @@ class SuppliersController extends Controller
     ########################################### Generate Suppliers Pdf ##########################################
     public function SuppliersPdf(){
         $suppliers = Supplier::latest()->get();
-        // إعداد محتوى HTML
+
         $html = '
         <html lang="ar" dir="rtl">
         <head>
             <style>
                 body {
-                    font-family: "Cairo", sans-serif; /* اختر خط يدعم اللغة العربية */
-                    text-align: right; /* محاذاة النصوص لليمين */
+                    font-family: "tajawal", sans-serif;
+                    text-align: right;
+                    direction: rtl;
                 }
                 table {
                     width: 100%;
@@ -244,16 +271,18 @@ class SuppliersController extends Controller
                 th, td {
                     border: 1px solid #000;
                     padding: 8px;
-                    text-align: right; /* لمحاذاة النصوص داخل الجدول */
+                    text-align: right;
                 }
                 th {
-                    background-color: #f2f2f2; /* لون خلفية للرأس */
+                    background-color: #f2f2f2;
                 }
             </style>
         </head>
         <body>
-            <h1>تقرير عن الموردين</h1>
-
+        <div style="text-align:center; margin:auto;display:block">
+            <img  src="' . url('assets/admin/images/logo.png') . '" style="width:120px;" alt="Logo">
+            <h4>تقرير عن الموردين</h4>
+        </div>
             <table>
                 <thead>
                     <tr>
@@ -267,7 +296,6 @@ class SuppliersController extends Controller
                 </thead>
                 <tbody>';
 
-        // تعبئة البيانات داخل الجدول
         foreach ($suppliers as $supplier) {
             $html .= '
                     <tr>
@@ -279,23 +307,21 @@ class SuppliersController extends Controller
                         <td>' . $supplier->created_at->format('Y-m-d') . '</td>
                     </tr>';
         }
+
         $html .= '
                 </tbody>
             </table>
         </body>
         </html>';
 
-        // إعداد mPDF
-        $mpdf = new Mpdf([
-            'default_font' => 'Cairo', // خط يدعم اللغة العربية
+        $mpdf = new \Mpdf\Mpdf([
+            'default_font' => 'tajawal', // خط fallback أساسي
         ]);
 
-        // تحميل المحتوى إلى ملف PDF
         $mpdf->WriteHTML($html);
-        // توليد ملف PDF وإرساله للتنزيل
-        return $mpdf->Output('تقرير عن الموردين.pdf', 'I'); // 'I' لعرض الملف في المتصفح
-
+        return $mpdf->Output('تقرير عن الموردين.pdf', 'I');
     }
+
 
     ######################################### Generate Suppliers Excel ############################
 
