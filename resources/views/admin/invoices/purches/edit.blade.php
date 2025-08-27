@@ -38,6 +38,7 @@
                                         @include('admin.layouts.validation_errors')
                                         <form class="form" action="{{ route('dashboard.purches_invoices.update',$invoice->id) }}"
                                             method="POST">
+
                                             @csrf
                                             @method('PUT')
                                             <div class="form-body">
@@ -53,7 +54,7 @@
                                                                     </option>
                                                                     @can('official_purches_invoices')
                                                                         <option
-                                                                            @if ($invoice->type == 'فاتورة رسمية') selected @endif
+                                                                            @if ($invoice->type == 'فاتورة رسمية' || session('type') == 'official' ) selected @endif
                                                                             value="فاتورة رسمية"> فاتورة رسمية </option>
                                                                     @endcan
                                                                 </optgroup>
@@ -81,7 +82,7 @@
                                                         // Run on select change
                                                         invoiceTypeSelect.addEventListener('change', toggleNoteVisibility);
                                                     });
-                                                </script> 
+                                                </script>
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">

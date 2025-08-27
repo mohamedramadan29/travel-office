@@ -190,7 +190,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="paid"> المدفوع (د.ل) </label>
-                <input min="0" max="{{ $total_price }}" wire:model.live="paid" type="number"
+                <input min="0" max="{{ $total_price }}" wire:model.live.debounce.700ms="paid" type="number"
                     id="paid" class="form-control" name="paid">
                 <span>اتركه صفرًا للدفع لاحقًا</span>
                 @error('paid')
@@ -199,7 +199,7 @@
             </div>
         </div>
         @if($paid > 0)
-        <div class="col-md-6">
+        {{-- <div class="col-md-6">
             <div class="form-group">
                 <label for="payment_method"> طريقة الدفع </label>
                 <select name="payment_method" id="payment_method" class="form-control" wire:model.live="payment_method">
@@ -212,7 +212,7 @@
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
-        </div>
+        </div> --}}
         <div class="col-md-6">
             <div class="form-group">
                 <label for="safe_id"> الخزينة </label>

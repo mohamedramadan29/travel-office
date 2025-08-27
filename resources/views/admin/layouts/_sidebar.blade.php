@@ -236,16 +236,42 @@
                               </a>
                           </li>
                           {{-- @can('employee_salary') --}}
-                              <li class="{{ Route::is('dashboard.employee_salary.index') ? 'active' : '' }}">
-                                  <a class="menu-item" href="{{ route('dashboard.employee_salary.index') }}"
-                                      data-i18n="nav.users.user_profile"> ادارة رواتب الموظفين 
-                                  </a>
-                              </li>
+                          <li class="{{ Route::is('dashboard.employee_salary.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.employee_salary.index') }}"
+                                  data-i18n="nav.users.user_profile"> ادارة رواتب الموظفين
+                              </a>
+                          </li>
                           {{-- @endcan --}}
 
                           <li class="{{ Route::is('dashboard.expenses.create') ? 'active' : '' }}">
                               <a class="menu-item" href="{{ route('dashboard.expenses.create') }}"
                                   data-i18n="nav.users.user_cards"> اضافة مصروف </a>
+                          </li>
+                      </ul>
+                  </li>
+              @endcan
+
+
+              @can('income_services')
+                  <li class="nav-item{{ Route::is('dashboard.income_services.*') ? 'active' : '' }}"><a href="#">
+                          <i class="bi bi-list-ul"></i> <span class="menu-title" data-i18n="nav.users.main"> ايرادات
+                              خارجية
+                          </span> </a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.income_services_categories.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.income_services_categories.index') }}"
+                                  data-i18n="nav.users.user_profile"> تصنيفات الايرادات
+                              </a>
+                          </li>
+                          <li class="{{ Route::is('dashboard.income_services.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.income_services.index') }}"
+                                  data-i18n="nav.users.user_profile"> ايرادات خارجية
+                              </a>
+                          </li>
+                          <li class="{{ Route::is('dashboard.income_services.create') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.income_services.create') }}"
+                                  data-i18n="nav.users.user_profile"> اضافة ايرادات خارجية
+                              </a>
                           </li>
                       </ul>
                   </li>

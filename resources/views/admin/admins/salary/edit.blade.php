@@ -55,7 +55,7 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="userinput1">  ادخل الراتب  </label>
+                                                            <label for="userinput1">   ادخل المبلغ  </label>
                                                             <input type="number" id="userinput1"
                                                                 class="form-control"
                                                                 name="salary" value="{{ $salary->salary }}">
@@ -65,11 +65,12 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label> الحالة </label>
-                                                            <select class="form-control" name="status">
-                                                                <optgroup label="الحالة">
-                                                                    <option @if ($salary->status == 1) selected @endif value="1">نشط</option>
-                                                                    <option @if ($salary->status == 0) selected @endif value="0">غير نشط</option>
+                                                            <label> حدد الخزينة  </label>
+                                                            <select class="form-control" name="safe_id">
+                                                                <optgroup label="حدد الخزينة">
+                                                                    @foreach ($safes as $safe)
+                                                                        <option @if ($salary->safe_id == $safe->id) selected @endif value="{{ $safe->id }}">{{ $safe->name }}</option>
+                                                                    @endforeach
                                                                 </optgroup>
                                                             </select>
                                                         </div>

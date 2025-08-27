@@ -10,10 +10,11 @@ Artisan::command('inspire', function () {
 // Artisan::command('total-employe-salary-in-month', function () {
 //     $this->call('app:total-employe-salary-in-month');
 // })->purpose('Total employe salary in month')->everyMinute();
-Artisan::command('total-employe-salary-in-month', function () {
-    $this->call('app:total-employe-salary-in-month');
-})->purpose('Total employe salary in month')
-  ->monthlyOn(1, '00:00'); // يشتغل يوم 1 من كل شهر الساعة 12:00 صباحًا
+############ Stopped 
+// Artisan::command('total-employe-salary-in-month', function () {
+//     $this->call('app:total-employe-salary-in-month');
+// })->purpose('Total employe salary in month')
+//   ->monthlyOn(1, '00:00'); // يشتغل يوم 1 من كل شهر الساعة 12:00 صباحًا
 
 
 

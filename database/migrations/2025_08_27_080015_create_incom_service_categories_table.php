@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('employee_salaries', function (Blueprint $table) {
+        Schema::create('incom_service_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('admin_id')->references('id')->on('admins')->cascadeOnDelete();
-            $table->decimal('salary', 10, 2);
-            $table->foreignId('safe_id')->references('id')->on('safes')->cascadeOnDelete();
+            $table->string('name')->unique();
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('employee_salaries');
+        Schema::dropIfExists('incom_service_categories');
     }
 };

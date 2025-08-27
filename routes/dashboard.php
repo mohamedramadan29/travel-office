@@ -20,6 +20,8 @@ use App\Http\Controllers\dashboard\{
     EmployeeSalaryController,
     ExpencesCategoriesController,
     IncomeReportController,
+    IncomeServiceCategoryController,
+    IncomeServiceController,
     PurchesInvoiceReturnController,
     ReportController,
     SellingInvoicesReturnController,
@@ -95,6 +97,7 @@ Route::group([
             Route::post('suppliers/add_transaction/{invoice_id}', [SuppliersController::class, 'AddTransaction'])->name('supplier.add_transaction');
             Route::get('suppliers/pdf/report',[SuppliersController::class,'SuppliersPdf'])->name('suppliers.pdf');
             Route::get('suppliers/excel/report',[SuppliersController::class,'SuppliersExcel'])->name('suppliers.excel');
+
         });
         ##################### End Suppliers Routes ######################
 
@@ -230,6 +233,23 @@ Route::group([
             Route::get('employee_salary/excel/report',[EmployeeSalaryController::class,'EmployeeSalaryExcel'])->name('employee_salary.excel');
         });
         #################### End Employee Salary #######################
+
+         ###################### Start Income Service  Controller ######################
+         Route::group(['middleware' => 'can:income_services'], function () {
+            Route::resource('income_services', IncomeServiceController::class);
+            Route::get('income_services/pdf/report',[IncomeServiceController::class,'IncomeServicesPdf'])->name('income_services.pdf');
+            Route::get('income_services/excel/report',[IncomeServiceController::class,'IncomeServicesExcel'])->name('income_services.excel');
+        });
+        ###################### End Income Service Controller ##########################
+
+        ###################### Start Income Service Categories Controller ######################
+        Route::group(['middleware' => 'can:income_services'], function () {
+            Route::resource('income_services_categories', IncomeServiceCategoryController::class);
+            Route::get('income_services_categories/pdf/report',[IncomeServiceCategoryController::class,'IncomeServiceCategoriesPdf'])->name('income_services_categories.pdf');
+            Route::get('income_services_categories/excel/report',[IncomeServiceCategoryController::class,'IncomeServiceCategoriesExcel'])->name('income_services_categories.excel');
+        });
+        ###################### End Income Service Categories Controller ##########################
+
 
     });
 });

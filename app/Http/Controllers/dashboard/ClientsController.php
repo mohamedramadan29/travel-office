@@ -14,7 +14,7 @@ use App\Http\Controllers\Controller;
 use App\Models\admin\SafeTransaction;
 use App\Models\admin\ClientTransaction;
 use Illuminate\Support\Facades\Validator;
-
+use Carbon\Carbon;
 class ClientsController extends Controller
 {
     use Message_Trait;
@@ -151,30 +151,75 @@ class ClientsController extends Controller
         return $this->success_message('تم تغير الحالة بنجاح');
     }
 
-    public function transactions($id){
 
-    // جلب العميل
-    $client = Client::findOrFail($id);
-    $safes = Safe::active()->get();
+    public function transactions(Request $request, $id)
+    {
+        // جلب العميل
+        $client = Client::findOrFail($id);
+        $safes = Safe::active()->get();
 
-    // جلب جميع المعاملات
-    $transactions = ClientTransaction::where('client_id', $client->id)
-        ->with('saleInvoice') // لعرض تفاصيل فاتورة البيع إذا وجدت
-        ->get();
+        // جلب معلمات التاريخ من الطلب
+        $fromDate = $request->query('from_date') ?? null;
+        $toDate = $request->query('to_date') ?? null;
 
-    // جلب إجمالي قيم فواتير البيع
-    $total_invoices = SaleInvoice::where('client_id', $client->id)
-        ->sum('total_price'); // إجمالي قيم الفواتير (مثلًا 1000 د.ل)
+        // التحقق من صحة التواريخ
+        if ($fromDate && $toDate) {
+            try {
+                $fromDate = Carbon::parse($fromDate)->startOfDay();
+                $toDate = Carbon::parse($toDate)->endOfDay();
+                if ($fromDate > $toDate) {
+                    return redirect()->back()->withErrors('تاريخ البداية يجب أن يكون قبل تاريخ النهاية');
+                }
+            } catch (\Exception $e) {
+                return redirect()->back()->withErrors('تنسيق التاريخ غير صالح');
+            }
+        }
 
-    // حساب إجمالي المدفوع (Credit)
-    $total_credit = $transactions->where('type', 'credit')->sum('amount'); // 200 + 600 = 800 د.ل
+        // جلب الفواتير بناءً على الفترة الزمنية
+        $query = SaleInvoice::where('client_id', $client->id);
+        if ($fromDate && $toDate) {
+            $query->whereBetween('created_at', [$fromDate, $toDate]);
+        }
+        $invoices = $query->orderBy('created_at', 'desc')->get();
 
-    // الرصيد المستحق = إجمالي الفواتير - إجمالي المدفوع
-    $balance = $total_invoices - $total_credit; // 1000 - 800 = 200 د.ل
-    $invoices = SaleInvoice::where('client_id', $client->id)->get();
+        // جلب إجمالي قيم الفواتير ضمن الفترة
+        $total_invoices = $invoices->sum('total_price');
 
-    return view('admin.clients.transactions', compact('client', 'transactions', 'total_invoices', 'total_credit', 'balance','safes','invoices'));
+        // حساب الرصيد الافتتاحي (إجمالي الفواتير قبل from_date)
+        $opening_balance = 0;
+        if ($fromDate) {
+            $opening_balance = SaleInvoice::where('client_id', $client->id)
+                ->where('created_at', '<', $fromDate)
+                ->sum('total_price');
+        }
 
+        // جلب جميع المعاملات
+        $transactions = ClientTransaction::where('client_id', $client->id)
+            ->with('saleInvoice')
+            ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+                return $query->whereBetween('created_at', [$fromDate, $toDate]);
+            })
+            ->orderBy('id', 'desc')
+            ->get();
+
+        // حساب إجمالي المدفوع (Credit)
+        $total_credit = $transactions->where('type', 'credit')->sum('amount');
+
+        // الرصيد المستحق = إجمالي الفواتير - إجمالي المدفوع
+        $balance = $total_invoices - $total_credit;
+
+        return view('admin.clients.transactions', compact(
+            'client',
+            'transactions',
+            'total_invoices',
+            'total_credit',
+            'balance',
+            'safes',
+            'invoices',
+            'fromDate',
+            'toDate',
+            'opening_balance'
+        ));
     }
 
     public function AddTransaction(Request $request, $id)

@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use App\Models\admin\SafeTransaction;
 use App\Models\admin\SupplierTransaction;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 use Mpdf\Mpdf;
 class SuppliersController extends Controller
 {
@@ -127,27 +128,78 @@ class SuppliersController extends Controller
         return $this->success_message('تم تغير الحالة بنجاح');
     }
 
-    public function transactions($id){
+
+    public function transactions(Request $request, $id)
+    {
         $safes = Safe::active()->get();
         $supplier = Supplier::findOrFail($id);
-        if(!$supplier){
+
+        if (!$supplier) {
             abort(404);
         }
+
+        // جلب معلمات التاريخ من الطلب
+        $fromDate = $request->query('from_date');
+        $toDate = $request->query('to_date');
+
+        // التحقق من صحة التواريخ
+        if ($fromDate && $toDate) {
+            try {
+                $fromDate = Carbon::parse($fromDate)->startOfDay();
+                $toDate = Carbon::parse($toDate)->endOfDay();
+                if ($fromDate > $toDate) {
+                    return redirect()->back()->withErrors('تاريخ البداية يجب أن يكون قبل تاريخ النهاية');
+                }
+            } catch (\Exception $e) {
+                return redirect()->back()->withErrors('تنسيق التاريخ غير صالح');
+            }
+        }
+
+        // جلب الفواتير بناءً على الفترة الزمنية
+        $query = PurcheInvoice::where('supplier_id', $supplier->id);
+        if ($fromDate && $toDate) {
+            $query->whereBetween('created_at', [$fromDate, $toDate]);
+        }
+        $invoices = $query->orderBy('created_at', 'desc')->get();
+
+        // جلب إجمالي قيم الفواتير ضمن الفترة
+        $total_invoices = $invoices->sum('total_price');
+
+        // حساب الرصيد الافتتاحي (إجمالي الفواتير قبل from_date)
+        $opening_balance = 0; // القيمة الافتراضية إذا لم يكن هناك from_date
+        if ($fromDate) {
+            $opening_balance = PurcheInvoice::where('supplier_id', $supplier->id)
+                ->where('created_at', '<', $fromDate)
+                ->sum('total_price');
+        }
+
         // جلب جميع المعاملات
         $transactions = SupplierTransaction::where('supplier_id', $supplier->id)
-        ->with('purchaseInvoice')->orderBy('id', 'desc')
-        ->get();
-
-        // جلب إجمالي قيم الفواتير
-        $total_invoices = PurcheInvoice::where('supplier_id', $supplier->id)
-        ->sum('total_price');
+            ->with('purchaseInvoice')
+            ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+                return $query->whereBetween('created_at', [$fromDate, $toDate]);
+            })
+            ->orderBy('id', 'desc')
+            ->get();
 
         // حساب إجمالي المدفوع (Debit)
         $total_debit = $transactions->where('type', 'debit')->sum('amount');
-        $invoices = PurcheInvoice::where('supplier_id',$supplier->id)->get();
+
         // الرصيد المستحق = إجمالي الفواتير - إجمالي المدفوع
-        $balance = $total_invoices - $total_debit; // 1000 - 800 = 200 د.ل
-        return view('admin.suppliers.transactions', compact('supplier','transactions','total_invoices','total_debit','balance','invoices','safes'));
+        $balance = $total_invoices - $total_debit;
+
+        return view('admin.suppliers.transactions', compact(
+            'supplier',
+            'transactions',
+            'total_invoices',
+            'total_debit',
+            'balance',
+            'invoices',
+            'safes',
+            'fromDate',
+            'toDate',
+            'opening_balance'
+        ));
     }
 
 

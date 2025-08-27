@@ -59,7 +59,7 @@ class PurchesInvoicesController extends Controller
             ];
              // لو المدفوع أكبر من صفر أضف القواعد
                 if (!empty($data['paid']) && $data['paid'] > 0) {
-                    $rules['payment_method'] = 'required';
+                   // $rules['payment_method'] = 'required';
                     $rules['safe_id'] = 'required';
                 }
         }else{
@@ -70,7 +70,7 @@ class PurchesInvoicesController extends Controller
             ];
             // لو المدفوع أكبر من صفر أضف القواعد
             if (!empty($data['paid']) && $data['paid'] > 0) {
-                $rules['payment_method'] = 'required';
+               // $rules['payment_method'] = 'required';
                 $rules['safe_id'] = 'required';
             }
         }
@@ -84,7 +84,7 @@ class PurchesInvoicesController extends Controller
         'total_price.required'=>'السعر الكلي مطلوب',
         'paid.required'=>'المدفوع مطلوب',
         'remaining.required'=>'الباقي مطلوب',
-        'payment_method.required'=>'طريقة الدفع مطلوبة',
+       // 'payment_method.required'=>'طريقة الدفع مطلوبة',
         'safe_id.required'=>'الخزنة مطلوبة',
        ];
        $validator = Validator::make($data,$rules,$messages);
@@ -107,7 +107,7 @@ class PurchesInvoicesController extends Controller
         $invoice->total_price = $data['total_price'];
         $invoice->paid = $data['paid'];
         $invoice->remaining = $data['remaining'];
-        $invoice->payment_method = $data['payment_method']??null;
+       // $invoice->payment_method = $data['payment_method']??null;
         $invoice->safe_id = $data['safe_id']??null;
         $invoice->category_id = $data['category_id'];
         $invoice->admin_id = Auth::user()->id;
@@ -130,7 +130,7 @@ class PurchesInvoicesController extends Controller
                     'purchase_invoice_id' => $invoice->id,
                     'amount' => $data['paid'],
                     'type' => 'debit', // المبلغ المدفوع للمورد  مدين
-                    'payment_method' => $data['payment_method'],
+                    //'payment_method' => $data['payment_method'],
                     'safe_id' => $data['safe_id'],
                     'description' => 'دفعة لفاتورة شراء #' . $invoice->id,
                 ]);
@@ -144,7 +144,7 @@ class PurchesInvoicesController extends Controller
     $safeTransaction->purchase_invoice_id = $invoice->id;
     $safeTransaction->amount = $data['paid'];
     $safeTransaction->type = 'withdraw';
-    $safeTransaction->payment_method = $data['payment_method'];
+    //$safeTransaction->payment_method = $data['payment_method'];
     $safeTransaction->description = ' اضافة دفعة الي المورد [ ' . $invoice->supplier->name . ' ]' . ' من فاتورة شراء الرقم المرجعي :  ' . $invoice->referance_number;
     $safeTransaction->save();
     ############################################ End Add Transaction To Safe ###############################
@@ -190,9 +190,13 @@ class PurchesInvoicesController extends Controller
                 'total_price' => 'required|numeric|min:1',
                 'paid' => 'required',
                 'remaining' => 'required',
-                'payment_method' => 'required',
-                'safe_id' => 'required',
+                // 'payment_method' => 'required',
+                // 'safe_id' => 'required',
             ];
+            if (!empty($data['paid']) && $data['paid'] > 0) {
+             //   $rules['payment_method'] = 'required';
+                $rules['safe_id'] = 'required';
+            }
         }else{
             $rules = [
                 'bayan_txt'=>'required',
@@ -200,6 +204,7 @@ class PurchesInvoicesController extends Controller
                 'supplier_id' => 'required',
             ];
         }
+
        $messages = [
         'bayan_txt.required'=>'البيان / الوصف مطلوب',
         'referance_number.required'=>'الرقم المرجعي مطلوب',
@@ -214,7 +219,7 @@ class PurchesInvoicesController extends Controller
         'total_price.min' => 'السعر الكلي يجب أن يكون 1 أو أكثر',
         'paid.required'=>'المدفوع مطلوب',
         'remaining.required'=>'الباقي مطلوب',
-        'payment_method.required'=>'طريقة الدفع مطلوبة',
+       // 'payment_method.required'=>'طريقة الدفع مطلوبة',
         'safe_id.required'=>'الخزنة مطلوبة',
        ];
        $validator = Validator::make($data,$rules,$messages);
@@ -237,8 +242,8 @@ class PurchesInvoicesController extends Controller
             "total_price" => $data['total_price'],
             "paid" => $data['paid'],
             "remaining" => $data['remaining'],
-            "payment_method" => $data['payment_method'],
-            "safe_id" => $data['safe_id'],
+           // "payment_method" => $data['payment_method']??null,
+            "safe_id" => $data['safe_id']??null,
             "category_id" => $data['category_id'],
         ]);
         ######################  Delete Old Transaction And Create New ########################
@@ -263,8 +268,8 @@ class PurchesInvoicesController extends Controller
                     'purchase_invoice_id' => $invoice->id,
                     'amount' => $data['paid'],
                     'type' => 'debit', // المبلغ المدفوع للمورد
-                    'payment_method' => $data['payment_method'],
-                    'safe_id' => $data['safe_id'],
+                   // 'payment_method' => $data['payment_method']??null,
+                    'safe_id' => $data['safe_id']??null,
                     'description' => 'دفعة لفاتورة شراء #' . $invoice->id,
                 ]);
             }
@@ -303,20 +308,22 @@ class PurchesInvoicesController extends Controller
 
     public function ConvertToOfficial($id){
         $invoice = PurcheInvoice::findOrFail($id);
+        $type ='official';
         if(!$invoice){
             abort(404);
         }
         if($invoice['bayan_txt'] !='' && $invoice['referance_number'] !='' && $invoice['supplier_id'] !='' && $invoice['qyt'] !=''
         && $invoice['purches_price'] !='' && $invoice['purches_price'] > 0 && $invoice['total_price'] !='' && $invoice['total_price'] > 0
-        && $invoice['payment_method'] !='' && $invoice['safe_id'] !='' && $invoice['admin_id'] !=''
+        && $invoice['safe_id'] !='' && $invoice['admin_id'] !=''
         ){
             $invoice->update([
                 "type" => "فاتورة رسمية",
             ]);
             return $this->success_message(' تم تحويل الفاتورة إلى فاتورة رسمية بنجاح  ');
         }
+
        // return Redirect()->back()->withInput()->withErrors(' يجب اكمال جميع بيانات الفاتورة ');
-       return to_route('dashboard.purches_invoices.edit',$invoice->id)->withErrors(' يجب اكمال جميع بيانات الفاتورة ');
+       return to_route('dashboard.purches_invoices.edit',$invoice->id)->with('type',$type)->withErrors(' يجب اكمال جميع بيانات الفاتورة ');
     }
 
     public function ReturnInvoice(Request $request,$id){
@@ -342,7 +349,7 @@ class PurchesInvoicesController extends Controller
             'purches_price'=>$invoice->purches_price,
             'total_price'=>$invoice->total_price,
             'supplier_id'=>$invoice->supplier_id,
-            'payment_method'=>$invoice->payment_method,
+           // 'payment_method'=>$invoice->payment_method,
             'safe_id'=>$invoice->safe_id,
             'paid'=>$invoice->paid,
             'remaining'=>$invoice->remaining,

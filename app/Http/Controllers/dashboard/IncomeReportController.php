@@ -10,6 +10,7 @@ use App\Models\admin\MothlySalary;
 use Illuminate\Support\Facades\DB;
 use App\Models\admin\PurcheInvoice;
 use App\Http\Controllers\Controller;
+use App\Models\admin\EmployeeSalary;
 use App\Models\admin\ExpenceCategory;
 
 class IncomeReportController extends Controller
@@ -21,11 +22,13 @@ class IncomeReportController extends Controller
         $mothlySalary = MothlySalary::all();
         $purchesInvoices = PurcheInvoice::all();
         $saleInvoices = SaleInvoice::all();
+        $employeeSalaries = EmployeeSalary::all();
         $expensesTotal = $expenses->sum('price');
         $purchesInvoicesTotal = $purchesInvoices->sum('total_price');
         $saleInvoicesTotal = $saleInvoices->sum('total_price');
-        $mothlySalaryTotal = $mothlySalary->sum('total_salary');
-        $totalIncome = $saleInvoicesTotal - ($expensesTotal + $purchesInvoicesTotal+$mothlySalaryTotal);
+        $employeeSalariesTotal = $employeeSalaries->sum('salary');
+     //   $mothlySalaryTotal = $mothlySalary->sum('total_salary');
+        $totalIncome = $saleInvoicesTotal - ($expensesTotal + $purchesInvoicesTotal+$employeeSalariesTotal);
 
 
         // التقرير الشهري
@@ -46,8 +49,8 @@ class IncomeReportController extends Controller
                 SELECT created_at, total_price AS amount, 'sale' AS type
                 FROM sale_invoices
                 UNION ALL
-                SELECT created_at, total_salary AS amount, 'salary' AS type
-                FROM mothly_salaries
+                SELECT created_at, salary AS amount, 'salary' AS type
+                FROM employee_salaries
             ) AS combined
             GROUP BY DATE_FORMAT(created_at, '%Y-%m')
             ORDER BY month DESC
@@ -62,9 +65,9 @@ class IncomeReportController extends Controller
         return view('admin.income-report.index', compact(
             'expenses', 'purchesInvoices', 'saleInvoices',
             'expensesTotal', 'purchesInvoicesTotal', 'saleInvoicesTotal', 'totalIncome',
-            'mothlySalary',
+            'employeeSalaries',
             'monthlyReport',
-            'mothlySalaryTotal'
+            'employeeSalariesTotal'
         ));
     }
 
@@ -94,7 +97,7 @@ class IncomeReportController extends Controller
     $saleInvoices = SaleInvoice::whereYear('created_at', $year)
         ->whereMonth('created_at', $monthNum)
         ->get();
-    $mothlySalary = MothlySalary::whereYear('created_at', $year)
+    $employeeSalaries = EmployeeSalary::whereYear('created_at', $year)
         ->whereMonth('created_at', $monthNum)
         ->get();
 
@@ -102,8 +105,8 @@ class IncomeReportController extends Controller
     $expensesTotal = $expenses->sum('price');
     $purchesInvoicesTotal = $purchesInvoices->sum('total_price');
     $saleInvoicesTotal = $saleInvoices->sum('total_price');
-    $mothlySalaryTotal = $mothlySalary->sum('total_salary');
-    $totalIncome = $saleInvoicesTotal - ($expensesTotal + $purchesInvoicesTotal+$mothlySalaryTotal);
+    $employeeSalariesTotal = $employeeSalaries->sum('salary');
+    $totalIncome = $saleInvoicesTotal - ($expensesTotal + $purchesInvoicesTotal+$employeeSalariesTotal);
 
     // التقرير الشهري المفصل
     $monthlyReport = DB::select("
@@ -126,8 +129,8 @@ class IncomeReportController extends Controller
             FROM sale_invoices
             WHERE YEAR(created_at) = ? AND MONTH(created_at) = ?
             UNION ALL
-            SELECT created_at, total_salary AS amount, 'salary' AS type
-            FROM mothly_salaries
+            SELECT created_at, salary AS amount, 'salary' AS type
+            FROM employee_salaries
             WHERE YEAR(created_at) = ? AND MONTH(created_at) = ?
         ) AS combined
         GROUP BY DATE_FORMAT(created_at, '%Y-%m')
@@ -185,7 +188,7 @@ class IncomeReportController extends Controller
     return view('admin.income-report.monthly-report', compact(
         'expenses', 'purchesInvoices', 'saleInvoices',
         'expensesTotal', 'purchesInvoicesTotal', 'saleInvoicesTotal', 'totalIncome',
-        'monthlyReport', 'month', 'categories', 'salesInvoicesByCategory', 'purchasesInvoicesByCategory', 'expensesByCategory', 'mothlySalary', 'mothlySalaryTotal'
+        'monthlyReport', 'month', 'categories', 'salesInvoicesByCategory', 'purchasesInvoicesByCategory', 'expensesByCategory', 'employeeSalaries', 'employeeSalariesTotal'
     ));
 }
 

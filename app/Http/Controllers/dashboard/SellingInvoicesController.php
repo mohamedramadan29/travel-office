@@ -67,7 +67,7 @@ class SellingInvoicesController extends Controller
             ];
             // لو المدفوع أكبر من صفر أضف القواعد
             if (!empty($data['paid']) && $data['paid'] > 0) {
-                $rules['payment_method'] = 'required';
+              //  $rules['payment_method'] = 'required';
                 $rules['safe_id'] = 'required';
             }
        $messages = [
@@ -84,7 +84,7 @@ class SellingInvoicesController extends Controller
         'total_price.min'=>'السعر الكلي يجب أن يكون 1 أو أكثر',
         'paid.required'=>'المدفوع مطلوب',
         'remaining.required'=>'الباقي مطلوب',
-        'payment_method.required'=>'طريقة الدفع مطلوبة',
+       // 'payment_method.required'=>'طريقة الدفع مطلوبة',
         'safe_id.required'=>'الخزنة مطلوبة',
        ];
        $validator = Validator::make($data,$rules,$messages);
@@ -103,8 +103,8 @@ class SellingInvoicesController extends Controller
         $invoice->total_price = $data['total_price'];
         $invoice->paid = $data['paid'];
         $invoice->remaining = $data['remaining'];
-        $invoice->payment_method = $data['payment_method'];
-        $invoice->safe_id = $data['safe_id'];
+        //$invoice->payment_method = $data['payment_method'] ?? null;
+        $invoice->safe_id = $data['safe_id'] ?? null;
         $invoice->category_id = $data['category_id'];
         $invoice->admin_id = Auth::user()->id;
         $invoice->save();
@@ -127,7 +127,7 @@ class SellingInvoicesController extends Controller
                 'sale_invoice_id' => $invoice->id,
                 'amount' => $data['paid'],
                 'type' => 'credit', // المبلغ المدفوع من العميل  دائن
-                'payment_method' => $data['payment_method'],
+                //'payment_method' => $data['payment_method'],
                 'safe_id' => $data['safe_id'],
                 'description' => 'دفعة لفاتورة بيع #' . $invoice->id,
             ]);
@@ -139,7 +139,7 @@ class SellingInvoicesController extends Controller
             $safeTransaction->sale_invoice_id = $invoice->id;
             $safeTransaction->amount = $data['paid'];
             $safeTransaction->type = 'deposit';
-            $safeTransaction->payment_method = $data['payment_method'];
+           // $safeTransaction->payment_method = $data['payment_method'];
             $safeTransaction->description = ' اضافة دفعة من العميل [ ' . $invoice->client->name . ' ]' . ' من فاتورة بيع الرقم المرجعي :  ' . $invoice->referance_number;
             $safeTransaction->save();
             ############################################ End Add Transaction To Safe ###############################
@@ -194,7 +194,7 @@ class SellingInvoicesController extends Controller
                 'total_price' => 'required|numeric|min:1',
                 'paid' => 'required',
                 'remaining' => 'required',
-                'payment_method' => 'required',
+               // 'payment_method' => 'required',
                 'safe_id' => 'required',
             ];
 
@@ -212,7 +212,7 @@ class SellingInvoicesController extends Controller
         'total_price.min' => 'السعر الكلي يجب أن يكون 1 أو أكثر',
         'paid.required'=>'المدفوع مطلوب',
         'remaining.required'=>'الباقي مطلوب',
-        'payment_method.required'=>'طريقة الدفع مطلوبة',
+      //  'payment_method.required'=>'طريقة الدفع مطلوبة',
         'safe_id.required'=>'الخزنة مطلوبة',
        ];
        $validator = Validator::make($data,$rules,$messages);
@@ -231,7 +231,7 @@ class SellingInvoicesController extends Controller
             "total_price" => $data['total_price'],
             "paid" => $data['paid'],
             "remaining" => $data['remaining'],
-            "payment_method" => $data['payment_method'],
+          //  "payment_method" => $data['payment_method'],
             "safe_id" => $data['safe_id'],
             "category_id" => $data['category_id'],
             "admin_id" => $data['admin_id'],
@@ -254,7 +254,7 @@ class SellingInvoicesController extends Controller
                 'sale_invoice_id' => $invoice->id,
                 'amount' => $data['paid'],
                 'type' => 'credit',
-                'payment_method' => $data['payment_method'],
+               // 'payment_method' => $data['payment_method'],
                 'safe_id' => $data['safe_id'],
                 'description' => 'دفعة لفاتورة بيع #' . $invoice->id,
             ]);
@@ -300,7 +300,7 @@ class SellingInvoicesController extends Controller
                  $returnSelling->total_price = $selling_invoice['total_price'];
                  $returnSelling->paid = $selling_invoice['paid'];
                  $returnSelling->remaining = $selling_invoice['remaining'];
-                 $returnSelling->payment_method = $selling_invoice['payment_method'];
+              //   $returnSelling->payment_method = $selling_invoice['payment_method'];
                  $returnSelling->safe_id = $selling_invoice['safe_id'];
                  $returnSelling->category_id = $selling_invoice['category_id'];
                  $returnSelling->admin_id =Auth::guard('admin')->id();
@@ -317,7 +317,7 @@ class SellingInvoicesController extends Controller
                     'sale_invoice_id' => $selling_invoice->id,
                     'amount' => $data['return_price'],
                     'type' => 'credit', // المبلغ المدفوع من العميل  دائن
-                    'payment_method' => $selling_invoice['payment_method'],
+                  //  'payment_method' => $selling_invoice['payment_method'],
                     'safe_id' => $selling_invoice['safe_id'],
                     'description' => 'إرجاع لفاتورة بيع #' . $selling_invoice->id,
                 ]);

@@ -37,4 +37,5 @@ return [
     'expenses_categories_edit'=>' تعديل تصنيف مصروفات',
     'expenses_categories_delete'=>' حذف تصنيف مصروفات',
     'employee_salary'=>'ادارة الراتب',
+    'income_services'=>' ادارة الايرادات الخارجية  ',
 ];

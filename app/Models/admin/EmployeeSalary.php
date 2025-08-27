@@ -12,4 +12,9 @@ class EmployeeSalary extends Model
     {
         return $this->belongsTo(Admin::class,'admin_id');
     }
+    public function safe()
+    {
+        return $this->belongsTo(Safe::class,'safe_id');
+    }
+
 }

@@ -50,7 +50,7 @@ class DoubleInvoiceController extends Controller
             'selling_total_price' => 'required|numeric|min:1',
             'selling_paid' => 'required',
             'selling_remaining' => 'required',
-            'payment_method' => 'required',
+            //'payment_method' => 'required',
             'safe_id' => 'required',
         ];
         $messages = [
@@ -63,7 +63,7 @@ class DoubleInvoiceController extends Controller
             'total_price.required'=>'السعر الكلي مطلوب',
             'paid.required'=>'المدفوع مطلوب',
             'remaining.required'=>'الباقي مطلوب',
-            'payment_method.required'=>'طريقة الدفع مطلوبة',
+            //'payment_method.required'=>'طريقة الدفع مطلوبة',
             'safe_id.required'=>'الخزنة مطلوبة',
             'type.required'=>'النوع مطلوب',
         'client_id.required'=>'العميل مطلوب',
@@ -94,7 +94,7 @@ class DoubleInvoiceController extends Controller
             $invoice->total_price = $data['total_price'];
             $invoice->paid = $data['paid'];
             $invoice->remaining = $data['remaining'];
-            $invoice->payment_method = $data['payment_method'];
+           // $invoice->payment_method = $data['payment_method'];
             $invoice->safe_id = $data['safe_id'];
             $invoice->category_id = $data['category_id'];
             $invoice->admin_id = Auth::user()->id;
@@ -119,7 +119,7 @@ class DoubleInvoiceController extends Controller
                     'purchase_invoice_id' => $invoice->id,
                     'amount' => $data['paid'],
                     'type' => 'debit', // المبلغ المدفوع للمورد  مدين
-                    'payment_method' => $data['payment_method'],
+                   // 'payment_method' => $data['payment_method'],
                     'safe_id' => $data['safe_id'],
                     'description' => 'دفعة لفاتورة شراء #' . $invoice->id,
                 ]);
@@ -138,7 +138,7 @@ class DoubleInvoiceController extends Controller
             $sale_invoice->total_price = $data['selling_total_price'];
             $sale_invoice->paid = $data['selling_paid'];
             $sale_invoice->remaining = $data['selling_remaining'];
-            $sale_invoice->payment_method = $data['payment_method'];
+           // $sale_invoice->payment_method = $data['payment_method'];
             $sale_invoice->safe_id = $data['safe_id'];
             $sale_invoice->category_id = $data['category_id'];
             $sale_invoice->admin_id = Auth::user()->id;
@@ -160,7 +160,7 @@ class DoubleInvoiceController extends Controller
                 'sale_invoice_id' => $sale_invoice->id,
                 'amount' => $data['selling_paid'],
                 'type' => 'credit', // المبلغ المدفوع من العميل  دائن
-                'payment_method' => $data['payment_method'],
+               // 'payment_method' => $data['payment_method'],
                 'safe_id' => $data['safe_id'],
                 'description' => 'دفعة لفاتورة بيع #' . $sale_invoice->id,
             ]);

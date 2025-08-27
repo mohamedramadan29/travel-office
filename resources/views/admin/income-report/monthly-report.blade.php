@@ -92,7 +92,7 @@
                                                 @endforelse
                                                 <tr>
                                                     <th style="font-size:18px; font-weight:bold">الرواتب</th>
-                                                    <td style="font-size:16px; font-weight:bold">{{ number_format($mothlySalaryTotal, 2) }} دينار</td>
+                                                    <td style="font-size:16px; font-weight:bold">{{ number_format($employeeSalariesTotal, 2) }} دينار</td>
                                                 </tr>
 
                                                 <!-- صافي الأرباح والخسائر -->
@@ -110,7 +110,7 @@
                                             </tbody>
                                         </table>
 
-                                        <!-- تفاصيل فواتير المبيعات -->
+                                        {{-- <!-- تفاصيل فواتير المبيعات -->
                                         <h6>تفاصيل فواتير المبيعات</h6>
                                         <table class="table table-striped table-bordered">
                                             <thead>
@@ -185,7 +185,7 @@
                                                     </tr>
                                                 @endforelse
                                             </tbody>
-                                        </table>
+                                        </table> --}}
                                     </div>
                                 </div>
                             </div>

@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\dashboard;
 
 use Mpdf\Mpdf;
+use App\Models\admin\Safe;
 use App\Models\admin\Admin;
 use Illuminate\Http\Request;
 use App\Http\Traits\Message_Trait;
+use Illuminate\Support\Facades\DB;
 use App\Exports\EmploeSalaryExport;
 use App\Http\Controllers\Controller;
 use App\Models\admin\EmployeeSalary;
+use App\Models\admin\SafeTransaction;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 
 class EmployeeSalaryController extends Controller
@@ -29,7 +33,8 @@ class EmployeeSalaryController extends Controller
     public function create()
     {
         $employees = Admin::where('status',1)->get();
-        return view('admin.admins.salary.create',compact('employees'));
+        $safes = Safe::where('status',1)->get();
+        return view('admin.admins.salary.create',compact('employees','safes'));
     }
 
     /**
@@ -41,25 +46,42 @@ class EmployeeSalaryController extends Controller
         $rules = [
             'admin_id' => 'required|exists:admins,id',
             'salary' => 'required|numeric',
-            'status' => 'required|in:0,1',
+            'safe_id' => 'required|exists:safes,id',
         ];
         $messages = [
             'admin_id.required' => 'الموظف مطلوب',
             'admin_id.exists' => 'الموظف غير موجود',
             'salary.required' => 'الراتب مطلوب',
             'salary.numeric' => 'الراتب يجب ان يكون رقم',
-            'status.required' => 'الحالة مطلوبة',
-            'status.in' => 'الحالة يجب ان تكون 0 أو 1',
+            'safe_id.required' => 'الخزينة مطلوبة',
+            'safe_id.exists' => 'الخزينة غير موجودة',
         ];
         $validator = Validator::make($data,$rules,$messages);
         if($validator->fails()){
-            return $this->error_message($validator->errors()->first());
+            return Redirect::back()->withInput()->withErrors($validator);
         }
+        $safe = Safe::findOrFail($data['safe_id']);
+        if($safe->balance < $data['salary']){
+            return Redirect::back()->withInput()->withErrors([' رصيد الخزينة غير كافي لصرف المبلغ  ']);
+        }
+        DB::beginTransaction();
         $salary = new EmployeeSalary();
         $salary->admin_id = $data['admin_id'];
         $salary->salary = $data['salary'];
-        $salary->status = $data['status'];
+        $salary->safe_id = $data['safe_id'];
         $salary->save();
+        $safe->update([
+            'balance' => $safe->balance - $data['salary']
+        ]);
+
+        ############################################# Start Add Transaction To Safe ############################
+        $safeTransaction = new SafeTransaction();
+        $safeTransaction->safe_id = $data['safe_id'];
+        $safeTransaction->amount = $data['salary'];
+        $safeTransaction->type = 'withdraw';
+        $safeTransaction->description = ' صرف راتب [ ' . $salary->employee->name . ' ]' . ' من الراتب رقم :  ' . $salary->id;
+        $safeTransaction->save();
+        DB::commit();
         return $this->success_message(' تم اضافة الراتب بنجاح  ');
     }
 
@@ -71,7 +93,8 @@ class EmployeeSalaryController extends Controller
     {
         $salary = EmployeeSalary::findOrFail($id);
         $employees = Admin::where('status',1)->get();
-        return view('admin.admins.salary.edit',compact('salary','employees'));
+        $safes = Safe::where('status',1)->get();
+        return view('admin.admins.salary.edit',compact('salary','employees','safes'));
     }
 
     /**
@@ -83,25 +106,44 @@ class EmployeeSalaryController extends Controller
         $rules = [
             'admin_id' => 'required|exists:admins,id',
             'salary' => 'required|numeric',
-            'status' => 'required|in:0,1',
+            'safe_id' => 'required|exists:safes,id',
         ];
         $messages = [
             'admin_id.required' => 'الموظف مطلوب',
             'admin_id.exists' => 'الموظف غير موجود',
             'salary.required' => 'الراتب مطلوب',
             'salary.numeric' => 'الراتب يجب ان يكون رقم',
-            'status.required' => 'الحالة مطلوبة',
-            'status.in' => 'الحالة يجب ان تكون 0 أو 1',
+            'safe_id.required' => 'الخزينة مطلوبة',
+            'safe_id.exists' => 'الخزينة غير موجودة',
         ];
         $validator = Validator::make($data,$rules,$messages);
         if($validator->fails()){
-            return $this->error_message($validator->errors()->first());
+            return Redirect::back()->withErrors($validator)->withInput();
         }
-        $salary = EmployeeSalary::findOrFail($id);
+        ################# First Delete all record salary and add old amount to old safe
+        $old_salary = EmployeeSalary::findOrFail($id);
+        $old_salary->safe->update([
+            'balance' => $old_salary->safe->balance + $old_salary->salary
+        ]);
+        $old_salary->delete();
+        ################# Second Add new record salary and sub new amount to new safe
+        $salary = new EmployeeSalary();
         $salary->admin_id = $data['admin_id'];
         $salary->salary = $data['salary'];
-        $salary->status = $data['status'];
+        $salary->safe_id = $data['safe_id'];
         $salary->save();
+        $salary->safe->update([
+            'balance' => $salary->safe->balance - $salary->salary
+        ]);
+
+           ############################################# Start Add Transaction To Safe ############################
+           $safeTransaction = new SafeTransaction();
+           $safeTransaction->safe_id = $data['safe_id'];
+           $safeTransaction->amount = $data['salary'];
+           $safeTransaction->type = 'withdraw';
+           $safeTransaction->description = ' صرف راتب [ ' . $salary->admin->name . ' ]' . ' من الراتب رقم :  ' . $salary->id;
+           $safeTransaction->save();
+        DB::commit();
         return $this->success_message(' تم تحديث الراتب بنجاح  ');
     }
 
@@ -111,6 +153,9 @@ class EmployeeSalaryController extends Controller
     public function destroy(string $id)
     {
         $salary = EmployeeSalary::findOrFail($id);
+        $salary->safe->update([
+            'balance' => $salary->safe->balance + $salary->salary
+        ]);
         $salary->delete();
         return $this->success_message(' تم حذف الراتب بنجاح  ');
     }

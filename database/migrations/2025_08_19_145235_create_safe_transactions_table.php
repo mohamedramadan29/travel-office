@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('sale_invoice_id')->nullable();
             $table->integer('purchase_invoice_id')->nullable();
             $table->integer('expense_category_id')->nullable();
+            $table->integer('income_service_category_id')->nullable();
             $table->double('amount',8,2);
             $table->enum('type',['withdraw', 'deposit']);
             $table->string('payment_method')->nullable();

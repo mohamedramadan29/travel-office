@@ -1,17 +1,27 @@
 @extends('admin.layouts.app')
-@section('title', ' ادارة رواتب الموظفين ')
+@section('title', ' ادارة الايرادات الخارجية  ')
+@section('css')
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.min.css">
+    <style>
+        .dt-layout-row {
+            display: flex;
+            justify-content: space-between
+        }
+    </style>
+
+@endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> ادارة رواتب الموظفين </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block"> ادارة الإيرادات الخارجية </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item active"> ادارة رواتب الموظفين
+                                <li class="breadcrumb-item active"> ادارة الإيرادات الخارجية
                                 </li>
                             </ol>
                         </div>
@@ -23,62 +33,63 @@
             </div>
             <div class="content-body">
 
+
                 <!-- Bordered striped start -->
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <a href="{{ route('dashboard.employee_salary.create') }}" class="btn btn-primary btn-sm">
-                                    صرف راتب </a>
+                                <a href="{{ route('dashboard.income_services.create') }}" class="btn btn-primary btn-sm"> اضافة ايرادات جديدة
+                                </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
-                                    href="{{ route('dashboard.employee_salary.pdf') }}">
-                                    استخراج ملف Pdf </a>
-                                <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
-                                    href="{{ route('dashboard.employee_salary.excel') }}"> استخراج
+                                href="{{ route('dashboard.income_services.pdf') }}">
+                                استخراج ملف Pdf </a>
+                            <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
+                                href="{{ route('dashboard.income_services.excel') }}"> استخراج
                                     ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">
+                                    @include('admin.layouts.toaster_error')
+                                    @include('admin.layouts.toaster_success')
+
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped">
+                                        <table
+                                            class="table table-striped table-bordered column-rendering">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th> الاسم </th>
-                                                    <th> الراتب </th>
-                                                    <th> الحالة </th>
+                                                    <th> التصنيف   </th>
+                                                    <th> المبلغ </th>
+                                                    <th> الخزينة  </th>
                                                     <th> تاريخ الانشاء </th>
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ($salaries as $salary)
+                                                @forelse ($incomes as $income_service)
                                                     <tr>
-                                                        <th scope="row">{{ $loop->iteration }}</th>
-                                                        <td> {{ $salary->employee->name }} </td>
-                                                        <td> {{ number_format($salary->salary, 2) }} دينار </td>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $income_service->category->name ?? 'غير محدد' }}</td>
+                                                        <td>{{ $income_service->price }}</td>
                                                         <td>
-                                                            @if ($salary->status = 1)
-                                                                <span class="badge badge-success"> نشط </span>
-                                                            @else
-                                                                <span class="badge badge-danger"> غير نشط </span>
-                                                            @endif
+                                                         {{ $income_service->safe->name }}
                                                         </td>
-                                                        <td> {{ $salary->created_at->format('Y-m-d') }} </td>
+                                                        <td>{{ $income_service->created_at }}</td>
                                                         <td>
                                                             <div class="dropdown float-md-left">
-                                                                <button class="px-2 btn btn-primary dropdown-toggle"
+                                                                <button class="px-2 btn btn-primary btn-sm dropdown-toggle"
                                                                     id="dropdownBreadcrumbButton" type="button"
                                                                     data-toggle="dropdown" aria-haspopup="true"
                                                                     aria-expanded="false"> العمليات </button>
                                                                 <div class="dropdown-menu"
                                                                     aria-labelledby="dropdownBreadcrumbButton">
-                                                                    {{-- <a
+                                                                    <a
                                                                         class="dropdown-item"
-                                                                        href="{{ route('dashboard.employee_salary.edit', $salary->id) }}"><i
-                                                                            class="la la-edit"></i> تعديل </a> --}}
+                                                                        href="{{ route('dashboard.income_services.edit', $income_service->id) }}"><i
+                                                                            class="la la-edit"></i> تعديل </a>
                                                                     <form
-                                                                        action="{{ route('dashboard.employee_salary.destroy', $salary->id) }}"
+                                                                        action="{{ route('dashboard.income_services.destroy', $income_service->id) }}"
                                                                         method="post">
                                                                         @csrf
                                                                         @method('delete')
@@ -86,7 +97,6 @@
                                                                             class="dropdown-item delete_confirm"><i
                                                                                 class="la la-trash"></i> حذف </button>
                                                                     </form>
-
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -94,12 +104,12 @@
                                                 @empty
                                                     <td colspan="4"> لا يوجد بيانات </td>
                                                 @endforelse
+
                                             </tbody>
                                         </table>
-                                        {{ $salaries->links() }}
+                                        {{ $incomes->links() }}
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -109,5 +119,11 @@
         </div>
     </div>
 
+
+@endsection
+
+@section('js')
+
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
 
 @endsection

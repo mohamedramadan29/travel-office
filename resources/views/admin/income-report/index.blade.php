@@ -55,7 +55,7 @@
                                                             </thead>
                                                             <tbody>
                                                                 <tr>
-                                                                    <td> <strong> {{ number_format($expensesTotal + $mothlySalaryTotal, 2) }}
+                                                                    <td> <strong> {{ number_format($expensesTotal + $employeeSalariesTotal, 2) }}
                                                                         </strong> دينار</td>
                                                                     <td> <strong>
                                                                             {{ number_format($purchesInvoicesTotal, 2) }}
