@@ -28,7 +28,8 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <a href="{{ route('dashboard.clients.create') }}" class="btn btn-primary"> اضافة عميل </a>
+                                <a href="{{ route('dashboard.clients.report') }}" class="btn btn-success btn-sm"> كشف شامل للعملاء  </a>
+                                <a href="{{ route('dashboard.clients.create') }}" class="btn btn-primary btn-sm"> اضافة عميل </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
                                 href="{{ route('dashboard.clients.pdf') }}">
                                 استخراج ملف Pdf </a>

@@ -289,6 +289,7 @@ class SellingInvoicesController extends Controller
             try{
                 $data = $request->all();
                 DB::beginTransaction();
+                $additional_profit = $data['return_price'] - $selling_invoice['total_price'];
                  ####### Start Add Sellign Return Invoice
                  $returnSelling = new SaleInvoiceReturn();
                  $returnSelling->bayan_txt = $selling_invoice['bayan_txt'];
@@ -306,6 +307,7 @@ class SellingInvoicesController extends Controller
                  $returnSelling->admin_id =Auth::guard('admin')->id();
                  $returnSelling->sale_invoice_id = $selling_invoice['id'];
                  $returnSelling->return_price = $data['return_price'];
+                 $returnSelling->additional_profit = $additional_profit;
                  $returnSelling->save();
                  ############ Update Selling Invoice Status
                  $selling_invoice->return_status = 'returned';

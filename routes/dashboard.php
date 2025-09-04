@@ -109,6 +109,7 @@ Route::group([
             Route::post('clients/add_transaction/{invoice_id}', [ClientsController::class, 'AddTransaction'])->name('client.add_transaction');
             Route::get('clients/pdf/report',[ClientsController::class,'ClientsPdf'])->name('clients.pdf');
             Route::get('clients/excel/report',[ClientsController::class,'ClientsExcel'])->name('clients.excel');
+            Route::get('clients/report/all',[ClientsController::class,'ClientsReport'])->name('clients.report');
         });
         ##################### End Clients Routes ######################
 

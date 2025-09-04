@@ -49,7 +49,9 @@
                                                                 <tr>
                                                                     <th>اجمالي المصروفات</th>
                                                                     <th>اجمالي المشتريات</th>
+                                                                    {{-- <th>اجمالي مرتجعات  المشتريات</th> --}}
                                                                     <th>اجمالي المبيعات</th>
+                                                                    {{-- <th>اجمالي مرتجعات المبيعات</th> --}}
                                                                     <th>اجمالي الدخل</th>
                                                                 </tr>
                                                             </thead>
@@ -60,8 +62,14 @@
                                                                     <td> <strong>
                                                                             {{ number_format($purchesInvoicesTotal, 2) }}
                                                                         </strong> دينار</td>
-                                                                    <td> <strong> {{ number_format($saleInvoicesTotal, 2) }}
+                                                                    {{-- <td> <strong> {{ number_format($purchesInvoicesTotalReturn, 2) }}
+                                                                        </strong> دينار</td> --}}
+                                                                    <td> <strong>
+                                                                            {{ number_format($saleInvoicesTotal, 2) }}
                                                                         </strong> دينار</td>
+                                                                    {{-- <td> <strong>
+                                                                            {{ number_format($saleInvoicesTotalReturn, 2) }}
+                                                                        </strong> دينار</td> --}}
                                                                     <td> <strong>
                                                                             @if ($totalIncome >= 0)
                                                                                 <span class="text-success">

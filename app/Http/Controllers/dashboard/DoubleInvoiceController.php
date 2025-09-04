@@ -51,8 +51,12 @@ class DoubleInvoiceController extends Controller
             'selling_paid' => 'required',
             'selling_remaining' => 'required',
             //'payment_method' => 'required',
-            'safe_id' => 'required',
+        //    'safe_id' => 'required',
         ];
+
+        if (!empty($data['paid']) && $data['paid'] > 0 || !empty($data['selling_paid'] && $data['selling_paid'] > 0)){
+            $rules['safe_id'] = 'required';
+        }
         $messages = [
             'bayan_txt.required'=>'البيان / الوصف مطلوب',
             'referance_number.required'=>'الرقم المرجعي مطلوب',
@@ -165,7 +169,6 @@ class DoubleInvoiceController extends Controller
                 'description' => 'دفعة لفاتورة بيع #' . $sale_invoice->id,
             ]);
         }
-
             ################ End Selling Invoice ###########
             DB::commit();
             return $this->success_message('تم إضافة  فاتورة شراء وفاتورة بيع بنجاح');

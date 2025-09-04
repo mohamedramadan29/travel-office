@@ -10,8 +10,11 @@ use App\Models\admin\MothlySalary;
 use Illuminate\Support\Facades\DB;
 use App\Models\admin\PurcheInvoice;
 use App\Http\Controllers\Controller;
+use App\Livewire\Dashboard\PurchesInvoiceReturn;
 use App\Models\admin\EmployeeSalary;
 use App\Models\admin\ExpenceCategory;
+use App\Models\admin\PurcheInvoiceReturn;
+use App\Models\admin\SaleInvoiceReturn;
 
 class IncomeReportController extends Controller
 {
@@ -21,53 +24,71 @@ class IncomeReportController extends Controller
         $expenses = Expense::all();
         $mothlySalary = MothlySalary::all();
         $purchesInvoices = PurcheInvoice::all();
+        $purchesInvoicesReturn = PurcheInvoiceReturn::all();
         $saleInvoices = SaleInvoice::all();
+        $saleInvoicesReturn = SaleInvoiceReturn::all();
         $employeeSalaries = EmployeeSalary::all();
         $expensesTotal = $expenses->sum('price');
         $purchesInvoicesTotal = $purchesInvoices->sum('total_price');
+        $purchesInvoicesTotalReturn = $purchesInvoicesReturn->sum('return_price');
+        // dd($purchesInvoicesTotalReturn);
         $saleInvoicesTotal = $saleInvoices->sum('total_price');
+        $saleInvoicesTotalReturn = $saleInvoicesReturn->sum('total_price');
         $employeeSalariesTotal = $employeeSalaries->sum('salary');
-     //   $mothlySalaryTotal = $mothlySalary->sum('total_salary');
-        $totalIncome = $saleInvoicesTotal - ($expensesTotal + $purchesInvoicesTotal+$employeeSalariesTotal);
+        $totalLastPurches = $purchesInvoicesTotal - $purchesInvoicesTotalReturn;
+        $totalLastSales = $saleInvoicesTotal - $saleInvoicesTotalReturn;
+        $totalLastSalesReturnIncome =  $saleInvoicesReturn->sum('additional_profit');
+        $totalIncome = ($totalLastSales + $totalLastSalesReturnIncome) - ($expensesTotal + $totalLastPurches + $employeeSalariesTotal);
 
-
+        //  dd($totalIncome);
+       // التقرير الشهري   #######
         // التقرير الشهري
-        $monthlyReport = DB::select("
-            SELECT
-                DATE_FORMAT(created_at, '%Y-%m') AS month,
-                COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS expenses_total,
-                COALESCE(SUM(CASE WHEN type = 'purchase' THEN amount ELSE 0 END), 0) AS purchases_total,
-                COALESCE(SUM(CASE WHEN type = 'sale' THEN amount ELSE 0 END), 0) AS sales_total,
-                COALESCE(SUM(CASE WHEN type = 'salary' THEN amount ELSE 0 END), 0) AS salary_total
-            FROM (
-                SELECT created_at, price AS amount, 'expense' AS type
-                FROM expenses
-                UNION ALL
-                SELECT created_at, total_price AS amount, 'purchase' AS type
-                FROM purche_invoices
-                UNION ALL
-                SELECT created_at, total_price AS amount, 'sale' AS type
-                FROM sale_invoices
-                UNION ALL
-                SELECT created_at, salary AS amount, 'salary' AS type
-                FROM employee_salaries
-            ) AS combined
-            GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-            ORDER BY month DESC
-        ");
+    $monthlyReport = DB::select("
+    SELECT
+        DATE_FORMAT(created_at, '%Y-%m') AS month,
+        COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS expenses_total,
+        COALESCE(SUM(CASE WHEN type = 'purchase' THEN amount ELSE 0 END), 0) AS purchases_total,
+        COALESCE(SUM(CASE WHEN type = 'purchase_return' THEN amount ELSE 0 END), 0) AS purchases_return_total,
+        COALESCE(SUM(CASE WHEN type = 'sale' THEN amount ELSE 0 END), 0) AS sales_total,
+        COALESCE(SUM(CASE WHEN type = 'sale_return' THEN amount ELSE 0 END), 0) AS sales_return_total,
+        COALESCE(SUM(CASE WHEN type = 'sale_return_profit' THEN amount ELSE 0 END), 0) AS sales_return_profit_total,
+        COALESCE(SUM(CASE WHEN type = 'salary' THEN amount ELSE 0 END), 0) AS salary_total
+    FROM (
+        SELECT created_at, price AS amount, 'expense' AS type
+        FROM expenses
+        UNION ALL
+        SELECT created_at, total_price AS amount, 'purchase' AS type
+        FROM purche_invoices
+        UNION ALL
+        SELECT created_at, return_price AS amount, 'purchase_return' AS type
+        FROM purche_invoice_returns
+        UNION ALL
+        SELECT created_at, total_price AS amount, 'sale' AS type
+        FROM sale_invoices
+        UNION ALL
+        SELECT created_at, total_price AS amount, 'sale_return' AS type
+        FROM sale_invoice_returns
+        UNION ALL
+        SELECT created_at, additional_profit AS amount, 'sale_return_profit' AS type
+        FROM sale_invoice_returns
+        UNION ALL
+        SELECT created_at, salary AS amount, 'salary' AS type
+        FROM employee_salaries
+    ) AS combined
+    GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+    ORDER BY month DESC
+    ");
 
-        // حساب إجمالي الدخل لكل شهر
+        // حساب إجمالي الدخل لكل شهر مع مراعاة الربح الإضافي من إرجاع المبيعات
         $monthlyReport = array_map(function ($item) {
-            $item->income = $item->sales_total - ($item->expenses_total + $item->purchases_total+$item->salary_total);
+            $item->income = ($item->sales_total - $item->sales_return_total + $item->sales_return_profit_total) - ($item->expenses_total + $item->purchases_total - $item->purchases_return_total + $item->salary_total);
             return $item;
         }, $monthlyReport);
 
         return view('admin.income-report.index', compact(
-            'expenses', 'purchesInvoices', 'saleInvoices',
-            'expensesTotal', 'purchesInvoicesTotal', 'saleInvoicesTotal', 'totalIncome',
-            'employeeSalaries',
-            'monthlyReport',
-            'employeeSalariesTotal'
+            'expenses', 'purchesInvoices', 'purchesInvoicesReturn', 'saleInvoices', 'saleInvoicesReturn',
+            'expensesTotal', 'purchesInvoicesTotal', 'purchesInvoicesTotalReturn', 'saleInvoicesTotal', 'saleInvoicesTotalReturn', 'totalIncome',
+            'employeeSalaries', 'monthlyReport', 'employeeSalariesTotal', 'totalLastSalesReturnIncome'
         ));
     }
 
@@ -94,9 +115,18 @@ class IncomeReportController extends Controller
         ->whereMonth('created_at', $monthNum)
         ->get();
 
+    $purchesInvoicesReturn = PurcheInvoiceReturn::whereYear('created_at', $year)
+        ->whereMonth('created_at', $monthNum)
+        ->get();
+
     $saleInvoices = SaleInvoice::whereYear('created_at', $year)
         ->whereMonth('created_at', $monthNum)
         ->get();
+
+    $saleInvoicesReturn = SaleInvoiceReturn::whereYear('created_at', $year)
+        ->whereMonth('created_at', $monthNum)
+        ->get();
+
     $employeeSalaries = EmployeeSalary::whereYear('created_at', $year)
         ->whereMonth('created_at', $monthNum)
         ->get();
@@ -104,9 +134,18 @@ class IncomeReportController extends Controller
     // حساب الإجماليات
     $expensesTotal = $expenses->sum('price');
     $purchesInvoicesTotal = $purchesInvoices->sum('total_price');
+    $purchesInvoicesTotalReturn = $purchesInvoicesReturn->sum('return_price');
     $saleInvoicesTotal = $saleInvoices->sum('total_price');
+    $saleInvoicesTotalReturn = $saleInvoicesReturn->sum('total_price');
     $employeeSalariesTotal = $employeeSalaries->sum('salary');
-    $totalIncome = $saleInvoicesTotal - ($expensesTotal + $purchesInvoicesTotal+$employeeSalariesTotal);
+    //$totalIncome = $saleInvoicesTotal - ($expensesTotal + $purchesInvoicesTotal-$purchesInvoicesTotalReturn+$saleInvoicesTotalReturn+$employeeSalariesTotal);
+
+
+    $totalLastPurches = $purchesInvoicesTotal - $purchesInvoicesTotalReturn;
+    $totalLastSales = $saleInvoicesTotal - $saleInvoicesTotalReturn;
+    $totalLastSalesReturnIncome =  $saleInvoicesReturn->sum('additional_profit');
+    $totalIncome = ($totalLastSales + $totalLastSalesReturnIncome) - ($expensesTotal + $totalLastPurches + $employeeSalariesTotal);
+
 
     // التقرير الشهري المفصل
     $monthlyReport = DB::select("
@@ -114,7 +153,9 @@ class IncomeReportController extends Controller
             DATE_FORMAT(created_at, '%Y-%m') AS month,
             COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS expenses_total,
             COALESCE(SUM(CASE WHEN type = 'purchase' THEN amount ELSE 0 END), 0) AS purchases_total,
+            COALESCE(SUM(CASE WHEN type = 'purchase_return' THEN amount ELSE 0 END), 0) AS purchases_return_total,
             COALESCE(SUM(CASE WHEN type = 'sale' THEN amount ELSE 0 END), 0) AS sales_total,
+            COALESCE(SUM(CASE WHEN type = 'sale_return' THEN amount ELSE 0 END), 0) AS sales_return_total,
             COALESCE(SUM(CASE WHEN type = 'salary' THEN amount ELSE 0 END), 0) AS salary_total
         FROM (
             SELECT created_at, price AS amount, 'expense' AS type
@@ -125,8 +166,16 @@ class IncomeReportController extends Controller
             FROM purche_invoices
             WHERE YEAR(created_at) = ? AND MONTH(created_at) = ?
             UNION ALL
+            SELECT created_at, return_price AS amount, 'purchase_return' AS type
+            FROM purche_invoice_returns
+            WHERE YEAR(created_at) = ? AND MONTH(created_at) = ?
+            UNION ALL
             SELECT created_at, total_price AS amount, 'sale' AS type
             FROM sale_invoices
+            WHERE YEAR(created_at) = ? AND MONTH(created_at) = ?
+            UNION ALL
+            SELECT created_at, return_price AS amount, 'sale_return' AS type
+            FROM sale_invoice_returns
             WHERE YEAR(created_at) = ? AND MONTH(created_at) = ?
             UNION ALL
             SELECT created_at, salary AS amount, 'salary' AS type
@@ -134,11 +183,11 @@ class IncomeReportController extends Controller
             WHERE YEAR(created_at) = ? AND MONTH(created_at) = ?
         ) AS combined
         GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-    ", [$year, $monthNum, $year, $monthNum, $year, $monthNum, $year, $monthNum]);
+    ", [$year, $monthNum, $year, $monthNum, $year, $monthNum, $year, $monthNum,$year, $monthNum,$year, $monthNum]);
 
     // حساب إجمالي الدخل للشهر
     $monthlyReport = array_map(function ($item) {
-        $item->income = $item->sales_total - ($item->expenses_total + $item->purchases_total+$item->salary_total);
+        $item->income = $item->sales_total - ($item->expenses_total + $item->purchases_total - $item->purchases_return_total + $item->sales_return_total + $item->salary_total);
         return $item;
     }, $monthlyReport);
 
@@ -187,7 +236,7 @@ class IncomeReportController extends Controller
     // إرجاع العرض مع البيانات
     return view('admin.income-report.monthly-report', compact(
         'expenses', 'purchesInvoices', 'saleInvoices',
-        'expensesTotal', 'purchesInvoicesTotal', 'saleInvoicesTotal', 'totalIncome',
+        'expensesTotal', 'purchesInvoicesTotal', 'purchesInvoicesTotalReturn', 'saleInvoicesTotal','saleInvoicesTotalReturn', 'totalIncome',
         'monthlyReport', 'month', 'categories', 'salesInvoicesByCategory', 'purchasesInvoicesByCategory', 'expensesByCategory', 'employeeSalaries', 'employeeSalariesTotal'
     ));
 }

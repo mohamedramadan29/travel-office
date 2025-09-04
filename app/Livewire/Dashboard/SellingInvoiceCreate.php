@@ -21,7 +21,7 @@ class SellingInvoiceCreate extends Component
     public $purchesInvoices;
     public function mount($selling_invoice = null)
     {
-        $this->purchesInvoices = PurcheInvoice::where('status','available')->get();
+        $this->purchesInvoices = PurcheInvoice::where('status','available')->where('return_status','not_returned')->get();
         $this->selling_invoice = $selling_invoice;
 
         // جلب بيانات الموردين والخزائن

@@ -62,6 +62,9 @@
                                                         <th scope="row">{{ $loop->iteration }}</th>
                                                         <td>
                                                             {{ $invoice->client->name }}
+                                                            @if($invoice->return_status == 'returned')
+                                                            <span class="badge badge-danger"> تم الارجاع </span>
+                                                            @endif
                                                         </td>
                                                         <td> {{ $invoice->bayan_txt }} </td>
                                                         <td> {{ $invoice->referance_number }} </td>

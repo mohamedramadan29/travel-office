@@ -68,6 +68,10 @@
                                                                 <span class="badge badge-pill badge-success">
                                                                     {{ $invoice->type }} </span>
                                                             @endif
+                                                            @if($invoice->return_status == 'returned')
+                                                            
+                                                            <span class="badge badge-pill badge-danger"> تم الارجاع  </span>
+                                                            @endif
                                                         </td>
                                                         <td> {{ $invoice->bayan_txt }} </td>
                                                         <td> {{ $invoice->referance_number }} </td>

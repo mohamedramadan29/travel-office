@@ -48,6 +48,10 @@
                                                     <th style="font-size:18px; font-weight:bold">الإيرادات</th>
                                                     <td style="font-size:16px; font-weight:bold">{{ number_format($saleInvoicesTotal, 2) }} دينار</td>
                                                 </tr>
+                                                <tr>
+                                                    <th style="font-size:18px; font-weight:bold"> الإيرادات (الإرجاعات) </th>
+                                                    <td style="font-size:16px; font-weight:bold">{{ number_format($saleInvoicesTotalReturn, 2) }} دينار</td>
+                                                </tr>
                                                 @forelse ($salesInvoicesByCategory as $categoryData)
                                                     <tr>
                                                         <th>{{ $categoryData['category']->name }}</th>
@@ -63,6 +67,10 @@
                                                 <tr>
                                                     <th style="font-size:18px; font-weight:bold">المشتريات</th>
                                                     <td style="font-size:16px; font-weight:bold">{{ number_format($purchesInvoicesTotal, 2) }} دينار</td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="font-size:18px; font-weight:bold">المشتريات (الإرجاعات)</th>
+                                                    <td style="font-size:16px; font-weight:bold">{{ number_format($purchesInvoicesTotalReturn, 2) }} دينار</td>
                                                 </tr>
                                                 @forelse ($purchasesInvoicesByCategory as $categoryData)
                                                     <tr>

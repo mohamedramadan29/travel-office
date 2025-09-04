@@ -142,6 +142,13 @@ class ClientsController extends Controller
         return $this->success_message('تم حذف العميل بنجاح');
     }
 
+    #################### All Report Clients  ######################
+
+    public function ClientsReport(){
+        $clients = Client::paginate(10);
+        return view('admin.clients.report', compact('clients'));
+    }
+
     public function ChangeStatus($id){
 
         $client = Client::findOrFail($id);

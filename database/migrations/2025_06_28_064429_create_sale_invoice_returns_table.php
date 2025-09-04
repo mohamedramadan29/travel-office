@@ -29,6 +29,7 @@ return new class extends Migration
             $table->foreignId('admin_id')->nullable()->references('id')->on('admins')->nullOnDelete();
             $table->foreignId('category_id')->nullable()->references('id')->on('categories')->nullOnDelete();
             $table->double('return_price',8,2);
+            $table->double('additional_profit',8,2)->default(0);
             $table->timestamps();
         });
     }
