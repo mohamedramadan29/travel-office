@@ -10,7 +10,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="purches_price"> سعر الشراء </label>
-                <input disabled readonly wire:model.live="purches_price" type="number" step="0.01" min="0" id="purches_price" class="form-control" name="purches_price">
+                <input disabled readonly wire:model.live="purches_price" type="number" step="0.00001" min="0" id="purches_price" class="form-control" name="purches_price">
                 @error('purches_price') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
@@ -91,7 +91,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="paid"> المدفوع (د.ل) </label>
-                <input disabled readonly min="0" max="{{ $total_price }}" wire:model.live="paid" type="number" id="paid" class="form-control" name="paid">
+                <input disabled readonly min="0" max="{{ $total_price }}" wire:model.live="paid" type="number" id="paid" class="form-control" name="paid" step="0.00001">
                 <span>اتركه صفرًا للدفع لاحقًا</span>
                 @error('paid') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
@@ -99,14 +99,14 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="remaining"> الباقي (د.ل) </label>
-                <input disabled readonly wire:model.live="remaining" readonly type="number" id="remaining" class="form-control" name="remaining">
+                <input disabled readonly wire:model.live="remaining" readonly type="number" id="remaining" class="form-control" name="remaining" step="0.00001">
                 @error('remaining') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <label for="total_price"> السعر الكلي (د.ل) </label>
-                <input disabled readonly wire:model.live="total_price" readonly type="number" id="total_price" class="form-control" name="total_price">
+                <input disabled readonly wire:model.live="total_price" readonly type="number" id="total_price" class="form-control" name="total_price" step="0.00001">
                 @error('total_price') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
@@ -119,7 +119,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="return_price"> ادخل سعر الارجاع (د.ل) </label>
-                <input wire:model.live="return_price" type="number" id="return_price" class="form-control" name="return_price">
+                <input wire:model.live="return_price" type="number" id="return_price" class="form-control" name="return_price" step="0.00001">
                 @error('return_price') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>

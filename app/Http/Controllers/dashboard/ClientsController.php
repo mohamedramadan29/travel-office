@@ -191,6 +191,7 @@ class ClientsController extends Controller
 
         // جلب إجمالي قيم الفواتير ضمن الفترة
         $total_invoices = $invoices->sum('total_price');
+        $total_returned = $invoices->where('return_status','returned')->sum('total_price');
 
         // حساب الرصيد الافتتاحي (إجمالي الفواتير قبل from_date)
         $opening_balance = 0;
@@ -211,9 +212,11 @@ class ClientsController extends Controller
 
         // حساب إجمالي المدفوع (Credit)
         $total_credit = $transactions->where('type', 'credit')->sum('amount');
+        $total_debit = $transactions->where('type', 'debit')->sum('amount');
 
         // الرصيد المستحق = إجمالي الفواتير - إجمالي المدفوع
         $balance = $total_invoices - $total_credit;
+        $client_balance = $total_debit - $total_credit ;
 
         return view('admin.clients.transactions', compact(
             'client',
@@ -221,6 +224,7 @@ class ClientsController extends Controller
             'total_invoices',
             'total_credit',
             'balance',
+            'client_balance',
             'safes',
             'invoices',
             'fromDate',

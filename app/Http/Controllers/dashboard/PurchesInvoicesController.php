@@ -115,15 +115,16 @@ class PurchesInvoicesController extends Controller
         ################################################ Add Transaction In Supplier Account ##############
 
         //if($data['type'] == 'فاتورة رسمية'){
-            if ($data['remaining'] > 0) {
+           // if ($data['remaining'] > 0) {
                 SupplierTransaction::create([
                     'supplier_id' => $data['supplier_id'],
                     'purchase_invoice_id' => $invoice->id,
-                    'amount' => $data['remaining'],
+                    //'amount' => $data['remaining'],
+                    'amount'=>$data['total_price'],
                     'type' => 'credit', // المبلغ المستحق للمورد   الدائن
                     'description' => 'مبلغ مستحق من فاتورة شراء #' . $invoice->id,
                 ]);
-            }
+           // }
             if ($data['paid'] > 0) {
                SupplierTransaction::create([
                     'supplier_id' => $data['supplier_id'],
@@ -135,6 +136,7 @@ class PurchesInvoicesController extends Controller
                     'description' => 'دفعة لفاتورة شراء #' . $invoice->id,
                 ]);
             }
+
    //     }
 
    if($data['paid'] > 0){
@@ -312,9 +314,7 @@ class PurchesInvoicesController extends Controller
         if(!$invoice){
             abort(404);
         }
-        if($invoice['bayan_txt'] !='' && $invoice['referance_number'] !='' && $invoice['supplier_id'] !='' && $invoice['qyt'] !=''
-        && $invoice['purches_price'] !='' && $invoice['purches_price'] > 0 && $invoice['total_price'] !='' && $invoice['total_price'] > 0
-        && $invoice['safe_id'] !='' && $invoice['admin_id'] !=''
+        if($invoice['bayan_txt'] !='' && $invoice['referance_number'] !='' && $invoice['supplier_id'] !='' && $invoice['qyt'] !='' && $invoice['admin_id'] !=''
         ){
             $invoice->update([
                 "type" => "فاتورة رسمية",
@@ -339,6 +339,7 @@ class PurchesInvoicesController extends Controller
 
         $data = $request->all();
         DB::beginTransaction();
+        $additional_profit = $data['return_price'] - $invoice['total_price'];
         $returnInvoice = new PurcheInvoiceReturn();
         $returnInvoice->create([
             'purche_invoice_id'=>$invoice->id,
@@ -356,20 +357,47 @@ class PurchesInvoicesController extends Controller
             'admin_id'=>$admin_id,
             'category_id'=>$invoice->category_id,
             'return_price'=>$data['return_price'],
+            'additional_profit'=>$additional_profit,
         ]);
         ########### Update Invoice Return Status ########
 
         $invoice->return_status = 'returned';
+        $invoice->status = 'not_available';
         $invoice->save();
 
         ################################################ Add Transaction In Supplier Account ##############
         SupplierTransaction::create([
             'supplier_id' => $invoice->supplier_id,
             'purchase_invoice_id' => $invoice->id,
-            'amount' => $data['return_price'],
-            'type' => 'credit',
-            'description' => 'مبلغ مستحق من فاتورة رجوع #' . $invoice->id,
+           // 'amount' => $data['return_price'],
+           'amount'=>$invoice->total_price,
+            'type' => 'debit',
+            'description' => ' فاتورة رجوع الي المورد #' . $invoice->id,
         ]);
+        ######## If return Price  > total Price Add New Trasactin credit to supplier ( More Liked  )
+        if($data['return_price'] > $invoice->total_price){
+            $additional_profit = $data['return_price'] - $invoice->total_price;
+            SupplierTransaction::create([
+                'supplier_id' => $invoice->supplier_id,
+                'purchase_invoice_id' => $invoice->id,
+               // 'amount' => $data['return_price'],
+               'amount'=>$additional_profit,
+               'type' => 'credit',
+               'description' => ' مبلغ مستحق للمورد من فاتورة الرجوع  #' . $invoice->id,
+            ]);
+        }
+        ####### If return Price < total Price Add New Transaction debit To Supplier
+        if($data['return_price'] < $invoice->total_price){
+            $additional_profit = $invoice->total_price - $data['return_price'];
+            SupplierTransaction::create([
+                'supplier_id' => $invoice->supplier_id,
+                'purchase_invoice_id' => $invoice->id,
+               // 'amount' => $data['return_price'],
+               'amount'=>$additional_profit,
+               'type' => 'debit',
+               'description' => ' مبلغ مستحق للشركة من فاتورة الرجوع  #' . $invoice->id,
+            ]);
+        }
         DB::commit();
         return to_route('dashboard.purches_invoices_return.index');
     }catch(\Exception $e){

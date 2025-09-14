@@ -164,6 +164,7 @@ class SuppliersController extends Controller
 
         // جلب إجمالي قيم الفواتير ضمن الفترة
         $total_invoices = $invoices->sum('total_price');
+        $total_returned = $invoices->where('return_status','returned')->sum('total_price');
 
         // حساب الرصيد الافتتاحي (إجمالي الفواتير قبل from_date)
         $opening_balance = 0; // القيمة الافتراضية إذا لم يكن هناك from_date
@@ -185,15 +186,22 @@ class SuppliersController extends Controller
         // حساب إجمالي المدفوع (Debit)
         $total_debit = $transactions->where('type', 'debit')->sum('amount');
 
+        $total_credit = $transactions->where('type', 'credit')->sum('amount');
+
         // الرصيد المستحق = إجمالي الفواتير - إجمالي المدفوع
         $balance = $total_invoices - $total_debit;
+
+        $supplier_balance = $total_credit - $total_debit;
 
         return view('admin.suppliers.transactions', compact(
             'supplier',
             'transactions',
             'total_invoices',
+            'total_returned',
             'total_debit',
+            'total_credit',
             'balance',
+            'supplier_balance',
             'invoices',
             'safes',
             'fromDate',

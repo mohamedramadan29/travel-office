@@ -112,15 +112,15 @@ class SellingInvoicesController extends Controller
         $purchesInvoice->status = 'sold';
         $purchesInvoice->save();
         ############################################# Add Transction To Client #############################
-        if($data['remaining'] > 0) {
+     //   if($data['remaining'] > 0) {
             ClientTransaction::create([
                 'client_id' => $data['client_id'],
                 'sale_invoice_id' => $invoice->id,
-                'amount' => $data['remaining'],
+                'amount' => $data['total_price'],
                 'type' => 'debit', // المبلغ المستحق من العميل  مدين
                 'description' => 'مبلغ مستحق من فاتورة بيع #' . $invoice->id,
             ]);
-        }
+      //  }
         if ($data['paid'] > 0) {
             ClientTransaction::create([
                 'client_id' => $data['client_id'],
@@ -311,18 +311,54 @@ class SellingInvoicesController extends Controller
                  $returnSelling->save();
                  ############ Update Selling Invoice Status
                  $selling_invoice->return_status = 'returned';
+
                  $selling_invoice->save();
+                 ############# Update Purches Invoice
+                 $purchesInvoice = PurcheInvoice::where('referance_number', $selling_invoice['referance_number'])->first();
+                 $purchesInvoice->status = 'available';
+                 $purchesInvoice->save();
                  ###################################
                 ############################################# Add Transction To Client #############################
                 ClientTransaction::create([
                     'client_id' => $selling_invoice['client_id'],
                     'sale_invoice_id' => $selling_invoice->id,
-                    'amount' => $data['return_price'],
+                  //  'amount' => $data['return_price'],
+                    'amount'=>$selling_invoice->total_price,
                     'type' => 'credit', // المبلغ المدفوع من العميل  دائن
                   //  'payment_method' => $selling_invoice['payment_method'],
                     'safe_id' => $selling_invoice['safe_id'],
                     'description' => 'إرجاع لفاتورة بيع #' . $selling_invoice->id,
                 ]);
+
+                ######## If return Price  < total Price Add New Trasactin depit to client ( More Liked  )
+
+                if($data['return_price'] < $selling_invoice->total_price){
+                    $additional_profit = $selling_invoice->total_price - $data['return_price'];
+                    ClientTransaction::create([
+                        'client_id' => $selling_invoice['client_id'],
+                        'sale_invoice_id' => $selling_invoice->id,
+                      //  'amount' => $data['return_price'],
+                      'amount'=>$additional_profit,
+                        'type' => 'debit',  // مبلغ اضافي مستحق من العميل عند رجوع الفاتورة
+                      //  'payment_method' => $selling_invoice['payment_method'],
+                        'safe_id' => $selling_invoice['safe_id'],
+                        'description' => ' مبلغ  مستحق للشركة من فاتورة رجوع  #' . $selling_invoice->id,
+                    ]);
+                }
+
+                if($data['return_price'] > $selling_invoice->total_price){
+                    $additional_profit = $data['return_price']  - $selling_invoice['total_price'] ;
+                    ClientTransaction::create([
+                        'client_id' => $selling_invoice['client_id'],
+                        'sale_invoice_id' => $selling_invoice->id,
+                      //  'amount' => $data['return_price'],
+                      'amount'=>$additional_profit,
+                        'type' => 'credit',  // مبلغ هينضاف الي العميل
+                      //  'payment_method' => $selling_invoice['payment_method'],
+                        'safe_id' => $selling_invoice['safe_id'],
+                        'description' => ' مبلغ مستحق للعميل من الشركة في فاتورة رجوع  #' . $selling_invoice->id,
+                    ]);
+                }
                  DB::commit();
                  return to_route('dashboard.selling_invoices_return.index');
             }catch(\Exception $e){

@@ -43,33 +43,43 @@
                                                 <div class="card-body">
                                                     <!-- التقرير الكلي -->
                                                     <h5 class="card-title">تقرير قائمة الدخل الكلي</h5>
-                                                    <div>
+                                                    <div class="table-responsive">
                                                         <table class="table table-striped table-bordered">
                                                             <thead>
                                                                 <tr>
                                                                     <th>اجمالي المصروفات</th>
-                                                                    <th>اجمالي المشتريات</th>
-                                                                    {{-- <th>اجمالي مرتجعات  المشتريات</th> --}}
-                                                                    <th>اجمالي المبيعات</th>
-                                                                    {{-- <th>اجمالي مرتجعات المبيعات</th> --}}
+                                                                    <th>اجمالي فواتير الشراء الكلي </th>
+                                                                    <th> اجمالي فواتير الشراء الفعلي </th>
+                                                                    <th>اجمالي مرتجعات المشتريات</th>
+                                                                    <th>اجمالي فواتير البيع الكلي </th>
+                                                                    <th>اجمالي فواتير البيع الفعلي </th>
+                                                                    <th>اجمالي مرتجعات المبيعات</th>
                                                                     <th>اجمالي الدخل</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 <tr>
-                                                                    <td> <strong> {{ number_format($expensesTotal + $employeeSalariesTotal, 2) }}
+                                                                    <td> <strong>
+                                                                            {{ number_format($expensesTotal + $employeeSalariesTotal, 2) }}
                                                                         </strong> دينار</td>
                                                                     <td> <strong>
                                                                             {{ number_format($purchesInvoicesTotal, 2) }}
                                                                         </strong> دينار</td>
-                                                                    {{-- <td> <strong> {{ number_format($purchesInvoicesTotalReturn, 2) }}
-                                                                        </strong> دينار</td> --}}
+                                                                    <td> <strong>
+                                                                            {{ number_format($purchesInvoicesTotalNotReturned, 2) }}
+                                                                        </strong> دينار</td>
+                                                                    <td> <strong>
+                                                                            {{ number_format($purchesInvoicesTotalReturn, 2) }}
+                                                                        </strong> دينار</td>
                                                                     <td> <strong>
                                                                             {{ number_format($saleInvoicesTotal, 2) }}
                                                                         </strong> دينار</td>
-                                                                    {{-- <td> <strong>
+                                                                    <td> <strong>
+                                                                            {{ number_format($saleInvoicesTotalNotReturned, 2) }}
+                                                                        </strong> دينار</td>
+                                                                    <td> <strong>
                                                                             {{ number_format($saleInvoicesTotalReturn, 2) }}
-                                                                        </strong> دينار</td> --}}
+                                                                        </strong> دينار</td>
                                                                     <td> <strong>
                                                                             @if ($totalIncome >= 0)
                                                                                 <span class="text-success">

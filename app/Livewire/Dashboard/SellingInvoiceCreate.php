@@ -132,16 +132,37 @@ class SellingInvoiceCreate extends Component
         }
     }
 
-    public function calculateTotalPrice()
-    {
-        $this->total_price = ($this->qyt && $this->selling_price) ? $this->qyt * $this->selling_price : 0;
-    }
+    // public function calculateTotalPrice()
+    // {
+    //     $this->total_price = ($this->qyt && $this->selling_price) ? $this->qyt * $this->selling_price : 0;
+    // }
 
-    public function calculateRemaining()
-    {
-        $this->paid = (int) ($this->paid ?? 0); // التأكد من أن paid ليس null
-        $this->remaining = ($this->paid > $this->total_price) ? 0 : $this->total_price - $this->paid;
-    }
+    // public function calculateRemaining()
+    // {
+    //     $this->paid = (int) ($this->paid ?? 0); // التأكد من أن paid ليس null
+    //     $this->remaining = ($this->paid > $this->total_price) ? 0 : $this->total_price - $this->paid;
+    // }
+
+    public function calculateTotalPrice()
+{
+    // التأكد من أن qyt و selling_price أرقام
+    $qyt = is_numeric($this->qyt) ? (float)$this->qyt : 0;
+    $selling_price = is_numeric($this->selling_price) ? (float)$this->selling_price : 0;
+
+    $this->total_price = ($qyt && $selling_price) ? $qyt * $selling_price : 0;
+}
+
+public function calculateRemaining()
+{
+    // التأكد من أن paid ليس null وهو رقم
+    $this->paid = is_numeric($this->paid) ? (float)$this->paid : 0;
+
+    // التأكد من أن total_price رقم
+    $total_price = is_numeric($this->total_price) ? (float)$this->total_price : 0;
+
+    // حساب المتبقي
+    $this->remaining = ($this->paid > $total_price) ? 0 : $total_price - $this->paid;
+}
 
 
     public function getClientInfo()

@@ -70,7 +70,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="selling_price"> سعر البيع </label>
-                <input wire:model.live="selling_price" type="number" step="0.01" min="0" id="selling_price" disabled readonly
+                <input wire:model.live="selling_price" type="number" step="0.00001" min="0" id="selling_price" disabled readonly
                     class="form-control" name="selling_price">
                 @error('selling_price')
                     <span class="text-danger">{{ $message }}</span>
@@ -217,7 +217,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="paid"> المدفوع (د.ل) </label>
-                <input min="0" max="{{ $total_price }}" wire:model.live="paid" type="number" disabled readonly
+                <input min="0" max="{{ $total_price }}" wire:model.live="paid" type="number" disabled readonly step="0.00001"
                     id="paid" class="form-control" name="paid">
                 <span>اتركه صفرًا للدفع لاحقًا</span>
                 @error('paid')
@@ -228,7 +228,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="remaining"> الباقي (د.ل) </label>
-                <input wire:model.live="remaining" readonly type="number" id="remaining" class="form-control" disabled readonly
+                <input wire:model.live="remaining" readonly type="number" id="remaining" class="form-control" disabled readonly step="0.00001"
                     name="remaining">
                 @error('remaining')
                     <span class="text-danger">{{ $message }}</span>
@@ -238,7 +238,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="total_price"> السعر الكلي (د.ل) </label>
-                <input wire:model.live="total_price" readonly type="number" id="total_price" class="form-control" disabled readonly
+                <input wire:model.live="total_price" readonly type="number" id="total_price" class="form-control" disabled readonly step="0.00001"
                     name="total_price">
                 @error('total_price')
                     <span class="text-danger">{{ $message }}</span>
@@ -253,7 +253,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="return_price"> سعر الارجاع  (د.ل) </label>
-                <input wire:model.live="return_price" type="number" id="return_price" class="form-control" name="return_price">
+                <input wire:model.live="return_price" type="number" id="return_price" class="form-control" name="return_price" step="0.00001">
                 @error('return_price')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror

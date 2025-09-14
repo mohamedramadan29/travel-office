@@ -1,27 +1,103 @@
 @extends('admin.layouts.app')
-@section('title', 'كشف حساب المورد ')
+@section('title', 'كشف حساب المورد')
+@section('css')
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .dt-layout-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        #printButton {
+            margin-bottom: 20px;
+        }
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .summary p {
+            padding: 10px;
+            border-radius: 10px;
+            color: #fff;
+        }
+        .report-header {
+            display: none; /* مخفي في عرض المتصفح */
+            background: #f8f9fa;
+
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .report-header img {
+            max-width: 180px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        .report-header h2 {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2a3b4b;
+            margin: 0 0 10px 0;
+        }
+        .report-header .details {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+        .report-header .details p {
+            margin: 5px 0;
+        }
+        .report-header .supplier-details {
+            flex: 1;
+            text-align: right;
+            display: flex;
+            justify-content: space-around;
+        }
+        .report-footer {
+            display: none; /* مخفي في عرض المتصفح */
+            background: #f8f9fa;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .report-footer .company-details {
+            font-size: 16px;
+            color: #333;
+            display: flex;
+            justify-content: space-around;
+        }
+        .report-footer .company-details p {
+            margin: 5px 0;
+        }
+    </style>
+@endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> كشف حساب المورد </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block">كشف حساب المورد</h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
-                                </li>
-                                <li class="breadcrumb-item active"> ادارة الموردين
-                                </li>
-                                <li class="breadcrumb-item active"> كشف حساب المورد
-                                </li>
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية</a></li>
+                                <li class="breadcrumb-item active">إدارة الموردين</li>
+                                <li class="breadcrumb-item active">كشف حساب المورد</li>
                             </ol>
                         </div>
                     </div>
                 </div>
+                <div class="content-header-right col-md-6 col-12">
+                    <button id="printButton" class="btn btn-warning float-end">طباعة كـ PDF</button>
+                </div>
             </div>
             <div class="content-body">
-
                 <!-- Bordered striped start -->
                 <div class="row">
                     <div class="col-12">
@@ -29,57 +105,67 @@
                             <div class="card-header">
                                 <button style="margin-right: 3px" type="button" class="btn btn-primary btn-sm"
                                     data-toggle="modal" data-target="#addtransaction{{ $supplier->id }}">
-                                    <i class="bi bi-plus"></i> اضافة دفعة الي المورد
+                                    <i class="bi bi-plus"></i> إضافة دفعة إلى المورد
                                 </button>
                                 @include('admin.suppliers._add_transaction', ['supplier' => $supplier])
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">
-                                    @if (!$fromDate || !$toDate)
-                                        @if ($transactions->count() > 0)
-                                            <div class="summary d-flex justify-content-between">
-                                                <p
-                                                    style="padding: 10px;border: 1px solid #2a3b4b;border-radius: 10px;background: #2a3b4b;color: #fff;">
-                                                    <strong>إجمالي قيم الفواتير:</strong> {{ $total_invoices }} د.ل
-                                                </p>
-                                                <p
-                                                    style="padding: 10px;border: 1px solid #29d094;border-radius: 10px;background: #29d094;color: #fff;">
-                                                    <strong>إجمالي المدفوع (Debit):</strong> {{ $total_debit }} د.ل
-                                                </p>
-                                                <p
-                                                    style="padding: 10px;border: 1px solid #FE4961;border-radius: 10px;background: #FE4961;color: #fff;">
-                                                    <strong>الرصيد المستحق:</strong> {{ $balance }} د.ل
-                                                </p>
+                                    <div id="reportContent">
+                                        <!-- رأس التقرير -->
+                                        <div class="report-header">
+                                            <img src="{{ asset($setting->logo) }}" alt="{{ $setting->site_name }}">
+                                            <h2>{{ $setting->site_name }}</h2>
+                                            <div class="details">
+                                                <div class="supplier-details">
+                                                    <p><strong>اسم المورد:</strong> {{ $supplier->name ?? 'غير محدد' }}</p>
+                                                    <p><strong>رقم الهاتف:</strong> {{ $supplier->mobile ?? 'غير متوفر' }}</p>
+                                                </div>
                                             </div>
+                                        </div>
+
+                                        @if (!$fromDate || !$toDate)
+                                            @if ($transactions->count() > 0)
+                                                <div class="summary d-flex justify-content-between">
+                                                    <p style="padding: 10px;border: 1px solid #2a3b4b;border-radius: 10px;background: #2a3b4b;color: #fff;">
+                                                        <strong> اجمالي قيم الفواتير الكلي :  </strong> {{ number_format($total_invoices, 2) }} د.ل
+                                                    </p>
+                                                    {{-- <p style="padding: 10px;border: 1px solid #2a3b4b;border-radius: 10px;background: #2a3b4b;color: #fff;">
+                                                        <strong> اجمالي قيم  المرتجعات الكلي :  </strong> {{ number_format($total_returned, 2) }} د.ل
+                                                    </p> --}}
+                                                    <p style="padding: 10px;border: 1px solid #29d094;border-radius: 10px;background: #29d094;color: #fff;">
+                                                        <strong>إجمالي المدفوع (Debit):</strong> {{ number_format($total_debit, 2) }} د.ل
+                                                    </p>
+                                                    <p style="padding: 10px;border: 1px solid #FE4961;border-radius: 10px;background: #FE4961;color: #fff;">
+                                                        <strong>الرصيد المستحق:</strong> {{ number_format($supplier_balance, 2) }} د.ل
+                                                    </p>
+                                                </div>
+                                            @endif
                                         @endif
-                                    @endif
-                                    <!-- Start Search For Transactions  -->
-                                    <div class="">
-                                        <form method="GET"
-                                            action="{{ route('dashboard.suppliers.transactions', $supplier->id) }}">
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <label for="from_date">من تاريخ</label>
-                                                    <input type="date" name="from_date" id="from_date"
-                                                        class="form-control" value="{{ $fromDate ?? '' }}">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label for="to_date">إلى تاريخ</label>
-                                                    <input type="date" name="to_date" id="to_date" class="form-control"
-                                                        value="{{ $toDate ?? '' }}">
-                                                </div>
-                                                <div class="col-md-4 d-flex align-items-end">
-                                                    <button type="submit" class="btn btn-primary"> فلترة <i
-                                                            class="bi bi-search"></i> </button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <!-- End Search For Transactions  -->
 
-                                    <hr>
+                                        <!-- نموذج البحث -->
+                                        <div class="">
+                                            <form method="GET" action="{{ route('dashboard.suppliers.transactions', $supplier->id) }}">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <label for="from_date">من تاريخ</label>
+                                                        <input type="date" name="from_date" id="from_date"
+                                                            class="form-control" value="{{ $fromDate ?? '' }}">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="to_date">إلى تاريخ</label>
+                                                        <input type="date" name="to_date" id="to_date" class="form-control"
+                                                            value="{{ $toDate ?? '' }}">
+                                                    </div>
+                                                    <div class="col-md-4 d-flex align-items-end">
+                                                        <button type="submit" class="btn btn-primary">فلترة <i class="bi bi-search"></i></button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
 
-                                    <div class="table-responsive">
+                                        <hr>
+
                                         @if (!$fromDate || !$toDate)
                                             <table class="table table-bordered table-striped">
                                                 <thead>
@@ -97,8 +183,7 @@
                                                     @forelse ($transactions as $transaction)
                                                         <tr>
                                                             <td>{{ $loop->iteration }}</td>
-                                                            <td>{{ $transaction->purchaseInvoice->referance_number ?? 'غير مرتبط' }}
-                                                            </td>
+                                                            <td>{{ $transaction->purchaseInvoice->referance_number ?? 'غير مرتبط' }}</td>
                                                             <td>
                                                                 <span class="text-success">
                                                                     <strong>
@@ -133,13 +218,11 @@
                                                 </tbody>
                                             </table>
                                         @endif
-                                        <!-- Start Table If Is Search Search -->
 
+                                        <!-- جدول كشف الحساب -->
                                         @if ($fromDate && $toDate)
-                                            <!-- جدول كشف الحساب -->
                                             <h5 style="text-align: center; font-weight: bold; margin-bottom: 20px">
-                                                كشف حساب من تاريخ {{ $fromDate ?? 'غير محدد' }} إلى تاريخ
-                                                {{ $toDate ?? 'غير محدد' }}
+                                                كشف حساب من تاريخ {{ $fromDate ?? 'غير محدد' }} إلى تاريخ {{ $toDate ?? 'غير محدد' }}
                                             </h5>
                                             <table class="table table-bordered table-striped">
                                                 <thead>
@@ -163,31 +246,24 @@
                                                         </tr>
                                                     @empty
                                                         <tr>
-                                                            <td colspan="3" class="text-center">لا يوجد فواتير في الفترة
-                                                                المحددة</td>
+                                                            <td colspan="3" class="text-center">لا يوجد فواتير في الفترة المحددة</td>
                                                         </tr>
                                                     @endforelse
                                                 </tbody>
-                                                {{-- <tfoot>
-                                                    <tr>
-                                                        <td colspan="2"><strong>إجمالي الفواتير</strong></td>
-                                                        <td><strong>{{ number_format($total_invoices, 2) }} د.ل</strong></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2"><strong>الرصيد المستحق</strong></td>
-                                                        <td><strong>{{ number_format($balance, 2) }} د.ل</strong></td>
-                                                    </tr>
-                                                </tfoot> --}}
                                             </table>
                                         @endif
-                                        <!-- End Table If Is Set Search -->
 
-                                        <hr>
-
-                                        {{-- {{ $transactions->links() }} --}}
+                                        <!-- تذييل التقرير -->
+                                        <div class="report-footer">
+                                            <div class="company-details">
+                                                <p><strong>رقم الهاتف:</strong> {{ $setting->site_phone ?? 'غير متوفر' }}</p>
+                                                <p><strong>العنوان:</strong> {{ $setting->site_address ?? 'غير متوفر' }}</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
 
+                                    <hr>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -196,6 +272,70 @@
             </div>
         </div>
     </div>
+@endsection
+@section('js')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        document.getElementById('printButton').addEventListener('click', function () {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
 
+            const element = document.getElementById('reportContent');
+            const header = document.querySelector('.report-header');
+            const footer = document.querySelector('.report-footer');
+            const logo = header.querySelector('img');
 
+            // إظهار الهيدر والتذييل مؤقتًا لالتقاطهما بواسطة html2canvas
+            header.style.display = 'block';
+            footer.style.display = 'block';
+
+            // التحقق من تحميل الشعار قبل إنشاء PDF
+            const loadImage = (src) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.src = src;
+                    img.crossOrigin = 'Anonymous'; // للتعامل مع CORS
+                    img.onload = () => resolve(img);
+                    img.onerror = () => reject(new Error('فشل تحميل الشعار'));
+                });
+            };
+
+            // التقاط الصورة بعد تحميل الشعار
+            loadImage(logo.src)
+                .then(() => {
+                    return html2canvas(element, {
+                        scale: 2,
+                        useCORS: true // السماح بتحميل الصور من مصادر خارجية
+                    });
+                })
+                .then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgProps = doc.getImageProperties(imgData);
+                    const pdfWidth = doc.internal.pageSize.getWidth();
+                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                    doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                    const fromDate = '{{ $fromDate ?? '' }}';
+                    const toDate = '{{ $toDate ?? '' }}';
+                    const fileName = fromDate && toDate
+                        ? `كشف_حساب_المورد_${fromDate}_إلى_${toDate}.pdf`
+                        : `كشف_حساب_المورد.pdf`;
+                    doc.save(fileName);
+                })
+                .catch(error => {
+                    console.error('خطأ أثناء إنشاء PDF:', error);
+                    alert('حدث خطأ أثناء إنشاء ملف PDF. تأكد من تحميل الشعار.');
+                })
+                .finally(() => {
+                    // إعادة إخفاء الهيدر والتذييل بعد الطباعة
+                    header.style.display = 'none';
+                    footer.style.display = 'none';
+                });
+        });
+    </script>
 @endsection

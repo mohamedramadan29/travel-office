@@ -12,7 +12,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="purches_price"> سعر الشراء </label>
-                <input wire:model.live="purches_price" type="number" step="0.01" min="0" id="purches_price"
+                <input wire:model.live="purches_price" type="number" step="0.00001" min="0" id="purches_price"
                     class="form-control" name="purches_price">
                 @error('purches_price')
                     <span class="text-danger">{{ $message }}</span>
@@ -77,7 +77,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="paid"> المدفوع (د.ل) </label>
-                <input min="0" max="{{ $total_price }}" wire:model.live.debounce.700ms="paid" type="number" id="paid"
+                <input step="0.00001" min="0" max="{{ $total_price }}" wire:model.live.debounce.700ms="paid" type="number" id="paid"
                     class="form-control" name="paid">
                 <span>اتركه صفرًا للدفع لاحقًا</span>
                 @error('paid')

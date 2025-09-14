@@ -192,18 +192,27 @@ class DoubleInvoiceCreate extends Component
     ###################################### Selling Data Number ###########
 
 
+
     public function calculateSellingTotalPrice()
-    {
-        $this->selling_total_price = ($this->qyt && $this->selling_price) ? $this->qyt * $this->selling_price : 0;
-    }
+{
+    // التأكد من أن qyt و selling_price أرقام
+    $qyt = is_numeric($this->qyt) ? (float)$this->qyt : 0;
+    $selling_price = is_numeric($this->selling_price) ? (float)$this->selling_price : 0;
 
-    public function calculateSellingRemaining()
-    {
-        $this->selling_paid = $this->selling_paid ?? 0; // التأكد من أن paid ليس null
-        $this->selling_remaining = ($this->selling_paid > $this->selling_total_price) ? 0 : $this->selling_total_price - $this->selling_paid;
-    }
+    $this->selling_total_price = ($qyt && $selling_price) ? $qyt * $selling_price : 0;
+}
 
+public function calculateSellingRemaining()
+{
+    // التأكد من أن selling_paid ليس null وهو رقم
+    $this->selling_paid = is_numeric($this->selling_paid) ? (float)$this->selling_paid : 0;
 
+    // التأكد من أن selling_total_price رقم
+    $selling_total_price = is_numeric($this->selling_total_price) ? (float)$this->selling_total_price : 0;
+
+    // حساب المتبقي
+    $this->selling_remaining = ($this->selling_paid > $selling_total_price) ? 0 : $selling_total_price - $this->selling_paid;
+}
 
 
 
