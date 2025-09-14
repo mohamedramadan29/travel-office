@@ -177,9 +177,9 @@ class SafesController extends Controller
             return Redirect()->back()->withErrors($validator);
         }
         ########## Check If Safe Have Amount Or Not
-        if($current_balance < $data['amount']){
-            return Redirect()->back()->withErrors('الرصيد الحالي غير كافٍ');
-        }
+        // if($current_balance < $data['amount']){
+        //     return Redirect()->back()->withErrors('الرصيد الحالي غير كافٍ');
+        // }
         DB::beginTransaction();
 
         ############################################# Start Add Transaction To Safe ############################

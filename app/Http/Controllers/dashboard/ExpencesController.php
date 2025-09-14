@@ -64,9 +64,9 @@ class ExpencesController extends Controller
         $safe = Safe::findOrFail($data['safe_id']);
         $oldSafeBalance =  $safe->balance;
         $newSafeBalance = $oldSafeBalance - $data['price'];
-        if($newSafeBalance < 0){
-            return Redirect()->back()->withErrors(['الرصيد غير كافٍ لاتمام العملية'])->withInput();
-        }
+        // if($newSafeBalance < 0){
+        //     return Redirect()->back()->withErrors(['الرصيد غير كافٍ لاتمام العملية'])->withInput();
+        // }
         DB::beginTransaction();
         $expense = new Expense();
         $expense->category_id = $data['category_id'];

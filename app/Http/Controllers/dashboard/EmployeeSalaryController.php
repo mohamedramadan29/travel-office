@@ -61,9 +61,9 @@ class EmployeeSalaryController extends Controller
             return Redirect::back()->withInput()->withErrors($validator);
         }
         $safe = Safe::findOrFail($data['safe_id']);
-        if($safe->balance < $data['salary']){
-            return Redirect::back()->withInput()->withErrors([' رصيد الخزينة غير كافي لصرف المبلغ  ']);
-        }
+        // if($safe->balance < $data['salary']){
+        //     return Redirect::back()->withInput()->withErrors([' رصيد الخزينة غير كافي لصرف المبلغ  ']);
+        // }
         DB::beginTransaction();
         $salary = new EmployeeSalary();
         $salary->admin_id = $data['admin_id'];
