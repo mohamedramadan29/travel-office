@@ -13,7 +13,7 @@
                             <div class="m-0 card border-grey border-lighten-3">
                                 <div class="border-0 card-header">
                                     <div class="text-center card-title">
-                                        <img width="140px" src="{{ asset($setting->logo) }}"
+                                        <img width="140px" src="{{ asset('uploads/settings/logo.png') }}"
                                             alt="branding logo">
                                     </div>
                                     <h6 class="pt-2 text-center card-subtitle line-on-side text-muted font-small-3">

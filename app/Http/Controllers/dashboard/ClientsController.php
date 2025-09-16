@@ -40,10 +40,10 @@ class ClientsController extends Controller
         $data = $request->all();
         $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:suppliers,email|max:255',
-            'mobile' => 'nullable|string|max:255|unique:suppliers,mobile',
-            'telegram' => 'nullable|string|max:255|unique:suppliers,telegram',
-            'whatsapp' => 'nullable|string|max:255|unique:suppliers,whatsapp',
+            'email' => 'nullable|email|unique:clients,email|max:255',
+            'mobile' => 'nullable|string|max:255|unique:clients,mobile',
+            'telegram' => 'nullable|string|max:255|unique:clients,telegram',
+            'whatsapp' => 'nullable|string|max:255|unique:clients,whatsapp',
             'status' => 'required|numeric',
             'address' => 'nullable|string|max:255',
         ];

@@ -33,7 +33,7 @@
                                 <span class="user-name text-bold-700"> {{ Auth::user()->name }} </span>
                             </span>
                             <span class="avatar avatar-online">
-                                <img src="{{ asset('assets/admin/') }}/images/portrait/small/avatar-s-19.png"
+                                <img src="{{ asset('uploads/settings/logo.png') }}"
                                     alt="avatar"><i></i></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" href="#"><i

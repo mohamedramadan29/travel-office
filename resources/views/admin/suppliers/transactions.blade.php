@@ -114,7 +114,7 @@
                                     <div id="reportContent">
                                         <!-- رأس التقرير -->
                                         <div class="report-header">
-                                            <img src="{{ asset($setting->logo) }}" alt="{{ $setting->site_name }}">
+                                            <img src="{{ asset('uploads/settings/logo.png') }}" alt="{{ $setting->site_name }}">
                                             <h2>{{ $setting->site_name }}</h2>
                                             <div class="details">
                                                 <div class="supplier-details">
