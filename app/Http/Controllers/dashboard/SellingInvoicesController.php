@@ -466,4 +466,10 @@ class SellingInvoicesController extends Controller
         public function SellingInvoicesExcel(){
             return (new SellingInvoicesExport())->download('SellingInvoices.xlsx');
         }
+
+        public function PrintInvoice($id){
+            $invoice = SaleInvoice::find($id);
+
+            return view('admin.invoices.selling.print',compact('invoice'));
+        }
 }

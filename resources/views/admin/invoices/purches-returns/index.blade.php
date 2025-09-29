@@ -1,5 +1,8 @@
 @extends('admin.layouts.app')
 @section('title', ' فواتير الارجاع للشراء ')
+@section('css')
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
+@endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
@@ -11,7 +14,9 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.purches_invoices_return.index') }}">  فواتير الارجاع للشراء  </a>
+                                <li class="breadcrumb-item"><a
+                                        href="{{ route('dashboard.purches_invoices_return.index') }}"> فواتير الارجاع للشراء
+                                    </a>
                                 </li>
                                 <li class="breadcrumb-item active"> فواتير الارجاع
                                 </li>
@@ -30,13 +35,15 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                    <a href="{{ route('dashboard.purches_invoices_return.pdf') }}" class="btn btn-info btn-sm"> استخراج ملف Pdf </a>
-                                    <a href="{{ route('dashboard.purches_invoices_return.excel') }}" class="btn btn-warning btn-sm"> استخراج ملف Excel </a>
+                                <a href="{{ route('dashboard.purches_invoices_return.pdf') }}" class="btn btn-info btn-sm">
+                                    استخراج ملف Pdf </a>
+                                <a href="{{ route('dashboard.purches_invoices_return.excel') }}"
+                                    class="btn btn-warning btn-sm"> استخراج ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped">
+                                        <table class="table table-bordered table-striped" id="datatable">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
@@ -47,7 +54,7 @@
                                                     <th> التصنيف </th>
                                                     <th> الكمية </th>
                                                     <th> السعر الكلي </th>
-                                                    <th> السعر الارجاع  </th>
+                                                    <th> السعر الارجاع </th>
                                                     <th> تاريخ الانشاء </th>
                                                     <th> العمليات </th>
                                                 </tr>
@@ -57,8 +64,8 @@
                                                     <tr>
                                                         <th scope="row">{{ $loop->iteration }}</th>
                                                         <td>
-                                                                <span class="badge badge-pill badge-warning">
-                                                                     فاتورة ارجاع  </span>
+                                                            <span class="badge badge-pill badge-warning">
+                                                                فاتورة ارجاع </span>
                                                         </td>
                                                         <td> {{ $invoice->bayan_txt }} </td>
                                                         <td> {{ $invoice->referance_number }} </td>
@@ -82,15 +89,15 @@
                                                                                 class="la la-edit"></i> تعديل
                                                                         </a> --}}
                                                                     @endcan
-                                                                        <form
-                                                                            action="{{ route('dashboard.purches_invoices_return.destroy', $invoice->id) }}"
-                                                                            method="post">
-                                                                            @csrf
-                                                                            @method('delete')
-                                                                            <button type="submit"
-                                                                                class="dropdown-item delete_confirm"><i
-                                                                                    class="la la-trash"></i> حذف </button>
-                                                                        </form>
+                                                                    <form
+                                                                        action="{{ route('dashboard.purches_invoices_return.destroy', $invoice->id) }}"
+                                                                        method="post">
+                                                                        @csrf
+                                                                        @method('delete')
+                                                                        <button type="submit"
+                                                                            class="dropdown-item delete_confirm"><i
+                                                                                class="la la-trash"></i> حذف </button>
+                                                                    </form>
 
                                                                 </div>
                                                             </div>
@@ -115,4 +122,26 @@
     </div>
 
 
+@endsection
+
+
+
+
+@section('js')
+    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#datatable').DataTable({
+                "language": {
+                    "sSearch": "ابحث:",
+                },
+                "bLengthChange": false,
+                "bInfo": false,
+                "bPaginate": false,
+                "ordering": false
+            });
+
+
+        });
+    </script>
 @endsection

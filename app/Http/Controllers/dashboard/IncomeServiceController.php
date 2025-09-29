@@ -224,4 +224,12 @@ class IncomeServiceController extends Controller
         public function IncomeServicesExcel(){
             return (new IncomeServicesExport())->download('IncomeServices.xlsx');
         }
+
+
+        public function PrintIncomeServices($id){
+            $income = IncomService::findOrFail($id);
+
+            return view('admin.income-services.print',compact('income'));
+
+        }
 }

@@ -1,5 +1,8 @@
 @extends('admin.layouts.app')
 @section('title', $type)
+@section('css')
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
+@endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
@@ -33,25 +36,31 @@
                             @can('purches_invoices_create')
                                 <div class="card-header">
                                     @if ($type == 'فواتير شراء  مؤقتة')
-                                    <a href="{{ route('dashboard.purches_invoices.create') }}" class="btn btn-primary btn-sm"> اضافة
-                                        فاتورة </a>
+                                        <a href="{{ route('dashboard.purches_invoices.create') }}"
+                                            class="btn btn-primary btn-sm"> اضافة
+                                            فاتورة </a>
                                     @elseif($type == 'فواتير شراء رسمية')
-                                    <a href="{{ route('dashboard.purches_invoices.create','type=official') }}" class="btn btn-primary btn-sm"> اضافة
-                                        فاتورة </a>
+                                        <a href="{{ route('dashboard.purches_invoices.create', 'type=official') }}"
+                                            class="btn btn-primary btn-sm"> اضافة
+                                            فاتورة </a>
                                     @endif
                                     @if ($type == 'فواتير شراء  مؤقتة')
-                                        <a href="{{ route('dashboard.purches_invoices.pdf.type', 'فاتورة مؤقتة') }}" class="btn btn-info btn-sm"> استخراج ملف Pdf </a>
-                                        <a href="{{ route('dashboard.purches_invoices.excel.type', 'فاتورة مؤقتة') }}" class="btn btn-warning btn-sm"> استخراج ملف Excel </a>
+                                        <a href="{{ route('dashboard.purches_invoices.pdf.type', 'فاتورة مؤقتة') }}"
+                                            class="btn btn-info btn-sm"> استخراج ملف Pdf </a>
+                                        <a href="{{ route('dashboard.purches_invoices.excel.type', 'فاتورة مؤقتة') }}"
+                                            class="btn btn-warning btn-sm"> استخراج ملف Excel </a>
                                     @elseif($type == 'فواتير شراء رسمية')
-                                        <a href="{{ route('dashboard.purches_invoices.pdf.type', 'فاتورة رسمية') }}" class="btn btn-info btn-sm"> استخراج ملف Pdf </a>
-                                        <a href="{{ route('dashboard.purches_invoices.excel.type', 'فاتورة رسمية') }}" class="btn btn-warning btn-sm"> استخراج ملف Excel </a>
+                                        <a href="{{ route('dashboard.purches_invoices.pdf.type', 'فاتورة رسمية') }}"
+                                            class="btn btn-info btn-sm"> استخراج ملف Pdf </a>
+                                        <a href="{{ route('dashboard.purches_invoices.excel.type', 'فاتورة رسمية') }}"
+                                            class="btn btn-warning btn-sm"> استخراج ملف Excel </a>
                                     @endif
                                 </div>
                             @endcan
                             <div class="card-content collapse show">
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped">
+                                        <table id="datatable" class="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
@@ -142,4 +151,25 @@
     </div>
 
 
+@endsection
+
+
+
+@section('js')
+    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#datatable').DataTable({
+                "language": {
+                    "sSearch": "ابحث:",
+                },
+                "bLengthChange": false,
+                "bInfo": false,
+                "bPaginate": false,
+                "ordering": false
+            });
+
+
+        });
+    </script>
 @endsection

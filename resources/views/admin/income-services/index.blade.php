@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('title', ' ادارة الايرادات الخارجية  ')
+@section('title', ' ادارة الايرادات الخارجية ')
 @section('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.min.css">
     <style>
@@ -39,13 +39,14 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <a href="{{ route('dashboard.income_services.create') }}" class="btn btn-primary btn-sm"> اضافة ايرادات جديدة
+                                <a href="{{ route('dashboard.income_services.create') }}" class="btn btn-primary btn-sm">
+                                    اضافة ايرادات جديدة
                                 </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
-                                href="{{ route('dashboard.income_services.pdf') }}">
-                                استخراج ملف Pdf </a>
-                            <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
-                                href="{{ route('dashboard.income_services.excel') }}"> استخراج
+                                    href="{{ route('dashboard.income_services.pdf') }}">
+                                    استخراج ملف Pdf </a>
+                                <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
+                                    href="{{ route('dashboard.income_services.excel') }}"> استخراج
                                     ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
@@ -54,14 +55,13 @@
                                     @include('admin.layouts.toaster_success')
 
                                     <div class="table-responsive">
-                                        <table
-                                            class="table table-striped table-bordered column-rendering">
+                                        <table class="table table-striped table-bordered column-rendering">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th> التصنيف   </th>
+                                                    <th> التصنيف </th>
                                                     <th> المبلغ </th>
-                                                    <th> الخزينة  </th>
+                                                    <th> الخزينة </th>
                                                     <th> تاريخ الانشاء </th>
                                                     <th> العمليات </th>
                                                 </tr>
@@ -73,7 +73,7 @@
                                                         <td>{{ $income_service->category->name ?? 'غير محدد' }}</td>
                                                         <td>{{ $income_service->price }}</td>
                                                         <td>
-                                                         {{ $income_service->safe->name }}
+                                                            {{ $income_service->safe->name }}
                                                         </td>
                                                         <td>{{ $income_service->created_at }}</td>
                                                         <td>
@@ -84,10 +84,12 @@
                                                                     aria-expanded="false"> العمليات </button>
                                                                 <div class="dropdown-menu"
                                                                     aria-labelledby="dropdownBreadcrumbButton">
-                                                                    <a
-                                                                        class="dropdown-item"
+                                                                    <a class="dropdown-item"
                                                                         href="{{ route('dashboard.income_services.edit', $income_service->id) }}"><i
                                                                             class="la la-edit"></i> تعديل </a>
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('dashboard.income_services.print', $income_service->id) }}"><i
+                                                                            class="la la-print"></i> طباعة </a>
                                                                     <form
                                                                         action="{{ route('dashboard.income_services.destroy', $income_service->id) }}"
                                                                         method="post">

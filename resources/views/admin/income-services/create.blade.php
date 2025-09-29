@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', ' اضافة ايرادات  ')
+@section('title', ' اضافة ايرادات ')
 
 @section('content')
     <div class="app-content content">
@@ -13,10 +13,11 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.income_services.index') }}"> ادارة ايرادات
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.income_services.index') }}"> ادارة
+                                        ايرادات
                                     </a>
                                 </li>
-                                <li class="breadcrumb-item active"><a href="#"> اضافة ايرادات  </a>
+                                <li class="breadcrumb-item active"><a href="#"> اضافة ايرادات </a>
                                 </li>
                             </ol>
                         </div>
@@ -31,7 +32,7 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title" id="basic-layout-form"> اضافة ايرادات  </h4>
+                                    <h4 class="card-title" id="basic-layout-form"> اضافة ايرادات </h4>
 
                                 </div>
                                 <div class="card-content collapse show">
@@ -44,28 +45,31 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="projectinput1"> حدد  تصنيف المصروف    </label>
+                                                            <label for="projectinput1"> حدد تصنيف الايراد </label>
                                                             <select name="category_id" id="" class="form-control">
-                                                                <option value="" selected disabled> -- حدد -- </option>
+                                                                <option value="" selected disabled> -- حدد --
+                                                                </option>
                                                                 @foreach ($categories as $category)
-                                                                    <option {{ old('category_id') == $category->id ? 'selected' : '' }} value="{{ $category->id }}">{{ $category->name }}</option>
+                                                                    <option
+                                                                        {{ old('category_id') == $category->id ? 'selected' : '' }}
+                                                                        value="{{ $category->id }}">{{ $category->name }}
+                                                                    </option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="projectinput1"> المبلغ   </label>
+                                                            <label for="projectinput1"> المبلغ </label>
                                                             <input type="number" id="projectinput1" class="form-control"
-                                                                placeholder="  " name="price"
-                                                                value="{{ old('price') }}">
+                                                                placeholder="  " name="price" value="{{ old('price') }}">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="projectinput1"> الخزينة   </label>
+                                                            <label for="projectinput1"> الخزينة </label>
                                                             <select name="safe_id" id="" class="form-control">
-                                                                <option value="" selected disabled> -- الخزينة  --
+                                                                <option value="" selected disabled> -- الخزينة --
                                                                 </option>
                                                                 @foreach ($safes as $safe)
                                                                     <option value="{{ $safe->id }}"
@@ -78,7 +82,7 @@
                                                     </div>
                                                     <div class="col-md-12">
                                                         <div class="form-group">
-                                                            <label for="projectinput1">  اضافة ملاحظات    </label>
+                                                            <label for="projectinput1"> اضافة ملاحظات </label>
                                                             <textarea name="description" id="" cols="30" rows="5" class="form-control">{{ old('description') }}</textarea>
                                                         </div>
                                                     </div>
@@ -88,7 +92,8 @@
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
                                                 </button>
-                                                <a href="{{ route('dashboard.income_services.index') }}" type="button" class="mr-1 btn btn-warning">
+                                                <a href="{{ route('dashboard.income_services.index') }}" type="button"
+                                                    class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> رجوع
                                                 </a>
 

@@ -32,7 +32,7 @@ use App\Http\Controllers\dashboard\auth\ResetPasswordController;
 use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
 
 Route::group([
-    'prefix' =>'/dashboard',
+    'prefix' => '/dashboard',
     'as' => 'dashboard.',
 ], function () {
 
@@ -85,8 +85,8 @@ Route::group([
         Route::group(['middleware' => 'can:admins'], function () {
             Route::resource('admins', AdminController::class)->except(['show']);
             Route::get('admins/status/{id}', [AdminController::class, 'ChangeStatus'])->name('admins.status');
-            Route::get('admins/pdf/report',[AdminController::class,'AdminsPdf'])->name('admins.pdf');
-            Route::get('admins/excel/report',[AdminController::class,'AdminsExcel'])->name('admins.excel');
+            Route::get('admins/pdf/report', [AdminController::class, 'AdminsPdf'])->name('admins.pdf');
+            Route::get('admins/excel/report', [AdminController::class, 'AdminsExcel'])->name('admins.excel');
         });
         ################### End Admins Routes ###########################
         ##################### Start Suppliers Routes ####################
@@ -95,9 +95,8 @@ Route::group([
             Route::get('suppliers/status/{id}', [SuppliersController::class, 'ChangeStatus'])->name('suppliers.status');
             Route::get('suppliers/transactions/{id}', [SuppliersController::class, 'transactions'])->name('suppliers.transactions');
             Route::post('suppliers/add_transaction/{invoice_id}', [SuppliersController::class, 'AddTransaction'])->name('supplier.add_transaction');
-            Route::get('suppliers/pdf/report',[SuppliersController::class,'SuppliersPdf'])->name('suppliers.pdf');
-            Route::get('suppliers/excel/report',[SuppliersController::class,'SuppliersExcel'])->name('suppliers.excel');
-
+            Route::get('suppliers/pdf/report', [SuppliersController::class, 'SuppliersPdf'])->name('suppliers.pdf');
+            Route::get('suppliers/excel/report', [SuppliersController::class, 'SuppliersExcel'])->name('suppliers.excel');
         });
         ##################### End Suppliers Routes ######################
 
@@ -107,86 +106,87 @@ Route::group([
             Route::get('clients/status/{id}', [ClientsController::class, 'ChangeStatus'])->name('clients.status');
             Route::get('clients/transactions/{id}', [ClientsController::class, 'transactions'])->name('clients.transactions');
             Route::post('clients/add_transaction/{invoice_id}', [ClientsController::class, 'AddTransaction'])->name('client.add_transaction');
-            Route::get('clients/pdf/report',[ClientsController::class,'ClientsPdf'])->name('clients.pdf');
-            Route::get('clients/excel/report',[ClientsController::class,'ClientsExcel'])->name('clients.excel');
-            Route::get('clients/report/all',[ClientsController::class,'ClientsReport'])->name('clients.report');
+            Route::get('clients/pdf/report', [ClientsController::class, 'ClientsPdf'])->name('clients.pdf');
+            Route::get('clients/excel/report', [ClientsController::class, 'ClientsExcel'])->name('clients.excel');
+            Route::get('clients/report/all', [ClientsController::class, 'ClientsReport'])->name('clients.report');
         });
         ##################### End Clients Routes ######################
 
-         ##################### Start Safes Routes ####################
-         Route::group(['middleware' => 'can:safes'], function () {
+        ##################### Start Safes Routes ####################
+        Route::group(['middleware' => 'can:safes'], function () {
             Route::resource('safes', SafesController::class);
             Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
             Route::post('safes/add_balance/{id}', [SafesController::class, 'AddBalance'])->name('safes.add_balance');
             Route::post('safes/remove_balance/{id}', [SafesController::class, 'RemoveBalance'])->name('safes.remove_balance');
-            Route::get('safes/movements/{id}',[SafesController::class,'SafeMovement'])->name('safes.movements');
-            Route::get('safes/pdf/report',[SafesController::class,'SafesPdf'])->name('safes.pdf');
-            Route::get('safes/excel/report',[SafesController::class,'SafesExcel'])->name('safes.excel');
+            Route::get('safes/movements/{id}', [SafesController::class, 'SafeMovement'])->name('safes.movements');
+            Route::get('safes/pdf/report', [SafesController::class, 'SafesPdf'])->name('safes.pdf');
+            Route::get('safes/excel/report', [SafesController::class, 'SafesExcel'])->name('safes.excel');
         });
         ##################### End Safes Routes ################################
         ##################### Start Purches Invoices Controller ###############
         Route::group(['middleware' => 'can:purches_invoices'], function () {
-            Route::get('purches_invoices_type/{type}',[PurchesInvoicesController::class, 'PurchesInvoice'])->name('purches_invoices_type.type');
+            Route::get('purches_invoices_type/{type}', [PurchesInvoicesController::class, 'PurchesInvoice'])->name('purches_invoices_type.type');
             Route::resource('purches_invoices', PurchesInvoicesController::class);
-            Route::match(['get','post'],'invoice/convert_to_official_purches/{id}',[PurchesInvoicesController::class, 'ConvertToOfficial'])->name('convert_to_official_purches');
-            Route::match(['get','post'],'invoice/return/{id}',[PurchesInvoicesController::class, 'ReturnInvoice'])->name('return_invoice');
-            Route::get('purches_invoices/pdf/report',[PurchesInvoicesController::class,'PurchesInvoicesPdf'])->name('purches_invoices.pdf');
-            Route::get('purches_invoices/excel/report',[PurchesInvoicesController::class,'PurchesInvoicesExcel'])->name('purches_invoices.excel');
-           ######## Official Export  && Interim Export ########
-            Route::get('purches_invoices/pdf/report/{type}',[PurchesInvoicesController::class,'PurchesInvoicesPdfType'])->name('purches_invoices.pdf.type');
-            Route::get('purches_invoices/excel/report/{type}',[PurchesInvoicesController::class,'PurchesInvoicesExcelType'])->name('purches_invoices.excel.type');
-
+            Route::get('purches_invoice/print/{id}', [PurchesInvoicesController::class, 'PrintInvoice'])->name('print_purches_invoice');
+            Route::match(['get', 'post'], 'invoice/convert_to_official_purches/{id}', [PurchesInvoicesController::class, 'ConvertToOfficial'])->name('convert_to_official_purches');
+            Route::match(['get', 'post'], 'invoice/return/{id}', [PurchesInvoicesController::class, 'ReturnInvoice'])->name('return_invoice');
+            Route::get('purches_invoices/pdf/report', [PurchesInvoicesController::class, 'PurchesInvoicesPdf'])->name('purches_invoices.pdf');
+            Route::get('purches_invoices/excel/report', [PurchesInvoicesController::class, 'PurchesInvoicesExcel'])->name('purches_invoices.excel');
+            ######## Official Export  && Interim Export ########
+            Route::get('purches_invoices/pdf/report/{type}', [PurchesInvoicesController::class, 'PurchesInvoicesPdfType'])->name('purches_invoices.pdf.type');
+            Route::get('purches_invoices/excel/report/{type}', [PurchesInvoicesController::class, 'PurchesInvoicesExcelType'])->name('purches_invoices.excel.type');
         });
         ##################### End Purches Invoices Controller #################
 
-          ##################### Start Purches Invoices Return Controller ###############
-          Route::group(['middleware' => 'can:purches_invoices_return'], function () {
+        ##################### Start Purches Invoices Return Controller ###############
+        Route::group(['middleware' => 'can:purches_invoices_return'], function () {
             Route::resource('purches_invoices_return', PurchesInvoiceReturnController::class);
             ############ Purches Return Invoices ###################
-            Route::get('purches_invoices_return/pdf/report',[PurchesInvoiceReturnController::class,'PurchesInvoicesReturnPdf'])->name('purches_invoices_return.pdf');
-            Route::get('purches_invoices_return/excel/report',[PurchesInvoiceReturnController::class,'PurchesInvoicesReturnExcel'])->name('purches_invoices_return.excel');
-
+            Route::get('purches_invoices_return/pdf/report', [PurchesInvoiceReturnController::class, 'PurchesInvoicesReturnPdf'])->name('purches_invoices_return.pdf');
+            Route::get('purches_invoices_return/excel/report', [PurchesInvoiceReturnController::class, 'PurchesInvoicesReturnExcel'])->name('purches_invoices_return.excel');
         });
         ##################### End Purches Invoices Return  Controller #################
 
-           ##################### Start Selling Invoices Controller ###############
-           Route::group(['middleware' => 'can:selling_invoices'], function () {
-            Route::get('selling_invoices_type/{type}',[SellingInvoicesController::class, 'SellingInvoice'])->name('selling_invoices_type.type');
+        ##################### Start Selling Invoices Controller ###############
+        Route::group(['middleware' => 'can:selling_invoices'], function () {
+            Route::get('selling_invoices_type/{type}', [SellingInvoicesController::class, 'SellingInvoice'])->name('selling_invoices_type.type');
             Route::resource('selling_invoices', SellingInvoicesController::class);
-            Route::match(['get','post'],'invoice/convert_to_official/{id}',[SellingInvoicesController::class, 'ConvertToOfficial'])->name('convert_to_official');
-            Route::match(['get','post'],'selling_invoice/return/{id}',[SellingInvoicesController::class, 'ReturnInvoice'])->name('selling_return_invoice');
+            Route::get('selling_invoice/print/{id}', [SellingInvoicesController::class, 'PrintInvoice'])->name('print_selling_invoice');
+            Route::match(['get', 'post'], 'invoice/convert_to_official/{id}', [SellingInvoicesController::class, 'ConvertToOfficial'])->name('convert_to_official');
+            Route::match(['get', 'post'], 'selling_invoice/return/{id}', [SellingInvoicesController::class, 'ReturnInvoice'])->name('selling_return_invoice');
             Route::get('selling_invoices/interim/index', [SellingInvoicesController::class, 'InterimInvoices'])->name('selling_invoices.interim');
-            Route::get('selling_invoices/pdf/report',[SellingInvoicesController::class,'SellingInvoicesPdf'])->name('selling_invoices.pdf');
-            Route::get('selling_invoices/excel/report',[SellingInvoicesController::class,'SellingInvoicesExcel'])->name('selling_invoices.excel');
+            Route::get('selling_invoices/pdf/report', [SellingInvoicesController::class, 'SellingInvoicesPdf'])->name('selling_invoices.pdf');
+            Route::get('selling_invoices/excel/report', [SellingInvoicesController::class, 'SellingInvoicesExcel'])->name('selling_invoices.excel');
             //   Route::get('safes/status/{id}', [SafesController::class, 'ChangeStatus'])->name('safes.status');
         });
         ##################### End Selling Invoices Controller #################
-          ##################### Start Selling Invoices Return Controller ###############
-          Route::group(['middleware' => 'can:selling_invoices_return'], function () {
+        ##################### Start Selling Invoices Return Controller ###############
+        Route::group(['middleware' => 'can:selling_invoices_return'], function () {
             Route::resource('selling_invoices_return', SellingInvoicesReturnController::class);
         });
         ##################### End Selling Invoices Return  Controller #################
 
         ##################### Start Double Invoices Controller ###############
         Route::group(['middleware' => 'can:double_invoices'], function () {
-            Route::get('double_invoices/create', [DoubleInvoiceController::class,'create'])->name('double_invoices.create');
-            Route::post('double_invoices/store', [DoubleInvoiceController::class,'store'])->name('double_invoices.store');
+            Route::get('double_invoices/create', [DoubleInvoiceController::class, 'create'])->name('double_invoices.create');
+            Route::post('double_invoices/store', [DoubleInvoiceController::class, 'store'])->name('double_invoices.store');
         });
         #################### End Double Invoices Controller ##################
 
         ###################### Start Expences Controller ######################
         Route::group(['middleware' => 'can:expenses'], function () {
             Route::resource('expenses', ExpencesController::class);
-            Route::get('expenses/pdf/report',[ExpencesController::class,'ExpensesPdf'])->name('expenses.pdf');
-            Route::get('expenses/excel/report',[ExpencesController::class,'ExpensesExcel'])->name('expenses.excel');
+            Route::get('expenses/print/{id}', [ExpencesController::class, 'PrintExpenses'])->name('expenses.print');
+            Route::get('expenses/pdf/report', [ExpencesController::class, 'ExpensesPdf'])->name('expenses.pdf');
+            Route::get('expenses/excel/report', [ExpencesController::class, 'ExpensesExcel'])->name('expenses.excel');
         });
         ###################### End Expences Controller ##########################
 
         ###################### Start Expences Categories Controller ######################
         Route::group(['middleware' => 'can:expenses_categories'], function () {
             Route::resource('expenses_categories', ExpencesCategoriesController::class);
-            Route::get('expenses_categories/pdf/report',[ExpencesCategoriesController::class,'ExpencesCategoriesPdf'])->name('expenses_categories.pdf');
-            Route::get('expenses_categories/excel/report',[ExpencesCategoriesController::class,'ExpencesCategoriesExcel'])->name('expenses_categories.excel');
+            Route::get('expenses_categories/pdf/report', [ExpencesCategoriesController::class, 'ExpencesCategoriesPdf'])->name('expenses_categories.pdf');
+            Route::get('expenses_categories/excel/report', [ExpencesCategoriesController::class, 'ExpencesCategoriesExcel'])->name('expenses_categories.excel');
         });
         ###################### End Expences Categories Controller ##########################
 
@@ -195,8 +195,8 @@ Route::group([
         Route::group(['middleware' => 'can:categories'], function () {
             Route::resource('categories', CategoryController::class);
             Route::get('categories-all', [CategoryController::class, 'CategoryAll'])->name('categories.all');
-            Route::get('categories/pdf/report',[CategoryController::class,'CategoriesPdf'])->name('categories.pdf');
-            Route::get('categories/excel/report',[CategoryController::class,'CategoriesExcel'])->name('categories.excel');
+            Route::get('categories/pdf/report', [CategoryController::class, 'CategoriesPdf'])->name('categories.pdf');
+            Route::get('categories/excel/report', [CategoryController::class, 'CategoriesExcel'])->name('categories.excel');
         });
         ################# End Categories Routes #######################
 
@@ -210,44 +210,45 @@ Route::group([
         ################# End Settings Routes #######################
         ################# Start Report Controller ##################
 
-        Route::group(['middleware' => 'can:reports','prefix'=>'reports','as'=>'reports.'], function () {
-            Route::controller(ReportController::class)->group(function(){
-                Route::get('expenses-report','ExpensesReport')->name('expenses_report');
-                Route::get('PurchesInvoicesReport','PurchesInvoicesReport')->name('PurchesInvoicesReport');
-                Route::get('SalesInvoicesReport','SalesInvoicesReport')->name('SalesInvoicesReport');
+        Route::group(['middleware' => 'can:reports', 'prefix' => 'reports', 'as' => 'reports.'], function () {
+            Route::controller(ReportController::class)->group(function () {
+                Route::get('expenses-report', 'ExpensesReport')->name('expenses_report');
+                Route::get('PurchesInvoicesReport', 'PurchesInvoicesReport')->name('PurchesInvoicesReport');
+                Route::get('SalesInvoicesReport', 'SalesInvoicesReport')->name('SalesInvoicesReport');
             });
         });
         ################# End Report Controller ####################
 
         ################# Start Income Report Controller ##################
-        Route::group(['middleware' => 'can:reports','prefix'=>'reports','as'=>'reports.'], function () {
-            Route::controller(IncomeReportController::class)->group(function(){
-                Route::get('income-report','IncomeReport')->name('income_report');
-                Route::get('income-report/{month}','IncomeReportMonthly')->name('income_report.monthly');
+        Route::group(['middleware' => 'can:reports', 'prefix' => 'reports', 'as' => 'reports.'], function () {
+            Route::controller(IncomeReportController::class)->group(function () {
+                Route::get('income-report', 'IncomeReport')->name('income_report');
+                Route::get('income-report/{month}', 'IncomeReportMonthly')->name('income_report.monthly');
             });
         });
         ################# End Income Report Controller ##################
         #################### Start Employee Salary #####################
         Route::group(['middleware' => 'can:expenses'], function () {
             Route::resource('employee_salary', EmployeeSalaryController::class);
-            Route::get('employee_salary/pdf/report',[EmployeeSalaryController::class,'EmployeeSalaryPdf'])->name('employee_salary.pdf');
-            Route::get('employee_salary/excel/report',[EmployeeSalaryController::class,'EmployeeSalaryExcel'])->name('employee_salary.excel');
+            Route::get('employee_salary/pdf/report', [EmployeeSalaryController::class, 'EmployeeSalaryPdf'])->name('employee_salary.pdf');
+            Route::get('employee_salary/excel/report', [EmployeeSalaryController::class, 'EmployeeSalaryExcel'])->name('employee_salary.excel');
         });
         #################### End Employee Salary #######################
 
-         ###################### Start Income Service  Controller ######################
-         Route::group(['middleware' => 'can:income_services'], function () {
+        ###################### Start Income Service  Controller ######################
+        Route::group(['middleware' => 'can:income_services'], function () {
             Route::resource('income_services', IncomeServiceController::class);
-            Route::get('income_services/pdf/report',[IncomeServiceController::class,'IncomeServicesPdf'])->name('income_services.pdf');
-            Route::get('income_services/excel/report',[IncomeServiceController::class,'IncomeServicesExcel'])->name('income_services.excel');
+            Route::get('income_services/print/{id}', [IncomeServiceController::class,'PrintIncomeServices'])->name('income_services.print');
+            Route::get('income_services/pdf/report', [IncomeServiceController::class, 'IncomeServicesPdf'])->name('income_services.pdf');
+            Route::get('income_services/excel/report', [IncomeServiceController::class, 'IncomeServicesExcel'])->name('income_services.excel');
         });
         ###################### End Income Service Controller ##########################
 
         ###################### Start Income Service Categories Controller ######################
         Route::group(['middleware' => 'can:income_services'], function () {
             Route::resource('income_services_categories', IncomeServiceCategoryController::class);
-            Route::get('income_services_categories/pdf/report',[IncomeServiceCategoryController::class,'IncomeServiceCategoriesPdf'])->name('income_services_categories.pdf');
-            Route::get('income_services_categories/excel/report',[IncomeServiceCategoryController::class,'IncomeServiceCategoriesExcel'])->name('income_services_categories.excel');
+            Route::get('income_services_categories/pdf/report', [IncomeServiceCategoryController::class, 'IncomeServiceCategoriesPdf'])->name('income_services_categories.pdf');
+            Route::get('income_services_categories/excel/report', [IncomeServiceCategoryController::class, 'IncomeServiceCategoriesExcel'])->name('income_services_categories.excel');
         });
         ###################### End Income Service Categories Controller ##########################
 

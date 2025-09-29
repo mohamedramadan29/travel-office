@@ -232,4 +232,12 @@ class ExpencesController extends Controller
         public function ExpencesExcel(){
             return (new ExpencesExport())->download('Expences.xlsx');
         }
+
+
+        ############ Print Expenses
+
+        public function PrintExpenses($id){
+            $expense = Expense::find($id);
+            return view('admin.expenses.print',compact('expense'));
+        }
 }

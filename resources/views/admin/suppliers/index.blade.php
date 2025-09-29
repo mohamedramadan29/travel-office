@@ -1,5 +1,8 @@
 @extends('admin.layouts.app')
 @section('title', 'الموردين ')
+@section('css')
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
+@endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
@@ -28,18 +31,19 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header d-flex align-items-center">
-                                <a href="{{ route('dashboard.suppliers.create') }}" class="btn btn-primary btn-sm"> اضافة مورد </a>
+                                <a href="{{ route('dashboard.suppliers.create') }}" class="btn btn-primary btn-sm"> اضافة
+                                    مورد </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
                                     href="{{ route('dashboard.suppliers.pdf') }}">
                                     استخراج ملف Pdf </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
                                     href="{{ route('dashboard.suppliers.excel') }}"> استخراج
-                                        ملف Excel </a>
+                                    ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped">
+                                        <table id="datatable" class="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
@@ -77,7 +81,7 @@
                                                                             class="la la-edit"></i> تعديل </a>
                                                                     <a class="dropdown-item"
                                                                         href="{{ route('dashboard.suppliers.transactions', $supplier->id) }}"><i
-                                                                            class="la la-edit"></i> كشف حساب المورد  </a>
+                                                                            class="la la-edit"></i> كشف حساب المورد </a>
                                                                     <a class="dropdown-item"
                                                                         href="{{ route('dashboard.suppliers.status', $supplier->id) }}"><i
                                                                             class="la la-edit"></i> تعديل الحالة </a>
@@ -114,4 +118,24 @@
     </div>
 
 
+@endsection
+
+
+@section('js')
+    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#datatable').DataTable({
+                "language": {
+                    "sSearch": "ابحث:",
+                },
+                "bLengthChange": false,
+                "bInfo": false,
+                "bPaginate": false,
+                "ordering": false
+            });
+
+
+        });
+    </script>
 @endsection

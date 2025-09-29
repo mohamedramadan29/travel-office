@@ -579,4 +579,11 @@ class PurchesInvoicesController extends Controller
     public function PurchesInvoicesExcelType($type){
         return (new PurchesInvoicesExportType($type))->download('PurchesInvoices.xlsx');
     }
+
+    public function PrintInvoice($id){
+
+        $invoice = PurcheInvoice::findOrFail($id);
+        return view('admin.invoices.purches.print', compact('invoice'));
+
+    }
 }

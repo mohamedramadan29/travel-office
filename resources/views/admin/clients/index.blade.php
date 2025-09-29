@@ -1,5 +1,8 @@
 @extends('admin.layouts.app')
 @section('title', 'العملاء ')
+@section('css')
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
+@endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
@@ -28,19 +31,21 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <a href="{{ route('dashboard.clients.report') }}" class="btn btn-success btn-sm"> كشف شامل للعملاء  </a>
-                                <a href="{{ route('dashboard.clients.create') }}" class="btn btn-primary btn-sm"> اضافة عميل </a>
+                                <a href="{{ route('dashboard.clients.report') }}" class="btn btn-success btn-sm"> كشف شامل
+                                    للعملاء </a>
+                                <a href="{{ route('dashboard.clients.create') }}" class="btn btn-primary btn-sm"> اضافة عميل
+                                </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
-                                href="{{ route('dashboard.clients.pdf') }}">
-                                استخراج ملف Pdf </a>
-                            <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
-                                href="{{ route('dashboard.clients.excel') }}"> استخراج
+                                    href="{{ route('dashboard.clients.pdf') }}">
+                                    استخراج ملف Pdf </a>
+                                <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
+                                    href="{{ route('dashboard.clients.excel') }}"> استخراج
                                     ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped">
+                                        <table id="datatable" class="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
@@ -79,7 +84,7 @@
                                                                     <a class="dropdown-item"
                                                                         href="{{ route('dashboard.clients.transactions', $client->id) }}"><i
                                                                             class="la la-edit"></i> كشف حساب العميل
-                                                                        </a>
+                                                                    </a>
                                                                     <a class="dropdown-item"
                                                                         href="{{ route('dashboard.clients.status', $client->id) }}"><i
                                                                             class="la la-edit"></i> تعديل الحالة </a>
@@ -116,4 +121,25 @@
     </div>
 
 
+@endsection
+
+
+
+@section('js')
+    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#datatable').DataTable({
+                "language": {
+                    "sSearch": "ابحث:",
+                },
+                "bLengthChange": false,
+                "bInfo": false,
+                "bPaginate": false,
+                "ordering": false
+            });
+
+
+        });
+    </script>
 @endsection

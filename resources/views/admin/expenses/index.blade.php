@@ -39,13 +39,14 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <a href="{{ route('dashboard.expenses.create') }}" class="btn btn-primary btn-sm"> اضافة مصروف جديد
+                                <a href="{{ route('dashboard.expenses.create') }}" class="btn btn-primary btn-sm"> اضافة
+                                    مصروف جديد
                                 </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
-                                href="{{ route('dashboard.expenses.pdf') }}">
-                                استخراج ملف Pdf </a>
-                            <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
-                                href="{{ route('dashboard.expenses.excel') }}"> استخراج
+                                    href="{{ route('dashboard.expenses.pdf') }}">
+                                    استخراج ملف Pdf </a>
+                                <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
+                                    href="{{ route('dashboard.expenses.excel') }}"> استخراج
                                     ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
@@ -54,15 +55,15 @@
                                     @include('admin.layouts.toaster_success')
 
                                     <div class="table-responsive">
-                                        <table
-                                            class="table table-striped table-bordered column-rendering">
+                                        <table class="table table-striped table-bordered column-rendering">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th> التصنيف   </th>
+                                                    <th> التصنيف </th>
                                                     <th> المبلغ </th>
-                                                    <th> الخزينة  </th>
+                                                    <th> الخزينة </th>
                                                     <th> تاريخ الانشاء </th>
+
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
@@ -71,11 +72,12 @@
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $expense->category->name ?? 'غير محدد' }}</td>
-                                                        <td>{{ $expense->price }}</td>
+                                                        <td>{{ $expense->price }} دينار </td>
                                                         <td>
-                                                         {{ $expense->safe->name }}
+                                                            {{ $expense->safe->name }}
                                                         </td>
                                                         <td>{{ $expense->created_at }}</td>
+
                                                         <td>
                                                             <div class="dropdown float-md-left">
                                                                 <button class="px-2 btn btn-primary btn-sm dropdown-toggle"
@@ -84,10 +86,13 @@
                                                                     aria-expanded="false"> العمليات </button>
                                                                 <div class="dropdown-menu"
                                                                     aria-labelledby="dropdownBreadcrumbButton">
-                                                                    <a
-                                                                        class="dropdown-item"
+                                                                    <a class="dropdown-item"
                                                                         href="{{ route('dashboard.expenses.edit', $expense->id) }}"><i
                                                                             class="la la-edit"></i> تعديل </a>
+
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('dashboard.expenses.print', $expense->id) }}"><i
+                                                                            class="la la-print"></i> طباعة </a>
                                                                     <form
                                                                         action="{{ route('dashboard.expenses.destroy', $expense->id) }}"
                                                                         method="post">
