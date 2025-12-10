@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="content-body">
-                <input type="hidden" value="{{ $invoice->supplier->name }}" id="customername">
+                <input type="hidden" value="{{ $invoice->supplier->name ?? 'غير محدد' }}" id="customername">
                 <section class="card">
                     <div id="invoice-template" class="card-body">
                         <!-- Invoice Company Details -->
@@ -46,7 +46,7 @@
                             <div class="text-left col-md-6 col-sm-6">
                                 <p class="text-muted"> المورد </p>
                                 <ul class="px-0 list-unstyled">
-                                    <li class="text-bold-800"> {{ $invoice->supplier->name }} </li>
+                                    <li class="text-bold-800"> {{ $invoice->supplier->name ?? 'غير محدد' }} </li>
                                     <li> {{ $invoice->category->name ?? 'غير محدد' }} </li>
                                 </ul>
                             </div>
@@ -95,7 +95,7 @@
                                                 </td>
                                                 <td> {{ $invoice->bayan_txt }} </td>
                                                 <td> {{ $invoice->referance_number }} </td>
-                                                <td> {{ $invoice->supplier->name }} </td>
+                                                <td> {{ $invoice->supplier->name ?? 'غير محدد' }} </td>
                                                 <td> {{ $invoice->category->name ?? 'غير محدد' }} </td>
                                                 <td> {{ $invoice->qyt }} </td>
                                                 <td> {{ $invoice->total_price }} د.ل </td>

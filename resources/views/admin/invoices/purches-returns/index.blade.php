@@ -69,7 +69,7 @@
                                                         </td>
                                                         <td> {{ $invoice->bayan_txt }} </td>
                                                         <td> {{ $invoice->referance_number }} </td>
-                                                        <td> {{ $invoice->supplier->name }} </td>
+                                                        <td> {{ $invoice->supplier->name ?? 'غير محدد' }} </td>
                                                         <td> {{ $invoice->category->name ?? 'غير محدد' }} </td>
                                                         <td> {{ $invoice->qyt }} </td>
                                                         <td> {{ $invoice->total_price }} د.ل </td>

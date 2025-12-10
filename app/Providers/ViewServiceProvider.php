@@ -38,8 +38,8 @@ class ViewServiceProvider extends ServiceProvider
                 return Admin::count();
             });
         }
-         ########## Permissions Count
-         if (!Cache::has('PermissionsCount')) {
+        ########## Permissions Count
+        if (!Cache::has('PermissionsCount')) {
             Cache::remember('PermissionsCount', 60, function () {
                 return Role::count();
             });
@@ -74,8 +74,8 @@ class ViewServiceProvider extends ServiceProvider
                 return PurcheInvoice::count();
             });
         }
-         ######## Selling Invoices Count
-         if (!Cache::has('SellingInvoicesCount')) {
+        ######## Selling Invoices Count
+        if (!Cache::has('SellingInvoicesCount')) {
             Cache::remember('SellingInvoicesCount', 60, function () {
                 return SaleInvoice::count();
             });
@@ -95,8 +95,7 @@ class ViewServiceProvider extends ServiceProvider
         ########  Selling Invoices Interim
         if (!Cache::has('PurchesInvoicesInterim')) {
             Cache::remember('PurchesInvoicesInterim', 60, function () {
-                return PurcheInvoice::where('status','sold')->where('type','فاتورة مؤقتة')->count();
-
+                return PurcheInvoice::where('status', 'sold')->where('type', 'فاتورة مؤقتة')->count();
             });
         }
 
@@ -107,24 +106,23 @@ class ViewServiceProvider extends ServiceProvider
             'SuppliersCount' => Cache::get('SuppliersCount'),
             'ClientsCount' => Cache::get('ClientsCount'),
             'SafesCount' => Cache::get('SafesCount'),
-            'PurchesInvoicesCount'=>Cache::get('PurchesInvoicesCount'),
-            'SellingInvoicesCount'=>Cache::get('SellingInvoicesCount'),
-            'PurchesInvoicesReturnCount'=>Cache::get('PurchesInvoicesReturnCount'),
-            'SellingInvoicesReturnCount'=>Cache::get('SellingInvoicesReturnCount'),
-            'PurchesInvoicesInterim'=>Cache::get('PurchesInvoicesInterim'),
+            'PurchesInvoicesCount' => Cache::get('PurchesInvoicesCount'),
+            'SellingInvoicesCount' => Cache::get('SellingInvoicesCount'),
+            'PurchesInvoicesReturnCount' => Cache::get('PurchesInvoicesReturnCount'),
+            'SellingInvoicesReturnCount' => Cache::get('SellingInvoicesReturnCount'),
+            'PurchesInvoicesInterim' => Cache::get('PurchesInvoicesInterim'),
         ]);
 
 
-    ///// Get Settings And Share
+        ///// Get Settings And Share
 
-    /**
-     * Get the settings or create a new one if it doesn't exist.
-     *
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
-     */
-    view()->share([
-        'setting' => Setting::first(),
-    ]);
+        /**
+         * Get the settings or create a new one if it doesn't exist.
+         *
+         * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+         */
+        view()->share([
+            'setting' => Setting::first(),
+        ]);
     }
-
 }
