@@ -36,9 +36,9 @@
                                 <img src="{{ asset('uploads/settings/logo.png') }}"
                                     alt="avatar"><i></i></span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" href="#"><i
+                        <div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" href="{{ route('dashboard.update_profile') }}"><i
                                     class="ft-user"></i>  تعديل الحساب  </a>
-                            <a class="dropdown-item" href="#"><i class="ft-check-square"></i> تغيز كلمة المرور </a>
+                            <a class="dropdown-item" href="{{ route('dashboard.update_password') }}"><i class="ft-check-square"></i> تغيز كلمة المرور </a>
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('dashboard.logout') }}">
                                 @csrf

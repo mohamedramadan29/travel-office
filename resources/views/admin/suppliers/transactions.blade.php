@@ -176,6 +176,7 @@
                                                         <th>مدين (مستحق)</th>
                                                         <th>طريقة الدفع</th>
                                                         <th>الوصف</th>
+                                                        <th> الرقم المرجعي  </th>
                                                         <th>التاريخ</th>
                                                     </tr>
                                                 </thead>
@@ -208,6 +209,7 @@
                                                             </td>
                                                             <td>{{ $transaction->payment_method ?? '-' }}</td>
                                                             <td>{{ $transaction->description ?? 'غير محدد' }}</td>
+                                                            <td>{{ $transaction->purchaseInvoice->bayan_txt ?? 'غير محدد' }}</td>
                                                             <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
                                                         </tr>
                                                     @empty

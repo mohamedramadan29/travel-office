@@ -58,6 +58,11 @@ Route::group([
     ############################### Start Admin Auth Route  ###############
     Route::group(['middleware' => 'auth:admin'], function () {
 
+         Route::controller(AuthController::class)->group(function () {
+            Route::match(['post', 'get'], 'update_profile', 'update_profile')->name('update_profile');
+            Route::match(['post', 'get'], 'update_password', 'update_password')->name('update_password');
+        });
+
         ############################### Start Welcome  Controller ###############
 
         Route::controller(WelcomeController::class)->group(function () {

@@ -64,7 +64,7 @@
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="userinput1"> رقم الهاتف</label>
-                                                            <input type="number" id="userinput1" class="form-control"
+                                                            <input type="text" id="userinput1" class="form-control"
                                                                 placeholder="" name="mobile" value="{{ $client->mobile }}">
                                                         </div>
                                                     </div>
