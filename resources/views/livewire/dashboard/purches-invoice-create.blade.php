@@ -63,7 +63,7 @@
                             </div>
                             <div class="input-group-append">
                                 <button type="button" class="btn btn-success" data-toggle="modal"
-                                    data-target="#addSupplierModal">
+                                    data-target="#pc_addSupplierModal">
                                     <i class="la la-plus"></i>
                                 </button>
                             </div>
@@ -266,8 +266,8 @@
     </div>
 
     <!-- Modal for adding new supplier -->
-    <div class="modal fade" id="addSupplierModal" tabindex="-1" role="dialog" aria-labelledby="addSupplierLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="pc_addSupplierModal" tabindex="-1" role="dialog" aria-labelledby="addSupplierLabel"
+        aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="text-white modal-header bg-success">
@@ -277,8 +277,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div id="supplierFormErrors"></div>
-                    <form id="addSupplierForm">
+                    <div id="pc_supplierFormErrors"></div>
+                    <form id="pc_addSupplierForm">
                         @csrf
                         <div class="form-group">
                             <label><strong>الاسم <span class="text-danger">*</span></strong></label>
@@ -306,7 +306,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
-                    <button type="button" id="submitSupplierForm" class="btn btn-success">
+                    <button type="button" id="pc_submitSupplierForm" class="btn btn-success">
                         <i class="la la-save"></i> حفظ المورد
                     </button>
                 </div>
@@ -413,15 +413,18 @@
         }
 
         // Handle submit button click for supplier
-        $(document).on('click', '#submitSupplierForm', function(e) {
-            console.log('Submit supplier button clicked');
+        $(document).on('click', '#pc_submitSupplierForm', function(e) {
+            console.log('Purchase Create: Submit supplier button clicked');
             e.preventDefault();
-            submitSupplierForm();
-        });
 
-        function submitSupplierForm() {
-            console.log('submitSupplierForm called');
-            let formData = new FormData(document.getElementById('addSupplierForm'));
+            let formElement = document.getElementById('pc_addSupplierForm');
+            if (!formElement) {
+                console.error('pc_addSupplierForm not found');
+                return;
+            }
+
+            let formData = new FormData(formElement);
+            let $button = $(this);
 
             $.ajax({
                 url: "{{ route('dashboard.suppliers.storeQuick') }}",
@@ -430,52 +433,43 @@
                 contentType: false,
                 processData: false,
                 beforeSend: function() {
-                    console.log('Sending request...');
-                    $('#submitSupplierForm').prop('disabled', true).html('<i class="la la-spinner fa-spin"></i> جاري الحفظ...');
+                    $button.prop('disabled', true).html('<i class="la la-spinner fa-spin"></i> جاري الحفظ...');
                 },
                 success: function(response) {
-                    console.log('Success:', response);
                     if (response.success) {
-                        // Close modal
-                        $('#addSupplierModal').modal('hide');
-                        $('#addSupplierForm')[0].reset();
-                        $('#supplierFormErrors').html('');
+                        $('#pc_addSupplierModal').modal('hide');
+                        formElement.reset();
+                        $('#pc_supplierFormErrors').html('');
 
-                        // Add new option to Select2
                         var newOption = new Option(response.supplier.name, response.supplier.id, true, true);
                         $('#supplier_id').append(newOption).trigger('change');
 
-                        // Show success message
                         alert(response.message);
 
-                        // Update Livewire component
                         @this.refreshSuppliers();
                         @this.set('supplier_id', response.supplier.id);
                     }
                 },
                 error: function(xhr) {
-                    console.log('Error:', xhr);
-                    $('#submitSupplierForm').prop('disabled', false).html('<i class="la la-save"></i> حفظ المورد');
+                    $button.prop('disabled', false).html('<i class="la la-save"></i> حفظ المورد');
 
                     if (xhr.responseJSON && xhr.responseJSON.errors) {
                         let errors = xhr.responseJSON.errors;
-                        let errorHtml = '<div class="alert alert-danger">';
-                        errorHtml += '<strong>حدث خطأ:</strong><ul>';
+                        let errorHtml = '<div class="alert alert-danger"><strong>حدث خطأ:</strong><ul>';
                         for (let field in errors) {
                             errorHtml += '<li>' + errors[field][0] + '</li>';
                         }
                         errorHtml += '</ul></div>';
-                        $('#supplierFormErrors').html(errorHtml);
+                        $('#pc_supplierFormErrors').html(errorHtml);
                     } else {
-                        $('#supplierFormErrors').html('<div class="alert alert-danger">حدث خطأ، يرجى المحاولة لاحقاً</div>');
+                        $('#pc_supplierFormErrors').html('<div class="alert alert-danger">حدث خطأ، يرجى المحاولة لاحقاً</div>');
                     }
                 },
                 complete: function() {
-                    console.log('Request complete');
-                    $('#submitSupplierForm').prop('disabled', false).html('<i class="la la-save"></i> حفظ المورد');
+                    $button.prop('disabled', false).html('<i class="la la-save"></i> حفظ المورد');
                 }
             });
-        }
+        });
 
         // Re-initialize Select2 after Livewire updates
         document.addEventListener('livewire:navigated', function() {

@@ -103,7 +103,7 @@
                             </div>
                             <div class="input-group-append">
                                 <button type="button" class="btn btn-success" data-toggle="modal"
-                                    data-target="#addClientModal">
+                                     data-target="#se_addClientModal">
                                     <i class="la la-plus"></i>
                                 </button>
                             </div>
@@ -162,7 +162,7 @@
                             </div>
                             <div class="input-group-append">
                                 <button type="button" class="btn btn-success" data-toggle="modal"
-                                    data-target="#addSupplierModal">
+                                     data-target="#se_addSupplierModal">
                                     <i class="la la-plus"></i>
                                 </button>
                             </div>
@@ -295,7 +295,8 @@
     </div>
 
     <!-- Modal for adding new client -->
-    <div class="modal fade" id="addClientModal" tabindex="-1" role="dialog" aria-labelledby="addClientLabel"
+    <div class="modal fade" id="se_addClientModal" tabindex="-1" role="dialog" aria-labelledby="addClientLabel"
+        aria-hidden="true" wire:ignore.self>
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -306,8 +307,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div id="clientFormErrors"></div>
-                    <form id="addClientForm">
+                    <div id="se_clientFormErrors"></div>
+                    <form id="se_addClientForm">
                         @csrf
                         <div class="form-group">
                             <label><strong>الاسم <span class="text-danger">*</span></strong></label>
@@ -335,7 +336,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
-                    <button type="button" id="submitClientForm" class="btn btn-success">
+                    <button type="button" id="se_submitClientForm" class="btn btn-success">
                         <i class="la la-save"></i> حفظ العميل
                     </button>
                 </div>
@@ -344,7 +345,8 @@
     </div>
 
     <!-- Modal for adding new supplier -->
-    <div class="modal fade" id="addSupplierModal" tabindex="-1" role="dialog" aria-labelledby="addSupplierLabel"
+    <div class="modal fade" id="se_addSupplierModal" tabindex="-1" role="dialog" aria-labelledby="addSupplierLabel"
+        aria-hidden="true" wire:ignore.self>
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -355,8 +357,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div id="supplierFormErrors"></div>
-                    <form id="addSupplierForm">
+                    <div id="se_supplierFormErrors"></div>
+                    <form id="se_addSupplierForm">
                         @csrf
                         <div class="form-group">
                             <label><strong>الاسم <span class="text-danger">*</span></strong></label>
@@ -384,7 +386,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
-                    <button type="button" id="submitSupplierForm" class="btn btn-success">
+                    <button type="button" id="se_submitSupplierForm" class="btn btn-success">
                         <i class="la la-save"></i> حفظ المورد
                     </button>
                 </div>
@@ -553,6 +555,112 @@
             console.log('Livewire updated');
             initSelect2();
             setTimeout(updateSelect2Values, 200);
+        });
+
+        // Handle submit button click for client
+        $(document).on('click', '#se_submitClientForm', function(e) {
+            console.log('Selling Edit: Submit client button clicked');
+            e.preventDefault();
+
+            let formElement = document.getElementById('se_addClientForm');
+            if (!formElement) return;
+
+            let formData = new FormData(formElement);
+            let $button = $(this);
+
+            $.ajax({
+                url: "{{ route('dashboard.clients.storeQuick') }}",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function() {
+                    $button.prop('disabled', true).html('<i class="la la-spinner fa-spin"></i> جاري الحفظ...');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#se_addClientModal').modal('hide');
+                        formElement.reset();
+                        $('#se_clientFormErrors').html('');
+
+                        var newOption = new Option(response.client.name, response.client.id, true, true);
+                        $('#client_id').append(newOption).trigger('change');
+
+                        alert(response.message);
+
+                        @this.refreshClients();
+                        @this.set('client_id', response.client.id);
+                    }
+                },
+                error: function(xhr) {
+                    $button.prop('disabled', false).html('<i class="la la-save"></i> حفظ العميل');
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        let errors = xhr.responseJSON.errors;
+                        let errorHtml = '<div class="alert alert-danger"><strong>حدث خطأ:</strong><ul>';
+                        for (let field in errors) { errorHtml += '<li>' + errors[field][0] + '</li>'; }
+                        errorHtml += '</ul></div>';
+                        $('#se_clientFormErrors').html(errorHtml);
+                    } else {
+                        $('#se_clientFormErrors').html('<div class="alert alert-danger">حدث خطأ، يرجى المحاولة لاحقاً</div>');
+                    }
+                },
+                complete: function() {
+                    $button.prop('disabled', false).html('<i class="la la-save"></i> حفظ العميل');
+                }
+            });
+        });
+
+        // Handle submit button click for supplier
+        $(document).on('click', '#se_submitSupplierForm', function(e) {
+            console.log('Selling Edit: Submit supplier button clicked');
+            e.preventDefault();
+
+            let formElement = document.getElementById('se_addSupplierForm');
+            if (!formElement) return;
+
+            let formData = new FormData(formElement);
+            let $button = $(this);
+
+            $.ajax({
+                url: "{{ route('dashboard.suppliers.storeQuick') }}",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function() {
+                    $button.prop('disabled', true).html('<i class="la la-spinner fa-spin"></i> جاري الحفظ...');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#se_addSupplierModal').modal('hide');
+                        formElement.reset();
+                        $('#se_supplierFormErrors').html('');
+
+                        var newOption = new Option(response.supplier.name, response.supplier.id, true, true);
+                        $('#supplier_id').append(newOption).trigger('change');
+
+                        alert(response.message);
+
+                        @this.refreshSuppliers();
+                        @this.set('supplier_id', response.supplier.id);
+                    }
+                },
+                error: function(xhr) {
+                    $button.prop('disabled', false).html('<i class="la la-save"></i> حفظ المورد');
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        let errors = xhr.responseJSON.errors;
+                        let errorHtml = '<div class="alert alert-danger"><strong>حدث خطأ:</strong><ul>';
+                        for (let field in errors) { errorHtml += '<li>' + errors[field][0] + '</li>'; }
+                        errorHtml += '</ul></div>';
+                        $('#se_supplierFormErrors').html(errorHtml);
+                    } else {
+                        $('#se_supplierFormErrors').html('<div class="alert alert-danger">حدث خطأ، يرجى المحاولة لاحقاً</div>');
+                    }
+                },
+                complete: function() {
+                    $button.prop('disabled', false).html('<i class="la la-save"></i> حفظ المورد');
+                }
+            });
         });
 
         // Initialize on page load
