@@ -21,10 +21,10 @@
                             placeholder="ادخل المبلغ">
                     </div>
                     <div class="form-group">
-                        <select name="invoice_id" class="form-control">
-                            <option value="" selected> -- حدد فاتورة البيع  -- </option>
+                        <select name="invoice_id" class="form-control d-none">
+                            <option value="" selected> -- حدد فاتورة البيع -- </option>
                             @foreach ($invoices as $invoice)
-                                <option value="{{ $invoice->id }}">{{ $invoice->referance_number }}</option>
+                            <option value="{{ $invoice->id }}">{{ $invoice->referance_number }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -32,10 +32,14 @@
                         <select name="safe_id" class="form-control" required>
                             <option value="" selected disabled> -- حدد الخزينة -- </option>
                             @foreach ($safes as $safe)
-                                <option value="{{ $safe->id }}">{{ $safe->name }}</option>
+                            <option value="{{ $safe->id }}">{{ $safe->name }}</option>
                             @endforeach
                         </select>
                     </div>
+                    <div class="form-group">
+                        <textarea name="description" class="form-control" placeholder="ادخل ملاحظات"></textarea>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary btn-sm">

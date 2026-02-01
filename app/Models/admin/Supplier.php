@@ -4,6 +4,7 @@ namespace App\Models\admin;
 
 use App\Models\admin\PurcheInvoice;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use App\Models\admin\SupplierTransaction;
 
 class Supplier extends Model
@@ -24,6 +25,6 @@ class Supplier extends Model
     }
     public function balance()
     {
-        return $this->transactions()->sum('amount * (type = "credit" ? 1 : -1)');
+        return $this->transactions()->sum(DB::raw('CASE WHEN type = "credit" THEN amount ELSE -amount END'));
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Exports;
 
-use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -11,7 +10,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use App\Models\admin\Client;
 
-class ClientsExport implements FromCollection, WithHeadings, WithStyles
+class ClientsReportExport implements FromCollection, WithHeadings, WithStyles
 {
     use Exportable;
 
@@ -25,40 +24,38 @@ class ClientsExport implements FromCollection, WithHeadings, WithStyles
     public function collection()
     {
         $query = Client::latest();
+
         if ($this->client_ids && count($this->client_ids) > 0) {
             $query->whereIn('id', $this->client_ids);
         }
+
         $clients = $query->get();
 
         return $clients->map(function ($client) {
+            $balance = $client->balance();
+            $status = '';
+            if ($balance > 0) {
+                $status = 'مدين';
+            } elseif ($balance < 0) {
+                $status = 'دائن';
+            }
+
             return [
                 $client->name,
-                $client->email,
-                $client->mobile,
-                $client->telegram,
-                $client->whatsapp,
-                number_format($client->balance(), 2),
-                ($client->balance() > 0 ? 'مدين' : ($client->balance() < 0 ? 'دائن' : '')),
-                $client->status,
-                $client->created_at->format('Y-m-d'),
+                number_format($balance, 2),
+                $status,
             ];
         });
     }
+
     public function headings(): array
     {
         return [
-            'اسم العميل',
-            'البريد الالكتروني',
-            'رقم الهاتف',
-            'رقم التيلغرام',
-            'رقم الواتساب',
+            'الاسم',
             'الرصيد',
             'دائن / مدين',
-            'الحالة',
-            'تاريخ الاضافة',
         ];
     }
-
 
     public function styles(Worksheet $sheet)
     {

@@ -22,6 +22,11 @@
                                   data-i18n="nav.templates.vert.classic_menu"> <i class="la la-plus"></i> <span
                                       class="menu-title"> اضافة مورد جديد </a>
                           </li>
+                          {{-- <li class="{{ Route::is('dashboard.suppliers.report') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.suppliers.report') }}"
+                                  data-i18n="nav.role.index">
+                                  كشف شامل للموردين </a>
+                          </li> --}}
                       </ul>
                   </li>
               @endcan

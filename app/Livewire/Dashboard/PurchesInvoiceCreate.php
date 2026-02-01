@@ -1,19 +1,36 @@
 <?php
+
 namespace App\Livewire\Dashboard;
 
 use Livewire\Component;
 use App\Models\admin\Safe;
 use App\Models\admin\Supplier;
+use App\Models\admin\Category;
+use App\Models\admin\PurcheInvoice;
+use App\Models\admin\SupplierTransaction;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PurchesInvoiceCreate extends Component
 {
     public $suppliers;
     public $safes;
+    public $categories;
     public $supplier_id;
     public $supplier_mobile;
     public $supplier_whatsapp;
     public $supplier_email;
     public $supplier_address;
+
+    // Multi-invoice support
+    public $invoices = [];
+    public $invoice_count = 1;
+
+    // Common invoice data
+    public $category_id;
+    public $type = 'فاتورة مؤقتة'; // النوع الافتراضي
+
+    // Keep original properties for backward compatibility
     public $qyt = 1;
     public $purches_price = 0;
     public $total_price = 0;
@@ -21,37 +38,33 @@ class PurchesInvoiceCreate extends Component
     public $remaining = 0;
     public $payment_method;
     public $safe_id;
-    public $invoice;
 
-    public function mount($invoice = null)
+    public function mount()
     {
-        $this->invoice = $invoice;
-
-        // جلب بيانات الموردين والخزائن
+        // جلب بيانات الموردين والخزائن والتصنيفات
         $this->suppliers = Supplier::active()->get();
         $this->safes = Safe::active()->get();
+        $this->categories = Category::active()->get();
 
-        // إذا كانت هناك فاتورة (وضع التعديل)
-        if ($this->invoice) {
-            $this->qyt = $this->invoice->qyt;
-            $this->purches_price = $this->invoice->purches_price;
-            $this->supplier_id = $this->invoice->supplier_id;
-            $this->paid = $this->invoice->paid;
-            $this->total_price = $this->invoice->total_price;
-            $this->remaining = $this->invoice->remaining;
-            $this->payment_method = $this->invoice->payment_method;
-            $this->safe_id = $this->invoice->safe_id;
+        // Initialize first invoice
+        $this->initializeInvoices();
+
+        // تحديد نوع الفاتورة من URL أو old values
+        $urlType = request()->type;
+        if($urlType == 'official') {
+            $this->type = 'فاتورة رسمية';
         } else {
-            // إذا لم تكن هناك فاتورة (وضع الإضافة)، استخدم القيم القديمة أو الافتراضية
-            $this->qyt = old('qyt', 1);
-            $this->purches_price = old('purches_price', 0);
-            $this->supplier_id = old('supplier_id');
-            $this->paid = old('paid', 0);
-            $this->total_price = old('total_price', 0);
-            $this->remaining = old('remaining', 0);
-            $this->payment_method = old('payment_method');
-            $this->safe_id = old('safe_id');
+            $this->type = old('type', 'فاتورة مؤقتة');
         }
+
+        $this->qyt = old('qyt', 1);
+        $this->purches_price = old('purches_price', 0);
+        $this->supplier_id = old('supplier_id');
+        $this->paid = old('paid', 0);
+        $this->total_price = old('total_price', 0);
+        $this->remaining = old('remaining', 0);
+        $this->payment_method = old('payment_method');
+        $this->safe_id = old('safe_id');
 
         // تحميل بيانات المورد إذا كان هناك supplier_id
         if ($this->supplier_id) {
@@ -61,6 +74,89 @@ class PurchesInvoiceCreate extends Component
         // حساب السعر الكلي والباقي عند التحميل
         $this->calculateTotalPrice();
         $this->calculateRemaining();
+    }
+
+    public function initializeInvoices()
+    {
+        // Initialize with one empty invoice
+        $this->invoices = [
+            [
+                'bayan_txt' => '',
+                'referance_number' => '',
+                'qyt' => 1,
+                'purches_price' => 0,
+                'total_price' => 0,
+                'paid' => 0,
+                'remaining' => 0,
+                'safe_id' => null
+            ]
+        ];
+        $this->invoice_count = 1;
+    }
+
+    public function addNewInvoice()
+    {
+        $this->invoices[] = [
+            'bayan_txt' => '',
+            'referance_number' => '',
+            'qyt' => 1,
+            'purches_price' => 0,
+            'total_price' => 0,
+            'paid' => 0,
+            'remaining' => 0,
+            'safe_id' => null
+        ];
+        $this->invoice_count++;
+
+        // Emit event to JavaScript
+        $this->dispatch('invoice-added');
+    }
+
+    public function removeInvoice($index)
+    {
+        if (count($this->invoices) > 1) {
+            unset($this->invoices[$index]);
+            $this->invoices = array_values($this->invoices); // Re-index array
+            $this->invoice_count--;
+
+            // Emit event to JavaScript
+            $this->dispatch('invoice-removed');
+        }
+    }
+
+    public function calculateInvoiceTotal($index)
+    {
+        if (isset($this->invoices[$index])) {
+            $qyt = is_numeric($this->invoices[$index]['qyt']) ? (float)$this->invoices[$index]['qyt'] : 0;
+            $purches_price = is_numeric($this->invoices[$index]['purches_price']) ? (float)$this->invoices[$index]['purches_price'] : 0;
+
+            $this->invoices[$index]['total_price'] = $qyt * $purches_price;
+            $this->calculateInvoiceRemaining($index);
+        }
+    }
+
+    public function calculateInvoiceRemaining($index)
+    {
+        if (isset($this->invoices[$index])) {
+            $paid = is_numeric($this->invoices[$index]['paid']) ? (float)$this->invoices[$index]['paid'] : 0;
+            $total_price = is_numeric($this->invoices[$index]['total_price']) ? (float)$this->invoices[$index]['total_price'] : 0;
+
+            $this->invoices[$index]['remaining'] = ($paid > $total_price) ? 0 : $total_price - $paid;
+        }
+    }
+
+    public function updatedInvoices($value, $key)
+    {
+        // Parse the key to get index and field
+        $keyParts = explode('.', $key);
+        $index = (int)$keyParts[0];
+        $field = $keyParts[1] ?? null;
+
+        if ($field === 'qyt' || $field === 'purches_price') {
+            $this->calculateInvoiceTotal($index);
+        } elseif ($field === 'paid') {
+            $this->calculateInvoiceRemaining($index);
+        }
     }
 
     public function getSupplierInfo()
@@ -79,6 +175,9 @@ class PurchesInvoiceCreate extends Component
         } else {
             $this->resetSupplierInfo();
         }
+
+        // إرسال حدث لتحديث JavaScript
+        $this->dispatch('supplier-updated');
     }
 
     private function resetSupplierInfo()
@@ -108,6 +207,11 @@ class PurchesInvoiceCreate extends Component
         }
     }
 
+    public function refreshSuppliers()
+    {
+        $this->suppliers = Supplier::active()->get();
+    }
+
     // public function calculateTotalPrice()
     // {
     //     $this->total_price = ($this->qyt && $this->purches_price) ? $this->qyt * $this->purches_price : 0;
@@ -119,7 +223,7 @@ class PurchesInvoiceCreate extends Component
     //     $this->remaining = ($this->paid > $this->total_price) ? 0 : $this->total_price - $this->paid;
     // }
 
-        public function calculateTotalPrice()
+    public function calculateTotalPrice()
     {
         // التأكد من أن qyt و purches_price أرقام
         $qyt = is_numeric($this->qyt) ? (float)$this->qyt : 0;
@@ -138,6 +242,111 @@ class PurchesInvoiceCreate extends Component
 
         // حساب المتبقي
         $this->remaining = ($this->paid > $total_price) ? 0 : $total_price - $this->paid;
+    }
+
+    public function saveInvoices()
+    {
+        // Validate common data
+        $this->validate([
+            'type' => 'required|in:فاتورة مؤقتة,فاتورة رسمية',
+            'supplier_id' => 'required',
+            'category_id' => 'required',
+        ], [
+            'type.required' => 'نوع الفاتورة مطلوب',
+            'type.in' => 'نوع الفاتورة غير صحيح',
+            'supplier_id.required' => 'المورد مطلوب',
+            'category_id.required' => 'التصنيف مطلوب',
+        ]);
+
+        // Validate each invoice
+        foreach ($this->invoices as $index => $invoice) {
+            $this->validate([
+                "invoices.{$index}.bayan_txt" => 'required',
+                "invoices.{$index}.referance_number" => 'required',
+                "invoices.{$index}.qyt" => 'required|numeric|min:1',
+                "invoices.{$index}.purches_price" => 'required|numeric|min:0',
+            ], [
+                "invoices.{$index}.bayan_txt.required" => "البيان مطلوب للفاتورة " . ($index + 1),
+                "invoices.{$index}.referance_number.required" => "الرقم المرجعي مطلوب للفاتورة " . ($index + 1),
+                "invoices.{$index}.qyt.required" => "الكمية مطلوبة للفاتورة " . ($index + 1),
+                "invoices.{$index}.purches_price.required" => "سعر الشراء مطلوب للفاتورة " . ($index + 1),
+            ]);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $createdInvoices = [];
+
+            foreach ($this->invoices as $invoiceData) {
+                // Create invoice directly
+                $invoice = new PurcheInvoice;
+                $invoice->type = $this->type; // استخدام النوع المحدد من المستخدم
+                $invoice->bayan_txt = $invoiceData['bayan_txt'];
+                $invoice->referance_number = $invoiceData['referance_number'];
+                $invoice->supplier_id = $this->supplier_id;
+                $invoice->qyt = $invoiceData['qyt'] ?? 0;
+                $invoice->purches_price = $invoiceData['purches_price'] ?? 0;
+                $invoice->total_price = $invoiceData['total_price'] ?? 0;
+                $invoice->paid = $invoiceData['paid'] ?? 0;
+                $invoice->remaining = $invoiceData['remaining'] ?? 0;
+                $invoice->safe_id = $invoiceData['safe_id'] ?? null;
+                $invoice->category_id = $this->category_id;
+                $invoice->admin_id = Auth::user()->id;
+                $invoice->save();
+
+                $createdInvoices[] = $invoice;
+
+                // Add Transaction In Supplier Account
+                SupplierTransaction::create([
+                    'supplier_id' => $this->supplier_id,
+                    'purchase_invoice_id' => $invoice->id,
+                    'amount' => $invoice->total_price,
+                    'type' => 'credit', // المبلغ المستحق للمورد الدائن
+                    'description' => 'مبلغ مستحق من فاتورة شراء #' . $invoice->id,
+                ]);
+
+                // إذا كان هناك مبلغ مدفوع، أضف معاملة دفع
+                if ($invoice->paid > 0 && $invoice->safe_id) {
+                    SupplierTransaction::create([
+                        'supplier_id' => $this->supplier_id,
+                        'purchase_invoice_id' => $invoice->id,
+                        'amount' => $invoice->paid,
+                        'type' => 'debit', // المبلغ المدفوع للمورد مدين
+                        'safe_id' => $invoice->safe_id,
+                        'description' => 'دفعة لفاتورة شراء #' . $invoice->id,
+                    ]);
+
+                    // Update safe balance
+                    $safe = Safe::find($invoice->safe_id);
+                    if ($safe) {
+                        $safe->balance = $safe->balance - $invoice->paid;
+                        $safe->save();
+                    }
+                }
+            }
+
+            DB::commit();
+
+            // إعادة تعيين النموذج
+            $this->initializeInvoices();
+            $this->supplier_id = null;
+            $this->category_id = null;
+            $this->resetSupplierInfo();
+
+            // رسالة نجاح
+            if (count($createdInvoices) == 1) {
+                session()->flash('message', '✅ تم حفظ الفاتورة بنجاح!');
+            } else {
+                session()->flash('message', '✅ تم حفظ ' . count($createdInvoices) . ' فواتير بنجاح!');
+            }
+
+            $this->dispatch('show-success-message');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            session()->flash('error', '❌ حدث خطأ أثناء الحفظ: ' . $e->getMessage());
+        }
     }
 
     public function render()

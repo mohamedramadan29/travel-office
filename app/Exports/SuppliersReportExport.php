@@ -2,52 +2,52 @@
 
 namespace App\Exports;
 
-use Illuminate\Support\Facades\Auth;
+use App\Models\admin\Supplier;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use App\Models\admin\Client;
 
-class ClientsExport implements FromCollection, WithHeadings, WithStyles
+class SuppliersReportExport implements FromCollection, WithHeadings, WithStyles
 {
     use Exportable;
 
-    protected $client_ids;
+    protected $supplier_ids;
 
-    public function __construct($client_ids = null)
+    public function __construct($supplier_ids = null)
     {
-        $this->client_ids = $client_ids;
+        $this->supplier_ids = $supplier_ids;
     }
 
     public function collection()
     {
-        $query = Client::latest();
-        if ($this->client_ids && count($this->client_ids) > 0) {
-            $query->whereIn('id', $this->client_ids);
+        $query = Supplier::latest();
+        if ($this->supplier_ids && count($this->supplier_ids) > 0) {
+            $query->whereIn('id', $this->supplier_ids);
         }
-        $clients = $query->get();
+        $suppliers = $query->get();
 
-        return $clients->map(function ($client) {
+        return $suppliers->map(function ($supplier) {
             return [
-                $client->name,
-                $client->email,
-                $client->mobile,
-                $client->telegram,
-                $client->whatsapp,
-                number_format($client->balance(), 2),
-                ($client->balance() > 0 ? 'مدين' : ($client->balance() < 0 ? 'دائن' : '')),
-                $client->status,
-                $client->created_at->format('Y-m-d'),
+                $supplier->name,
+                $supplier->email,
+                $supplier->mobile,
+                $supplier->telegram,
+                $supplier->whatsapp,
+                number_format($supplier->balance(), 2),
+                ($supplier->balance() > 0 ? 'دائن' : ($supplier->balance() < 0 ? 'مدين' : '')),
+                $supplier->status,
+                $supplier->created_at->format('Y-m-d'),
             ];
         });
     }
+
     public function headings(): array
     {
         return [
-            'اسم العميل',
+            'اسم المورد',
             'البريد الالكتروني',
             'رقم الهاتف',
             'رقم التيلغرام',
@@ -58,7 +58,6 @@ class ClientsExport implements FromCollection, WithHeadings, WithStyles
             'تاريخ الاضافة',
         ];
     }
-
 
     public function styles(Worksheet $sheet)
     {

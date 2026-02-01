@@ -15,9 +15,21 @@ class SuppliersExport implements FromCollection, WithHeadings, WithStyles
 {
     use Exportable;
 
+    protected $supplier_ids;
+
+    public function __construct($supplier_ids = null)
+    {
+        $this->supplier_ids = $supplier_ids;
+    }
+
     public function collection()
     {
-        $suppliers = Supplier::latest()->get();
+        $query = Supplier::latest();
+        if ($this->supplier_ids && count($this->supplier_ids) > 0) {
+            $query->whereIn('id', $this->supplier_ids);
+        }
+        $suppliers = $query->get();
+
         return $suppliers->map(function ($supplier) {
             return [
                 $supplier->name,
@@ -25,6 +37,8 @@ class SuppliersExport implements FromCollection, WithHeadings, WithStyles
                 $supplier->mobile,
                 $supplier->telegram,
                 $supplier->whatsapp,
+                number_format($supplier->balance(), 2),
+                ($supplier->balance() > 0 ? 'دائن' : ($supplier->balance() < 0 ? 'مدين' : '')),
                 $supplier->status,
                 $supplier->created_at->format('Y-m-d'),
             ];
@@ -38,6 +52,8 @@ class SuppliersExport implements FromCollection, WithHeadings, WithStyles
             'رقم الهاتف',
             'رقم التيلغرام',
             'رقم الواتساب',
+            'الرصيد',
+            'دائن / مدين',
             'الحالة',
             'تاريخ الاضافة',
         ];

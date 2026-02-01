@@ -36,10 +36,10 @@
                                 <a href="{{ route('dashboard.clients.create') }}" class="btn btn-primary btn-sm"> اضافة عميل
                                 </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
-                                    href="{{ route('dashboard.clients.pdf') }}">
+                                    href="#" id="exportPdfBtn">
                                     استخراج ملف Pdf </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
-                                    href="{{ route('dashboard.clients.excel') }}"> استخراج
+                                    href="#" id="exportExcelBtn"> استخراج
                                     ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
@@ -48,11 +48,16 @@
                                         <table id="datatable" class="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
+                                                    <th>
+                                                        <input type="checkbox" id="selectAll">
+                                                    </th>
                                                     <th>#</th>
                                                     <th> الاسم </th>
                                                     <th> رقم الهاتف </th>
                                                     <th> رقم التيلغرام </th>
                                                     <th> رقم الواتساب </th>
+                                                    <th> الرصيد </th>
+                                                    <th> دائن / مدين </th>
                                                     <th> الحالة </th>
                                                     <th> تاريخ الانشاء </th>
                                                     <th> العمليات </th>
@@ -61,11 +66,16 @@
                                             <tbody>
                                                 @forelse ($clients as $client)
                                                     <tr>
+                                                        <td>
+                                                            <input type="checkbox" class="client-checkbox" value="{{ $client->id }}">
+                                                        </td>
                                                         <th scope="row">{{ $loop->iteration }}</th>
                                                         <td> {{ $client->name }} </td>
                                                         <td> {{ $client->mobile }} </td>
                                                         <td> {{ $client->telegram }} </td>
                                                         <td> {{ $client->whatsapp }} </td>
+                                                        <td> {{ number_format($client->balance(), 2) }} </td>
+                                                        <td> {{ $client->balance() > 0 ? 'مدين' : ($client->balance() < 0 ? 'دائن' : '') }} </td>
                                                         <td> <span
                                                                 class="badge badge-pill badge-{{ $client->status == 'نشط' ? 'success' : 'danger' }}">{{ $client->status }}</span>
                                                         </td>
@@ -139,6 +149,44 @@
                 "ordering": false
             });
 
+
+            // Select All Checkbox
+            $('#selectAll').click(function() {
+                $('.client-checkbox').prop('checked', this.checked);
+                updateExportLinks();
+            });
+
+            // Individual Checkbox Click
+            $(document).on('click', '.client-checkbox', function() {
+                if ($('.client-checkbox:checked').length == $('.client-checkbox').length) {
+                    $('#selectAll').prop('checked', true);
+                } else {
+                    $('#selectAll').prop('checked', false);
+                }
+                updateExportLinks();
+            });
+
+            // Update Export Links with selected clients
+            function updateExportLinks() {
+                var selectedClients = [];
+                $('.client-checkbox:checked').each(function() {
+                    selectedClients.push($(this).val());
+                });
+
+                var pdfLink = "{{ route('dashboard.clients.pdf') }}";
+                var excelLink = "{{ route('dashboard.clients.excel') }}";
+
+                if (selectedClients.length > 0) {
+                    var params = 'client_ids=' + selectedClients.join(',');
+                    $('#exportPdfBtn').attr('href', pdfLink + '?' + params);
+                    $('#exportExcelBtn').attr('href', excelLink + '?' + params);
+                } else {
+                    $('#exportPdfBtn').attr('href', pdfLink);
+                    $('#exportExcelBtn').attr('href', excelLink);
+                }
+            }
+
+             updateExportLinks();
 
         });
     </script>

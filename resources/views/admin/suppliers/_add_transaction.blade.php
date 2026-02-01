@@ -20,21 +20,24 @@
                         <input required type="number" step="0.01" name="amount" min="1" class="form-control"
                             placeholder="ادخل المبلغ">
                     </div>
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <select name="invoice_id" class="form-control">
                             <option value="" selected> -- حدد فاتورة الشراء -- </option>
                             @foreach ($invoices as $invoice)
-                                <option value="{{ $invoice->id }}">{{ $invoice->referance_number }}</option>
+                            <option value="{{ $invoice->id }}">{{ $invoice->referance_number }}</option>
                             @endforeach
                         </select>
-                    </div>
+                    </div> --}}
                     <div class="form-group">
                         <select name="safe_id" class="form-control" required>
                             <option value="" selected> -- حدد الخزينة -- </option>
                             @foreach ($safes as $safe)
-                                <option value="{{ $safe->id }}">{{ $safe->name }}</option>
+                            <option value="{{ $safe->id }}">{{ $safe->name }}</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <textarea name="description" class="form-control" placeholder="ادخل ملاحظات"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

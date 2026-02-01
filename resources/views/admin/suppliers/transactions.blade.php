@@ -8,6 +8,11 @@
             display: flex;
             justify-content: space-between;
         }
+        @media print {
+            .no-pdf {
+                display: none !important;
+            }
+        }
         #printButton {
             margin-bottom: 20px;
         }
@@ -124,102 +129,92 @@
                                             </div>
                                         </div>
 
-                                        @if (!$fromDate || !$toDate)
-                                            @if ($transactions->count() > 0)
-                                                <div class="summary d-flex justify-content-between">
-                                                    <p style="padding: 10px;border: 1px solid #2a3b4b;border-radius: 10px;background: #2a3b4b;color: #fff;">
-                                                        <strong> اجمالي قيم الفواتير الكلي :  </strong> {{ number_format($total_invoices, 2) }} د.ل
-                                                    </p>
-                                                    {{-- <p style="padding: 10px;border: 1px solid #2a3b4b;border-radius: 10px;background: #2a3b4b;color: #fff;">
-                                                        <strong> اجمالي قيم  المرتجعات الكلي :  </strong> {{ number_format($total_returned, 2) }} د.ل
-                                                    </p> --}}
-                                                    <p style="padding: 10px;border: 1px solid #29d094;border-radius: 10px;background: #29d094;color: #fff;">
-                                                        <strong>إجمالي المدفوع (Debit):</strong> {{ number_format($total_debit, 2) }} د.ل
-                                                    </p>
-                                                    <p style="padding: 10px;border: 1px solid #FE4961;border-radius: 10px;background: #FE4961;color: #fff;">
-                                                        <strong>الرصيد المستحق:</strong> {{ number_format($supplier_balance, 2) }} د.ل
-                                                    </p>
-                                                </div>
-                                            @endif
-                                        @endif
-
-                                        <!-- نموذج البحث -->
-                                        <div class="">
-                                            <form method="GET" action="{{ route('dashboard.suppliers.transactions', $supplier->id) }}">
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        <label for="from_date">من تاريخ</label>
-                                                        <input type="date" name="from_date" id="from_date"
-                                                            class="form-control" value="{{ $fromDate ?? '' }}">
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label for="to_date">إلى تاريخ</label>
-                                                        <input type="date" name="to_date" id="to_date" class="form-control"
-                                                            value="{{ $toDate ?? '' }}">
-                                                    </div>
-                                                    <div class="col-md-4 d-flex align-items-end">
-                                                        <button type="submit" class="btn btn-primary">فلترة <i class="bi bi-search"></i></button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-
-                                        <hr>
-
-                                        @if (!$fromDate || !$toDate)
-                                            <table class="table table-bordered table-striped">
-                                                <thead>
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>الرقم المرجعي</th>
+                                                    <th>دائن (مدفوع)</th>
+                                                    <th>مدين (مستحق)</th>
+                                                    <th>طريقة الدفع</th>
+                                                    <th>الوصف</th>
+                                                    <th>التاريخ</th>
+                                                    <th class="no-pdf">العمليات</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($transactions as $transaction)
                                                     <tr>
-                                                        <th>#</th>
-                                                        <th>الرقم المرجعي</th>
-                                                        <th>دائن (مدفوع)</th>
-                                                        <th>مدين (مستحق)</th>
-                                                        <th>طريقة الدفع</th>
-                                                        <th>الوصف</th>
-                                                        <th> الرقم المرجعي  </th>
-                                                        <th>التاريخ</th>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $transaction->purchaseInvoice->referance_number ?? 'غير مرتبط' }}
+                                                        </td>
+                                                        <td>
+                                                        <span class="text-success">
+                                                            <strong>
+                                                                @if ($transaction->type == 'credit')
+                                                                {{ number_format($transaction->amount, 2) }}
+                                                                @else
+                                                                -
+                                                                @endif
+                                                            </strong>
+                                                        </span>
+                                                        </td>
+                                                        <td>
+                                                        <span class="text-danger">
+                                                            <strong>
+                                                                @if ($transaction->type == 'debit')
+                                                                {{ number_format($transaction->amount, 2) }}
+                                                                @else
+                                                                -
+                                                                @endif
+                                                            </strong>
+                                                        </span>
+                                                        </td>
+                                                        <td>الخزينة ( {{ $transaction->safe->name ?? '-' }} )</td>
+                                                        <td>{{ $transaction->description ?? 'غير محدد' }}</td>
+                                                        <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
+                                                        <td class="no-pdf">
+                                                            <div class="btn-group">
+                                                                @if($transaction->type == 'debit')
+                                                                <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#edittransaction{{ $transaction->id }}">
+                                                                    <i class="la la-edit"></i> تعديل
+                                                                </button>
+                                                                <a href="{{ route('dashboard.suppliers.transactions.print', $transaction->id) }}" class="btn btn-sm btn-warning" target="_blank">
+                                                                    <i class="la la-print"></i> طباعة
+                                                                </a>
+                                                                @endif
+                                                            </div>
+                                                            @include('admin.suppliers._edit_transaction', ['transaction' => $transaction])
+                                                        </td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @forelse ($transactions as $transaction)
-                                                        <tr>
-                                                            <td>{{ $loop->iteration }}</td>
-                                                            <td>{{ $transaction->purchaseInvoice->referance_number ?? 'غير مرتبط' }}</td>
-                                                            <td>
-                                                                <span class="text-success">
-                                                                    <strong>
-                                                                        @if ($transaction->type == 'debit')
-                                                                            {{ number_format($transaction->amount, 2) }}
-                                                                        @else
-                                                                            -
-                                                                        @endif
-                                                                    </strong>
-                                                                </span>
-                                                            </td>
-                                                            <td>
-                                                                <span class="text-danger">
-                                                                    <strong>
-                                                                        @if ($transaction->type == 'credit')
-                                                                            {{ number_format($transaction->amount, 2) }}
-                                                                        @else
-                                                                            -
-                                                                        @endif
-                                                                    </strong>
-                                                                </span>
-                                                            </td>
-                                                            <td>{{ $transaction->payment_method ?? '-' }}</td>
-                                                            <td>{{ $transaction->description ?? 'غير محدد' }}</td>
-                                                            <td>{{ $transaction->purchaseInvoice->bayan_txt ?? 'غير محدد' }}</td>
-                                                            <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
-                                                        </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <td colspan="7" class="text-center">لا يوجد معاملات</td>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </table>
-                                        @endif
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="7" class="text-center">لا يوجد معاملات</td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="table-active">
+                                                    <th colspan="2" class="text-center">الإجمالي</th>
+                                                    <th class="text-success">{{ number_format($transactions->where('type', 'credit')->sum('amount'), 2) }}</th>
+                                                    <th class="text-danger">{{ number_format($transactions->where('type', 'debit')->sum('amount'), 2) }}</th>
+                                                    <th colspan="3"></th>
+                                                    <th class="no-pdf"></th>
+                                                </tr>
+                                                <tr class="table-light">
+                                                    <th colspan="7" class="text-center">
+                                                         <span style="color: #2a3b4b; font-weight: bold;">
+                                                            اجمالي قيم الفواتير الكلي : {{ number_format($total_invoices, 2) }} د.ل
+                                                         </span>
+                                                         &nbsp;&nbsp; | &nbsp;&nbsp;
+                                                         <span style="color: #FE4961; font-weight: bold;">
+                                                            الرصيد المستحق (Net): {{ number_format($balance, 2) }} د.ل
+                                                         </span>
+                                                    </th>
+                                                    <th class="no-pdf"></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
 
                                         <!-- جدول كشف الحساب -->
                                         @if ($fromDate && $toDate)
@@ -291,10 +286,14 @@
             const header = document.querySelector('.report-header');
             const footer = document.querySelector('.report-footer');
             const logo = header.querySelector('img');
+            const noPdfElements = document.querySelectorAll('.no-pdf');
 
             // إظهار الهيدر والتذييل مؤقتًا لالتقاطهما بواسطة html2canvas
             header.style.display = 'block';
             footer.style.display = 'block';
+
+            // إخفاء عناصر "العمليات"
+            noPdfElements.forEach(el => el.style.display = 'none');
 
             // التحقق من تحميل الشعار قبل إنشاء PDF
             const loadImage = (src) => {
@@ -337,7 +336,9 @@
                     // إعادة إخفاء الهيدر والتذييل بعد الطباعة
                     header.style.display = 'none';
                     footer.style.display = 'none';
+                    // إعادة إظهار عناصر "العمليات"
+                    noPdfElements.forEach(el => el.style.display = '');
                 });
         });
-    </script>
+</script>
 @endsection

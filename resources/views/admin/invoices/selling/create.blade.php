@@ -40,9 +40,9 @@
                                             method="POST">
                                             @csrf
                                             <div class="form-body">
-                                                @livewire('dashboard.selling-invoice-create', ['suppliers' => $suppliers, 'safes' => $safes, 'categories' => $categories, 'clients' => $clients,'purchesInvoices'=>$purchesInvoices])
+                                                @livewire('dashboard.selling-invoice-create')
                                             </div>
-                                            <div class="form-actions right">
+                                            {{-- <div class="form-actions right">
                                                 <a href="{{ route('dashboard.clients.index') }}" type="button"
                                                     class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> الغاء
@@ -50,7 +50,7 @@
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
                                                 </button>
-                                            </div>
+                                            </div> --}}
                                         </form>
                                     </div>
                                 </div>

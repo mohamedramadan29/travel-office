@@ -31,13 +31,15 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header d-flex align-items-center">
+                                <a href="{{ route('dashboard.suppliers.report') }}" class="btn btn-success btn-sm"> كشف شامل
+                                    للعملاء </a>
                                 <a href="{{ route('dashboard.suppliers.create') }}" class="btn btn-primary btn-sm"> اضافة
                                     مورد </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
-                                    href="{{ route('dashboard.suppliers.pdf') }}">
+                                    href="#" id="exportPdfBtn">
                                     استخراج ملف Pdf </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-warning btn-sm"
-                                    href="{{ route('dashboard.suppliers.excel') }}"> استخراج
+                                    href="#" id="exportExcelBtn"> استخراج
                                     ملف Excel </a>
                             </div>
                             <div class="card-content collapse show">
@@ -46,28 +48,38 @@
                                         <table id="datatable" class="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
+                                                    <th>
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input" id="selectAll">
+                                                            <label class="custom-control-label" for="selectAll"></label>
+                                                        </div>
+                                                    </th>
                                                     <th>#</th>
                                                     <th> الاسم </th>
                                                     <th> رقم الهاتف </th>
-                                                    <th> رقم التيلغرام </th>
-                                                    <th> رقم الواتساب </th>
+                                                    <th> الرصيد </th>
+                                                    <th> دائن / مدين </th>
                                                     <th> الحالة </th>
-                                                    <th> تاريخ الانشاء </th>
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @forelse ($suppliers as $supplier)
                                                     <tr>
+                                                         <td>
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input client-checkbox" id="client_{{ $supplier->id }}" value="{{ $supplier->id }}">
+                                                                <label class="custom-control-label" for="client_{{ $supplier->id }}"></label>
+                                                            </div>
+                                                        </td>
                                                         <th scope="row">{{ $loop->iteration }}</th>
-                                                        <td> {{ $supplier->name }} </td>
+                                                        <td> <a href="{{ route('dashboard.suppliers.transactions', $supplier->id) }}">{{ $supplier->name }}</a> </td>
                                                         <td> {{ $supplier->mobile }} </td>
-                                                        <td> {{ $supplier->telegram }} </td>
-                                                        <td> {{ $supplier->whatsapp }} </td>
+                                                        <td> {{ number_format($supplier->balance(), 2) }} </td>
+                                                        <td> {{ $supplier->balance() > 0 ? 'دائن' : ($supplier->balance() < 0 ? 'مدين' : '') }} </td>
                                                         <td> <span
                                                                 class="badge badge-pill badge-{{ $supplier->status == 'نشط' ? 'success' : 'danger' }}">{{ $supplier->status }}</span>
                                                         </td>
-                                                        <td> {{ $supplier->created_at->format('Y-m-d') }} </td>
                                                         <td>
                                                             <div class="dropdown float-md-right">
                                                                 <button class="px-2 btn btn-primary dropdown-toggle"
@@ -100,7 +112,7 @@
                                                         </td>
                                                     </tr>
                                                 @empty
-                                                    <td colspan="4"> لا يوجد بيانات </td>
+                                                    <td colspan="8"> لا يوجد بيانات </td>
                                                 @endforelse
                                             </tbody>
                                         </table>
@@ -135,7 +147,43 @@
                 "ordering": false
             });
 
+            // Select All Checkbox
+            $('#selectAll').click(function() {
+                $('.client-checkbox').prop('checked', this.checked);
+                updateExportLinks();
+            });
 
+            // Individual Checkbox Click
+            $(document).on('click', '.client-checkbox', function() {
+                if ($('.client-checkbox:checked').length == $('.client-checkbox').length) {
+                    $('#selectAll').prop('checked', true);
+                } else {
+                    $('#selectAll').prop('checked', false);
+                }
+                updateExportLinks();
+            });
+
+            // Update Export Links with selected suppliers
+            function updateExportLinks() {
+                var selectedSuppliers = [];
+                $('.client-checkbox:checked').each(function() {
+                    selectedSuppliers.push($(this).val());
+                });
+
+                var pdfLink = "{{ route('dashboard.suppliers.pdf') }}";
+                var excelLink = "{{ route('dashboard.suppliers.excel') }}";
+
+                if (selectedSuppliers.length > 0) {
+                    var params = 'supplier_ids=' + selectedSuppliers.join(',');
+                    $('#exportPdfBtn').attr('href', pdfLink + '?' + params);
+                    $('#exportExcelBtn').attr('href', excelLink + '?' + params);
+                } else {
+                    $('#exportPdfBtn').attr('href', pdfLink);
+                    $('#exportExcelBtn').attr('href', excelLink);
+                }
+            }
+
+             updateExportLinks();
         });
     </script>
 @endsection

@@ -99,9 +99,14 @@ Route::group([
             Route::resource('suppliers', SuppliersController::class);
             Route::get('suppliers/status/{id}', [SuppliersController::class, 'ChangeStatus'])->name('suppliers.status');
             Route::get('suppliers/transactions/{id}', [SuppliersController::class, 'transactions'])->name('suppliers.transactions');
+            Route::post('suppliers/store-quick', [SuppliersController::class, 'storeQuick'])->name('suppliers.storeQuick');
+            Route::get('suppliers/search', [SuppliersController::class, 'search'])->name('suppliers.search');
             Route::post('suppliers/add_transaction/{invoice_id}', [SuppliersController::class, 'AddTransaction'])->name('supplier.add_transaction');
+            Route::get('suppliers/report/all', [SuppliersController::class, 'SuppliersReport'])->name('suppliers.report');
             Route::get('suppliers/pdf/report', [SuppliersController::class, 'SuppliersPdf'])->name('suppliers.pdf');
             Route::get('suppliers/excel/report', [SuppliersController::class, 'SuppliersExcel'])->name('suppliers.excel');
+            Route::post('suppliers/transactions/update/{id}', [SuppliersController::class, 'UpdateTransaction'])->name('suppliers.transactions.update');
+            Route::get('suppliers/transactions/print/{id}', [SuppliersController::class, 'PrintTransaction'])->name('suppliers.transactions.print');
         });
         ##################### End Suppliers Routes ######################
 
@@ -110,10 +115,15 @@ Route::group([
             Route::resource('clients', ClientsController::class);
             Route::get('clients/status/{id}', [ClientsController::class, 'ChangeStatus'])->name('clients.status');
             Route::get('clients/transactions/{id}', [ClientsController::class, 'transactions'])->name('clients.transactions');
+            Route::post('clients/store-quick', [ClientsController::class, 'storeQuick'])->name('clients.storeQuick');
             Route::post('clients/add_transaction/{invoice_id}', [ClientsController::class, 'AddTransaction'])->name('client.add_transaction');
             Route::get('clients/pdf/report', [ClientsController::class, 'ClientsPdf'])->name('clients.pdf');
             Route::get('clients/excel/report', [ClientsController::class, 'ClientsExcel'])->name('clients.excel');
             Route::get('clients/report/all', [ClientsController::class, 'ClientsReport'])->name('clients.report');
+            Route::get('clients/report/pdf', [ClientsController::class, 'ClientsReportPdf'])->name('clients.report.pdf');
+            Route::get('clients/report/excel', [ClientsController::class, 'ClientsReportExcel'])->name('clients.report.excel');
+            Route::post('clients/transactions/update/{id}', [ClientsController::class, 'UpdateTransaction'])->name('clients.transactions.update');
+            Route::get('clients/transactions/print/{id}', [ClientsController::class, 'PrintTransaction'])->name('clients.transactions.print');
         });
         ##################### End Clients Routes ######################
 
@@ -132,6 +142,7 @@ Route::group([
         Route::group(['middleware' => 'can:purches_invoices'], function () {
             Route::get('purches_invoices_type/{type}', [PurchesInvoicesController::class, 'PurchesInvoice'])->name('purches_invoices_type.type');
             Route::resource('purches_invoices', PurchesInvoicesController::class);
+            Route::post('purches_invoices/store-multiple', [PurchesInvoicesController::class, 'storeMultiple'])->name('purches_invoices.store_multiple');
             Route::get('purches_invoice/print/{id}', [PurchesInvoicesController::class, 'PrintInvoice'])->name('print_purches_invoice');
             Route::match(['get', 'post'], 'invoice/convert_to_official_purches/{id}', [PurchesInvoicesController::class, 'ConvertToOfficial'])->name('convert_to_official_purches');
             Route::match(['get', 'post'], 'invoice/return/{id}', [PurchesInvoicesController::class, 'ReturnInvoice'])->name('return_invoice');

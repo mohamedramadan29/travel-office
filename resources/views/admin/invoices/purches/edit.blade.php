@@ -42,7 +42,7 @@
                                             @csrf
                                             @method('PUT')
                                             <div class="form-body">
-                                                <div class="row">
+                                                {{-- <div class="row">
                                                     <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label> نوع الفاتورة </label>
@@ -63,7 +63,7 @@
                                                                 تؤثر على المخزون </span>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div> --}}
 
                                                 <script>
                                                     document.addEventListener('DOMContentLoaded', function() {
@@ -83,7 +83,7 @@
                                                         invoiceTypeSelect.addEventListener('change', toggleNoteVisibility);
                                                     });
                                                 </script>
-                                                <div class="row">
+                                                {{-- <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="userinput1"> البيان / الوصف </label>
@@ -111,10 +111,10 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                @livewire('dashboard.purches-invoice-create', ['suppliers' => $suppliers, 'safes' => $safes,'invoice'=>$invoice])
+                                                </div> --}}
+                                                @livewire('dashboard.purches-invoice-edit', ['invoice' => $invoice])
                                             </div>
-                                            <div class="form-actions right">
+                                            {{-- <div class="form-actions right">
                                                 <a href="{{ route('dashboard.purches_invoices.index') }}" type="button"
                                                     class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> الغاء
@@ -122,7 +122,7 @@
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> تعديل الفاتورة
                                                 </button>
-                                            </div>
+                                            </div> --}}
                                         </form>
                                     </div>
                                 </div>

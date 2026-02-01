@@ -41,9 +41,9 @@
                                             @csrf
                                             @method('PUT')
                                             <div class="form-body">
-                                                @livewire('dashboard.selling-invoice-create', ['suppliers' => $suppliers, 'safes' => $safes, 'categories' => $categories, 'clients' => $clients, 'selling_invoice' => $selling_invoice])
+                                                @livewire('dashboard.selling-invoice-edit', ['invoice' => $selling_invoice])
                                             </div>
-                                            <div class="form-actions right">
+                                            {{-- <div class="form-actions right">
                                                 <a href="{{ route('dashboard.clients.index') }}" type="button"
                                                     class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> الغاء
@@ -51,7 +51,7 @@
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
                                                 </button>
-                                            </div>
+                                            </div> --}}
                                         </form>
                                     </div>
                                 </div>

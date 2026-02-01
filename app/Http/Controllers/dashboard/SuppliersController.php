@@ -48,6 +48,7 @@ class SuppliersController extends Controller
             'status.required' => 'الحالة مطلوبة',
            // 'address.required' => 'العنوان مطلوب',
         ];
+
         $validator = Validator::make($data, $rules, $messages);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -62,6 +63,64 @@ class SuppliersController extends Controller
         $supplier->address = $data['address'];
         $supplier->save();
       return $this->success_message('تم اضافة المورد بنجاح');
+    }
+
+    public function storeQuick(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255|unique:suppliers,email',
+            'mobile' => 'required|string|max:20|unique:suppliers,mobile',
+            'whatsapp' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+        ], [
+            'name.required' => 'الاسم مطلوب',
+            'mobile.required' => 'رقم الهاتف مطلوب',
+            'mobile.unique' => 'رقم الهاتف مستخدم من قبل',
+            'email.unique' => 'البريد الإلكتروني مستخدم من قبل'
+        ]);
+
+        $supplier = new Supplier();
+        $supplier->name = $data['name'];
+        $supplier->email = $data['email'];
+        $supplier->mobile = $data['mobile'];
+        $supplier->whatsapp = $data['whatsapp'];
+        $supplier->address = $data['address'];
+        $supplier->status = 1; // Active by default
+        $supplier->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم اضافة المورد بنجاح',
+            'supplier' => $supplier
+        ]);
+    }
+
+    public function search(Request $request)
+    {
+        $search = $request->get('q', '');
+
+        $suppliers = Supplier::active()
+            ->where('name', 'like', '%' . $search . '%')
+            ->orWhere('mobile', 'like', '%' . $search . '%')
+            ->limit(10)
+            ->get(['id', 'name', 'mobile', 'email', 'whatsapp', 'address']);
+
+        $results = $suppliers->map(function($supplier) {
+            return [
+                'id' => $supplier->id,
+                'text' => $supplier->name . (isset($supplier->mobile) ? ' - ' . $supplier->mobile : ''),
+                'name' => $supplier->name,
+                'mobile' => $supplier->mobile ?? '',
+                'email' => $supplier->email ?? '',
+                'whatsapp' => $supplier->whatsapp ?? '',
+                'address' => $supplier->address ?? ''
+            ];
+        });
+
+        return response()->json([
+            'results' => $results
+        ]);
     }
     public function show(string $id)
     {
@@ -185,8 +244,8 @@ class SuppliersController extends Controller
 
         // حساب إجمالي المدفوع (Debit)
         $total_debit = $transactions->where('type', 'debit')->sum('amount');
-
         $total_credit = $transactions->where('type', 'credit')->sum('amount');
+
 
         // الرصيد المستحق = إجمالي الفواتير - إجمالي المدفوع
         $balance = $total_invoices - $total_debit;
@@ -210,7 +269,164 @@ class SuppliersController extends Controller
         ));
     }
 
+    public function SuppliersReport(Request $request)
+    {
+        $suppliers = Supplier::latest()->get();
+        return view('admin.suppliers.report', compact('suppliers'));
+    }
 
+    public function SuppliersReportPdf(Request $request)
+    {
+        $query = Supplier::latest();
+
+        if ($request->has('supplier_ids')) {
+            if (is_array($request->supplier_ids)) {
+                $query->whereIn('id', $request->supplier_ids);
+            } else {
+                $query->whereIn('id', explode(',', $request->supplier_ids));
+            }
+        }
+
+        $suppliers = $query->get();
+        // إعداد محتوى HTML
+        $html = '
+        <html lang="ar" dir="rtl">
+        <head>
+            <style>
+                body {
+                    font-family: "tajawal", sans-serif; /* اختر خط يدعم اللغة العربية */
+                    text-align: right; /* محاذاة النصوص لليمين */
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: right; /* لمحاذاة النصوص داخل الجدول */
+                }
+                th {
+                    background-color: #f2f2f2; /* لون خلفية للرأس */
+                }
+            </style>
+        </head>
+        <body>
+        <div style="text-align:center; margin:auto;display:block">
+            <img  src="' . url('assets/admin/images/logo.png') . '" style="width:120px;" alt="Logo">
+            <h4>تقرير عن الموردين </h4>
+        </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th> الاسم </th>
+                        <th> رقم الهاتف </th>
+                        <th> رقم التيلغرام </th>
+                        <th> رقم الواتساب </th>
+                        <th> الرصيد  </th>
+                        <th> دائن / مدين  </th>
+                        <th> الحالة </th>
+                        <th> تاريخ الانشاء </th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+        // تعبئة البيانات داخل الجدول
+        foreach ($suppliers as $supplier) {
+            $html .= '
+                    <tr>
+                        <td>' . $supplier->name . '</td>
+                        <td>' . $supplier->mobile . '</td>
+                        <td>' . $supplier->telegram . '</td>
+                        <td>' . $supplier->whatsapp . '</td>
+                        <td>' . number_format($supplier->balance(), 2) . '</td>
+                        <td>' . ($supplier->balance() > 0 ? 'دائن' : ($supplier->balance() < 0 ? 'مدين' : '')) . '</td>
+                        <td>' . $supplier->status . '</td>
+                        <td>' . $supplier->created_at->format('Y-m-d') . '</td>
+                    </tr>';
+        }
+        $html .= '
+                </tbody>
+            </table>
+        </body>
+        </html>';
+
+        // إعداد mPDF
+        $mpdf = new Mpdf([
+            'default_font' => 'tajawal', // خط يدعم اللغة العربية
+        ]);
+
+        // تحميل المحتوى إلى ملف PDF
+        $mpdf->WriteHTML($html);
+        // توليد ملف PDF وإرساله للتنزيل
+        return $mpdf->Output('تقرير عن الموردين.pdf', 'I'); // 'I' لعرض الملف في المتصفح
+    }
+
+    public function SuppliersReportExcel(Request $request)
+    {
+        $supplier_ids = null;
+        if ($request->has('supplier_ids')) {
+            if (is_array($request->supplier_ids)) {
+                $supplier_ids = $request->supplier_ids;
+            } else {
+                $supplier_ids = explode(',', $request->supplier_ids);
+            }
+        }
+        return (new \App\Exports\SuppliersReportExport($supplier_ids))->download('Suppliers_Report.xlsx');
+    }
+
+    public function UpdateTransaction(Request $request, $id)
+    {
+        $transaction = SupplierTransaction::findOrFail($id);
+
+        $data = $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'safe_id' => 'required|exists:safes,id',
+            'description' => 'nullable|string',
+        ], [
+            'amount.required' => 'المبلغ مطلوب',
+            'amount.numeric' => 'المبلغ يجب أن يكون رقمًا',
+            'amount.min' => 'المبلغ يجب أن يكون أكبر من 0',
+            'safe_id.required' => 'الخزنة مطلوبة',
+            'safe_id.exists' => 'الخزنة غير موجودة',
+        ]);
+
+        if ($transaction->type != 'debit') {
+             return redirect()->back()->withErrors(['general' => 'لا يمكن تعديل هذه المعاملة']);
+        }
+
+        DB::beginTransaction();
+        try {
+            // 1. Revert Old Safe Balance (Assuming Debit = Withdraw from Safe)
+            $oldSafe = Safe::findOrFail($transaction->safe_id);
+            $oldSafe->balance += $transaction->amount;
+            $oldSafe->save();
+
+            // 2. Update Transaction
+            $transaction->amount = $data['amount'];
+            $transaction->safe_id = $data['safe_id'];
+            $transaction->description = $data['description'];
+            $transaction->save();
+
+            // 3. Apply New Safe Balance
+            $newSafe = Safe::findOrFail($data['safe_id']);
+            $newSafe->balance -= $data['amount'];
+            $newSafe->save();
+
+            DB::commit();
+            return redirect()->back()->with('success', 'تم تعديل المعاملة بنجاح');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['general' => 'حدث خطأ: ' . $e->getMessage()]);
+        }
+    }
+
+    public function PrintTransaction($id)
+    {
+        $transaction = SupplierTransaction::with('supplier', 'safe')->findOrFail($id);
+        $setting = \App\Models\admin\Setting::first();
+        return view('admin.suppliers.print_transaction', compact('transaction', 'setting'));
+    }
 
     public function AddTransaction(Request $request, $id)
     {
@@ -274,9 +490,7 @@ class SuppliersController extends Controller
             $transaction->purchase_invoice_id = isset($data['invoice_id']) ? $data['invoice_id'] : null;
             $transaction->safe_id = $data['safe_id'];
             $transaction->type = 'debit';
-            $transaction->description = isset($data['invoice_id']) && $data['invoice_id']
-            ? 'تسديد دفعة لفاتورة #' . $data['invoice_id']
-            : 'تسديد دفعة عامة';
+            $transaction->description =  $data['description'];
             $transaction->save();
 
             if(isset($data['invoice_id']) && $data['invoice_id'] !=null){
@@ -293,7 +507,7 @@ class SuppliersController extends Controller
             $safeTransaction->supplier_id = $supplier->id;
             $safeTransaction->amount = $data['amount'];
             $safeTransaction->type = 'withdraw';
-            $safeTransaction->description = ' اضافة دفعة الي المورد [ ' . $supplier->name . ' ]';
+            $safeTransaction->description = $data['description'];
             $safeTransaction->save();
             ############################################ End Add Transaction To Safe ###############################
             ################## Update Safe Balance #########
@@ -312,8 +526,19 @@ class SuppliersController extends Controller
     }
 
     ########################################### Generate Suppliers Pdf ##########################################
-    public function SuppliersPdf(){
-        $suppliers = Supplier::latest()->get();
+    ########################################### Generate Suppliers Pdf ##########################################
+    public function SuppliersPdf(Request $request)
+    {
+        $query = Supplier::latest();
+        if ($request->has('supplier_ids')) {
+            $supplier_ids = explode(',', $request->supplier_ids);
+            if(is_array($request->supplier_ids)){
+                $query->whereIn('id', $request->supplier_ids);
+            } else {
+                $query->whereIn('id', explode(',', $request->supplier_ids));
+            }
+        }
+        $suppliers = $query->get();
 
         $html = '
         <html lang="ar" dir="rtl">
@@ -350,6 +575,8 @@ class SuppliersController extends Controller
                         <th> رقم الهاتف </th>
                         <th> رقم التيلغرام </th>
                         <th> رقم الواتساب </th>
+                        <th> الرصيد  </th>
+                        <th> دائن / مدين  </th>
                         <th> الحالة </th>
                         <th> تاريخ الانشاء </th>
                     </tr>
@@ -363,6 +590,8 @@ class SuppliersController extends Controller
                         <td>' . $supplier->mobile . '</td>
                         <td>' . $supplier->telegram . '</td>
                         <td>' . $supplier->whatsapp . '</td>
+                        <td>' . number_format($supplier->balance(), 2) . '</td>
+                        <td>' . ($supplier->balance() > 0 ? 'دائن' : ($supplier->balance() < 0 ? 'مدين' : '')) . '</td>
                         <td>' . $supplier->status . '</td>
                         <td>' . $supplier->created_at->format('Y-m-d') . '</td>
                     </tr>';
@@ -385,8 +614,17 @@ class SuppliersController extends Controller
 
     ######################################### Generate Suppliers Excel ############################
 
-    public function SuppliersExcel(){
-        return (new SuppliersExport())->download('Suppliers.xlsx');
+    public function SuppliersExcel(Request $request)
+    {
+        $supplier_ids = null;
+        if ($request->has('supplier_ids')) {
+            if (is_array($request->supplier_ids)) {
+                $supplier_ids = $request->supplier_ids;
+            } else {
+                $supplier_ids = explode(',', $request->supplier_ids);
+            }
+        }
+        return (new SuppliersExport($supplier_ids))->download('Suppliers.xlsx');
     }
 
 
