@@ -444,7 +444,7 @@ class PurchesInvoicesController extends Controller
         if(!$invoice){
             abort(404);
         }
-        if($invoice['bayan_txt'] !='' && $invoice['referance_number'] !='' && $invoice['supplier_id'] !='' && $invoice['qyt'] !='' && $invoice['admin_id'] !=''
+        if($invoice['bayan_txt'] !='' && $invoice['referance_number'] !='' && $invoice['supplier_id'] !='' && $invoice['qyt'] !='' && $invoice['admin_id'] !='' && $invoice['purches_price'] != 0
         ){
             $invoice->update([
                 "type" => "فاتورة رسمية",

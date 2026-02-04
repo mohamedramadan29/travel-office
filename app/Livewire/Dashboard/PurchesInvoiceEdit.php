@@ -151,7 +151,7 @@ class PurchesInvoiceEdit extends Component
 
     protected function validateInvoiceData()
     {
-        return $this->validate([
+        $rules = [
             'bayan_txt' => 'required|string|max:255',
             'referance_number' => 'nullable|string|max:100',
             'supplier_id' => 'required|exists:suppliers,id',
@@ -160,8 +160,14 @@ class PurchesInvoiceEdit extends Component
             'qyt' => 'required|numeric|min:1',
             'purches_price' => 'required|numeric|min:0',
             'paid' => 'nullable|numeric|min:0',
-            'safe_id' => 'required_if:paid,>,0|exists:safes,id'
-        ], [
+        ];
+
+        // Only require safe_id if paid amount is greater than 0
+        if ($this->paid > 0) {
+            $rules['safe_id'] = 'required|exists:safes,id';
+        }
+
+        return $this->validate($rules, [
             'bayan_txt.required' => 'البيان مطلوب',
             'supplier_id.required' => 'المورد مطلوب',
             'supplier_id.exists' => 'المورد المحدد غير موجود',
@@ -177,7 +183,7 @@ class PurchesInvoiceEdit extends Component
             'purches_price.min' => 'سعر الشراء يجب أن يكون أكبر من أو يساوي صفر',
             'paid.numeric' => 'المبلغ المدفوع يجب أن يكون رقماً',
             'paid.min' => 'المبلغ المدفوع يجب أن يكون أكبر من أو يساوي صفر',
-            'safe_id.required_if' => 'الخزينة مطلوبة عند دفع مبلغ',
+            'safe_id.required' => 'الخزينة مطلوبة عند دفع مبلغ',
             'safe_id.exists' => 'الخزينة المحددة غير موجودة'
         ]);
     }
@@ -224,7 +230,6 @@ class PurchesInvoiceEdit extends Component
 
             session()->flash('message', 'تم تحديث الفاتورة بنجاح');
             return redirect()->route('dashboard.purches_invoices.index');
-
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'حدث خطأ أثناء تحديث الفاتورة: ' . $e->getMessage());
@@ -251,7 +256,6 @@ class PurchesInvoiceEdit extends Component
             if ($safe) {
                 $safe->decrement('balance', $paidDifference);
             }
-
         } elseif ($paidDifference < 0) {
             // مبلغ تم إرجاعه - إضافة معاملة إرجاع
             $returnAmount = abs($paidDifference);
