@@ -42,8 +42,7 @@
                                 </select>
                             </div>
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-success" data-toggle="modal"
-                                     data-target="#sc_addClientModal">
+                                <button type="button" class="btn btn-success" wire:click="openAddClientModal">
                                     <i class="la la-plus"></i>
                                 </button>
                             </div>
@@ -99,8 +98,7 @@
                                 </select>
                             </div>
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-success" data-toggle="modal"
-                                     data-target="#sc_addSupplierModal">
+                                <button type="button" class="btn btn-success" wire:click="openAddSupplierModal">
                                     <i class="la la-plus"></i>
                                 </button>
                             </div>
@@ -320,99 +318,123 @@
             <i class="la la-check-square-o"></i> حفظ جميع فواتير البيع
         </button>
     </div>
-    <!-- Modal for adding new client -->
-    <div class="modal fade" id="sc_addClientModal" tabindex="-1" role="dialog" aria-labelledby="addClientLabel"
-        aria-hidden="true" wire:ignore.self>
+    <!-- Livewire Modal for adding new client -->
+    @if($showAddClientModal)
+    <div class="modal fade show" id="addClientModal" tabindex="-1" role="dialog"
+         style="display: block; background-color: rgba(0,0,0,0.5);" aria-modal="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="text-white modal-header bg-success">
-                    <h5 class="modal-title" id="addClientLabel"><i class="la la-plus"></i> إضافة عميل جديد</h5>
-                    <button type="button" class="text-white close" data-dismiss="modal" aria-label="Close">
+                    <h5 class="modal-title"><i class="la la-plus"></i> إضافة عميل جديد</h5>
+                    <button type="button" class="text-white close" wire:click="closeAddClientModal">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div id="sc_clientFormErrors"></div>
-                    <form id="sc_addClientForm">
-                        @csrf
-                        <div class="form-group">
-                            <label><strong>الاسم <span class="text-danger">*</span></strong></label>
-                            <input type="text" name="name" class="form-control" placeholder="أدخل اسم العميل" required>
-                        </div>
-                        <div class="form-group">
-                            <label><strong>رقم الهاتف <span class="text-danger">*</span></strong></label>
-                            <input type="text" name="mobile" class="form-control" placeholder="أدخل رقم الهاتف" required>
-                        </div>
-                        <div class="form-group">
-                            <label>البريد الإلكتروني (اختياري)</label>
-                            <input type="email" name="email" class="form-control" placeholder="example@example.com">
-                        </div>
-                        <div class="form-group">
-                            <label>واتساب (اختياري)</label>
-                            <input type="text" name="whatsapp" class="form-control" placeholder="أدخل رقم الواتساب">
-                        </div>
-                        <div class="form-group">
-                            <label>العنوان (اختياري)</label>
-                            <textarea name="address" class="form-control" rows="2" placeholder="أدخل عنوان العميل"></textarea>
-                        </div>
-                    </form>
+                    @if($modalClientErrorMessage)
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="la la-exclamation-circle"></i> {{ $modalClientErrorMessage }}
+                        <button type="button" class="close" wire:click="$set('modalClientErrorMessage', '')">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    @endif
+
+                    <div class="form-group">
+                        <label><strong>الاسم <span class="text-danger">*</span></strong></label>
+                        <input type="text" wire:model="newClientName" class="form-control" placeholder="أدخل اسم العميل">
+                        @error('newClientName') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="form-group">
+                        <label><strong>رقم الهاتف <span class="text-danger">*</span></strong></label>
+                        <input type="text" wire:model="newClientMobile" class="form-control" placeholder="أدخل رقم الهاتف">
+                        @error('newClientMobile') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>البريد الإلكتروني (اختياري)</label>
+                        <input type="email" wire:model="newClientEmail" class="form-control" placeholder="example@example.com">
+                        @error('newClientEmail') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>واتساب (اختياري)</label>
+                        <input type="text" wire:model="newClientWhatsapp" class="form-control" placeholder="أدخل رقم الواتساب">
+                        @error('newClientWhatsapp') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>العنوان (اختياري)</label>
+                        <textarea wire:model="newClientAddress" class="form-control" rows="2" placeholder="أدخل عنوان العميل"></textarea>
+                        @error('newClientAddress') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
-                    <button type="button" id="sc_submitClientForm" class="btn btn-success">
+                    <button type="button" class="btn btn-secondary" wire:click="closeAddClientModal">إلغاء</button>
+                    <button type="button" class="btn btn-success" wire:click="saveClient">
                         <i class="la la-save"></i> حفظ العميل
                     </button>
                 </div>
             </div>
         </div>
     </div>
+    @endif
 
-    <!-- Modal for adding new supplier -->
-    <div class="modal fade" id="sc_addSupplierModal" tabindex="-1" role="dialog" aria-labelledby="addSupplierLabel"
-        aria-hidden="true" wire:ignore.self>
+    <!-- Livewire Modal for adding new supplier -->
+    @if($showAddSupplierModal)
+    <div class="modal fade show" id="addSupplierModal" tabindex="-1" role="dialog"
+         style="display: block; background-color: rgba(0,0,0,0.5);" aria-modal="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="text-white modal-header bg-success">
-                    <h5 class="modal-title" id="addSupplierLabel"><i class="la la-plus"></i> إضافة مورد جديد</h5>
-                    <button type="button" class="text-white close" data-dismiss="modal" aria-label="Close">
+                    <h5 class="modal-title"><i class="la la-plus"></i> إضافة مورد جديد</h5>
+                    <button type="button" class="text-white close" wire:click="closeAddSupplierModal">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div id="sc_supplierFormErrors"></div>
-                    <form id="sc_addSupplierForm">
-                        @csrf
-                        <div class="form-group">
-                            <label><strong>الاسم <span class="text-danger">*</span></strong></label>
-                            <input type="text" name="name" class="form-control" placeholder="أدخل اسم المورد" required>
-                        </div>
-                        <div class="form-group">
-                            <label><strong>رقم الهاتف <span class="text-danger">*</span></strong></label>
-                            <input type="text" name="mobile" class="form-control" placeholder="أدخل رقم الهاتف" required>
-                        </div>
-                        <div class="form-group">
-                            <label>البريد الإلكتروني (اختياري)</label>
-                            <input type="email" name="email" class="form-control" placeholder="example@example.com">
-                        </div>
-                        <div class="form-group">
-                            <label>واتساب (اختياري)</label>
-                            <input type="text" name="whatsapp" class="form-control" placeholder="أدخل رقم الواتساب">
-                        </div>
-                        <div class="form-group">
-                            <label>العنوان (اختياري)</label>
-                            <textarea name="address" class="form-control" rows="2" placeholder="أدخل عنوان المورد"></textarea>
-                        </div>
-                    </form>
+                    @if($modalSupplierErrorMessage)
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="la la-exclamation-circle"></i> {{ $modalSupplierErrorMessage }}
+                        <button type="button" class="close" wire:click="$set('modalSupplierErrorMessage', '')">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    @endif
+
+                    <div class="form-group">
+                        <label><strong>الاسم <span class="text-danger">*</span></strong></label>
+                        <input type="text" wire:model="newSupplierName" class="form-control" placeholder="أدخل اسم المورد">
+                        @error('newSupplierName') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="form-group">
+                        <label><strong>رقم الهاتف <span class="text-danger">*</span></strong></label>
+                        <input type="text" wire:model="newSupplierMobile" class="form-control" placeholder="أدخل رقم الهاتف">
+                        @error('newSupplierMobile') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>البريد الإلكتروني (اختياري)</label>
+                        <input type="email" wire:model="newSupplierEmail" class="form-control" placeholder="example@example.com">
+                        @error('newSupplierEmail') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>واتساب (اختياري)</label>
+                        <input type="text" wire:model="newSupplierWhatsapp" class="form-control" placeholder="أدخل رقم الواتساب">
+                        @error('newSupplierWhatsapp') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>العنوان (اختياري)</label>
+                        <textarea wire:model="newSupplierAddress" class="form-control" rows="2" placeholder="أدخل عنوان المورد"></textarea>
+                        @error('newSupplierAddress') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
-                    <button type="button" id="sc_submitSupplierForm" class="btn btn-success">
+                    <button type="button" class="btn btn-secondary" wire:click="closeAddSupplierModal">إلغاء</button>
+                    <button type="button" class="btn btn-success" wire:click="saveSupplier">
                         <i class="la la-save"></i> حفظ المورد
                     </button>
                 </div>
             </div>
         </div>
     </div>
+    @endif
 
     <!-- JavaScript -->
     @section('js')
@@ -599,111 +621,63 @@
             });
         }
 
-        // Handle submit button click for client
-        $(document).on('click', '#sc_submitClientForm', function(e) {
-            console.log('Selling Create: Submit client button clicked');
-            e.preventDefault();
+        // Listen for client added event
+        window.addEventListener('client-added', function(event) {
+            console.log('Client added event received', event.detail);
 
-            let formElement = document.getElementById('sc_addClientForm');
-            if (!formElement) return;
+            // Wait a bit for Livewire to finish processing
+            setTimeout(function() {
+                // Get the client details from the event
+                const clientId = event.detail[0].clientId;
+                const clientName = event.detail[0].clientName;
 
-            let formData = new FormData(formElement);
-            let $button = $(this);
+                console.log('Adding client to Select2:', clientId, clientName);
 
-            $.ajax({
-                url: "{{ route('dashboard.clients.storeQuick') }}",
-                type: "POST",
-                data: formData,
-                contentType: false,
-                processData: false,
-                beforeSend: function() {
-                    $button.prop('disabled', true).html('<i class="la la-spinner fa-spin"></i> جاري الحفظ...');
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $('#sc_addClientModal').modal('hide');
-                        formElement.reset();
-                        $('#sc_clientFormErrors').html('');
+                // Create a new option element
+                const newOption = new Option(clientName, clientId, true, true);
 
-                        var newOption = new Option(response.client.name, response.client.id, true, true);
-                        $('#client_id').append(newOption).trigger('change');
+                // Append it to the select
+                $('#client_id').append(newOption);
 
-                        alert(response.message);
+                // Trigger change to notify Select2 and Livewire
+                $('#client_id').trigger('change');
 
-                        @this.refreshClients();
-                        @this.set('client_id', response.client.id);
-                    }
-                },
-                error: function(xhr) {
-                    $button.prop('disabled', false).html('<i class="la la-save"></i> حفظ العميل');
-                    if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        let errors = xhr.responseJSON.errors;
-                        let errorHtml = '<div class="alert alert-danger"><strong>حدث خطأ:</strong><ul>';
-                        for (let field in errors) { errorHtml += '<li>' + errors[field][0] + '</li>'; }
-                        errorHtml += '</ul></div>';
-                        $('#sc_clientFormErrors').html(errorHtml);
-                    } else {
-                        $('#sc_clientFormErrors').html('<div class="alert alert-danger">حدث خطأ، يرجى المحاولة لاحقاً</div>');
-                    }
-                },
-                complete: function() {
-                    $button.prop('disabled', false).html('<i class="la la-save"></i> حفظ العميل');
-                }
-            });
+                // Also update Livewire's client_id
+                @this.set('client_id', clientId);
+
+                console.log('Client added to Select2 and selected');
+            }, 300);
         });
 
-        // Handle submit button click for supplier
-        $(document).on('click', '#sc_submitSupplierForm', function(e) {
-            console.log('Selling Create: Submit supplier button clicked');
-            e.preventDefault();
 
-            let formElement = document.getElementById('sc_addSupplierForm');
-            if (!formElement) return;
+        // Listen for supplier added event
+        window.addEventListener('supplier-added', function(event) {
+            console.log('Supplier added event received', event.detail);
 
-            let formData = new FormData(formElement);
-            let $button = $(this);
+            // Wait a bit for Livewire to finish processing
+            setTimeout(function() {
+                // Get the supplier details from the event
+                const supplierId = event.detail[0].supplierId;
+                const supplierName = event.detail[0].supplierName;
 
-            $.ajax({
-                url: "{{ route('dashboard.suppliers.storeQuick') }}",
-                type: "POST",
-                data: formData,
-                contentType: false,
-                processData: false,
-                beforeSend: function() {
-                    $button.prop('disabled', true).html('<i class="la la-spinner fa-spin"></i> جاري الحفظ...');
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $('#sc_addSupplierModal').modal('hide');
-                        formElement.reset();
-                        $('#sc_supplierFormErrors').html('');
+                console.log('Adding supplier to Select2:', supplierId, supplierName);
 
-                        var newOption = new Option(response.supplier.name, response.supplier.id, true, true);
-                        $('#supplier_id').append(newOption).trigger('change');
+                // Create a new option element
+                const newOption = new Option(supplierName, supplierId, true, true);
 
-                        alert(response.message);
+                // Append it to the select
+                $('#supplier_id').append(newOption);
 
-                        @this.refreshSuppliers();
-                        @this.set('supplier_id', response.supplier.id);
-                    }
-                },
-                error: function(xhr) {
-                    $button.prop('disabled', false).html('<i class="la la-save"></i> حفظ المورد');
-                    if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        let errors = xhr.responseJSON.errors;
-                        let errorHtml = '<div class="alert alert-danger"><strong>حدث خطأ:</strong><ul>';
-                        for (let field in errors) { errorHtml += '<li>' + errors[field][0] + '</li>'; }
-                        errorHtml += '</ul></div>';
-                        $('#sc_supplierFormErrors').html(errorHtml);
-                    } else {
-                        $('#sc_supplierFormErrors').html('<div class="alert alert-danger">حدث خطأ، يرجى المحاولة لاحقاً</div>');
-                    }
-                },
-                complete: function() {
-                    $button.prop('disabled', false).html('<i class="la la-save"></i> حفظ المورد');
-                }
-            });
+                // Trigger change to notify Select2 and Livewire
+                $('#supplier_id').trigger('change');
+
+                // Also update Livewire's supplier_id
+                @this.set('supplier_id', supplierId);
+
+                console.log('Supplier added to Select2 and selected');
+            }, 300);
         });
+
 
         // Re-initialize Select2 after Livewire updates
         document.addEventListener('livewire:navigated', function() {

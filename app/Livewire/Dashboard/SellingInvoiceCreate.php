@@ -48,6 +48,25 @@ class SellingInvoiceCreate extends Component
     public $payment_method;
     public $safe_id;
 
+    // Client Modal Properties
+    public $showAddClientModal = false;
+    public $newClientName = '';
+    public $newClientMobile = '';
+    public $newClientEmail = '';
+    public $newClientWhatsapp = '';
+    public $newClientAddress = '';
+    public $modalClientErrorMessage = '';
+
+    // Supplier Modal Properties
+    public $showAddSupplierModal = false;
+    public $newSupplierName = '';
+    public $newSupplierMobile = '';
+    public $newSupplierEmail = '';
+    public $newSupplierWhatsapp = '';
+    public $newSupplierAddress = '';
+    public $modalSupplierErrorMessage = '';
+
+
     public function mount()
     {
         // جلب بيانات العملاء والموردين والخزائن والتصنيفات
@@ -399,6 +418,185 @@ class SellingInvoiceCreate extends Component
         $this->supplier_email = '';
         $this->supplier_address = '';
     }
+
+    // Client Modal Methods
+    public function openAddClientModal()
+    {
+        $this->showAddClientModal = true;
+        $this->resetClientFormFields();
+    }
+
+    public function closeAddClientModal()
+    {
+        $this->showAddClientModal = false;
+        $this->resetClientFormFields();
+    }
+
+    public function resetClientFormFields()
+    {
+        $this->newClientName = '';
+        $this->newClientMobile = '';
+        $this->newClientEmail = '';
+        $this->newClientWhatsapp = '';
+        $this->newClientAddress = '';
+        $this->modalClientErrorMessage = '';
+        $this->resetValidation([
+            'newClientName',
+            'newClientMobile',
+            'newClientEmail',
+            'newClientWhatsapp',
+            'newClientAddress'
+        ]);
+    }
+
+    public function saveClient()
+    {
+        // Clear previous error message
+        $this->modalClientErrorMessage = '';
+
+        // Validate client data
+        $this->validate([
+            'newClientName' => 'required|string|max:255',
+            'newClientMobile' => 'required|string|max:20',
+            'newClientEmail' => 'nullable|email|max:255',
+            'newClientWhatsapp' => 'nullable|string|max:20',
+            'newClientAddress' => 'nullable|string|max:500',
+        ], [
+            'newClientName.required' => 'اسم العميل مطلوب',
+            'newClientName.max' => 'اسم العميل يجب ألا يتجاوز 255 حرف',
+            'newClientMobile.required' => 'رقم الهاتف مطلوب',
+            'newClientMobile.max' => 'رقم الهاتف يجب ألا يتجاوز 20 رقم',
+            'newClientEmail.email' => 'البريد الإلكتروني غير صحيح',
+            'newClientEmail.max' => 'البريد الإلكتروني يجب ألا يتجاوز 255 حرف',
+            'newClientWhatsapp.max' => 'رقم الواتساب يجب ألا يتجاوز 20 رقم',
+            'newClientAddress.max' => 'العنوان يجب ألا يتجاوز 500 حرف',
+        ]);
+
+        try {
+            // Create new client
+            $client = Client::create([
+                'name' => $this->newClientName,
+                'mobile' => $this->newClientMobile,
+                'email' => $this->newClientEmail ?: null,
+                'whatsapp' => $this->newClientWhatsapp ?: null,
+                'address' => $this->newClientAddress ?: null,
+                'status' => 1,
+            ]);
+
+            // Refresh clients list
+            $this->refreshClients();
+
+            // Set the newly created client as selected
+            $this->client_id = $client->id;
+            $this->getClientInfo();
+
+            // Close modal and reset form
+            $this->closeAddClientModal();
+
+            // Show success message
+            session()->flash('message', '✅ تم إضافة العميل بنجاح!');
+
+            // Dispatch event to update Select2 with client details
+            $this->dispatch('client-added', [
+                'clientId' => $client->id,
+                'clientName' => $client->name
+            ]);
+
+        } catch (\Exception $e) {
+            // Display error in modal instead of session flash
+            $this->modalClientErrorMessage = 'حدث خطأ أثناء إضافة العميل: ' . $e->getMessage();
+        }
+    }
+
+    // Supplier Modal Methods
+    public function openAddSupplierModal()
+    {
+        $this->showAddSupplierModal = true;
+        $this->resetSupplierFormFields();
+    }
+
+    public function closeAddSupplierModal()
+    {
+        $this->showAddSupplierModal = false;
+        $this->resetSupplierFormFields();
+    }
+
+    public function resetSupplierFormFields()
+    {
+        $this->newSupplierName = '';
+        $this->newSupplierMobile = '';
+        $this->newSupplierEmail = '';
+        $this->newSupplierWhatsapp = '';
+        $this->newSupplierAddress = '';
+        $this->modalSupplierErrorMessage = '';
+        $this->resetValidation([
+            'newSupplierName',
+            'newSupplierMobile',
+            'newSupplierEmail',
+            'newSupplierWhatsapp',
+            'newSupplierAddress'
+        ]);
+    }
+
+    public function saveSupplier()
+    {
+        // Clear previous error message
+        $this->modalSupplierErrorMessage = '';
+
+        // Validate supplier data
+        $this->validate([
+            'newSupplierName' => 'required|string|max:255',
+            'newSupplierMobile' => 'required|string|max:20',
+            'newSupplierEmail' => 'nullable|email|max:255',
+            'newSupplierWhatsapp' => 'nullable|string|max:20',
+            'newSupplierAddress' => 'nullable|string|max:500',
+        ], [
+            'newSupplierName.required' => 'اسم المورد مطلوب',
+            'newSupplierName.max' => 'اسم المورد يجب ألا يتجاوز 255 حرف',
+            'newSupplierMobile.required' => 'رقم الهاتف مطلوب',
+            'newSupplierMobile.max' => 'رقم الهاتف يجب ألا يتجاوز 20 رقم',
+            'newSupplierEmail.email' => 'البريد الإلكتروني غير صحيح',
+            'newSupplierEmail.max' => 'البريد الإلكتروني يجب ألا يتجاوز 255 حرف',
+            'newSupplierWhatsapp.max' => 'رقم الواتساب يجب ألا يتجاوز 20 رقم',
+            'newSupplierAddress.max' => 'العنوان يجب ألا يتجاوز 500 حرف',
+        ]);
+
+        try {
+            // Create new supplier
+            $supplier = Supplier::create([
+                'name' => $this->newSupplierName,
+                'mobile' => $this->newSupplierMobile,
+                'email' => $this->newSupplierEmail ?: null,
+                'whatsapp' => $this->newSupplierWhatsapp ?: null,
+                'address' => $this->newSupplierAddress ?: null,
+                'status' => 1,
+            ]);
+
+            // Refresh suppliers list
+            $this->refreshSuppliers();
+
+            // Set the newly created supplier as selected
+            $this->supplier_id = $supplier->id;
+            $this->getSupplierInfo();
+
+            // Close modal and reset form
+            $this->closeAddSupplierModal();
+
+            // Show success message
+            session()->flash('message', '✅ تم إضافة المورد بنجاح!');
+
+            // Dispatch event to update Select2 with supplier details
+            $this->dispatch('supplier-added', [
+                'supplierId' => $supplier->id,
+                'supplierName' => $supplier->name
+            ]);
+
+        } catch (\Exception $e) {
+            // Display error in modal instead of session flash
+            $this->modalSupplierErrorMessage = 'حدث خطأ أثناء إضافة المورد: ' . $e->getMessage();
+        }
+    }
+
 
     public function refreshClients()
     {

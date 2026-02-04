@@ -1,280 +1,309 @@
 @extends('admin.layouts.app')
 @section('title', 'كشف حساب المورد')
 @section('css')
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        .dt-layout-row {
-            display: flex;
-            justify-content: space-between;
-        }
-        @media print {
-            .no-pdf {
-                display: none !important;
-            }
-        }
-        #printButton {
-            margin-bottom: 20px;
-        }
-        .summary {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .summary p {
-            padding: 10px;
-            border-radius: 10px;
-            color: #fff;
-        }
-        .report-header {
-            display: none; /* مخفي في عرض المتصفح */
-            background: #f8f9fa;
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    .dt-layout-row {
+        display: flex;
+        justify-content: space-between;
+    }
 
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-family: 'Tajawal', sans-serif;
+    @media print {
+        .no-pdf {
+            display: none !important;
         }
-        .report-header img {
-            max-width: 180px;
-            height: auto;
-            margin-bottom: 15px;
-        }
-        .report-header h2 {
-            font-size: 28px;
-            font-weight: bold;
-            color: #2a3b4b;
-            margin: 0 0 10px 0;
-        }
-        .report-header .details {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
-            font-size: 16px;
-            color: #333;
-        }
-        .report-header .details p {
-            margin: 5px 0;
-        }
-        .report-header .supplier-details {
-            flex: 1;
-            text-align: right;
-            display: flex;
-            justify-content: space-around;
-        }
-        .report-footer {
-            display: none; /* مخفي في عرض المتصفح */
-            background: #f8f9fa;
-            padding: 15px;
-            margin-top: 20px;
-            text-align: center;
-            font-family: 'Tajawal', sans-serif;
-        }
-        .report-footer .company-details {
-            font-size: 16px;
-            color: #333;
-            display: flex;
-            justify-content: space-around;
-        }
-        .report-footer .company-details p {
-            margin: 5px 0;
-        }
-    </style>
+
+    }
+
+    #printButton {
+        margin-bottom: 20px;
+    }
+
+    .summary {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .summary p {
+        padding: 10px;
+        border-radius: 10px;
+        color: #fff;
+    }
+
+    .report-header {
+        display: none;
+        /* مخفي في عرض المتصفح */
+        background: #f8f9fa;
+
+        padding: 20px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-family: 'Tajawal', sans-serif;
+    }
+
+    .report-header img {
+        max-width: 180px;
+        height: auto;
+        margin-bottom: 15px;
+    }
+
+    .report-header h2 {
+        font-size: 28px;
+        font-weight: bold;
+        color: #2a3b4b;
+        margin: 0 0 10px 0;
+    }
+
+    .report-header .details {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .report-header .details p {
+        margin: 5px 0;
+    }
+
+    .report-header .supplier-details {
+        flex: 1;
+        text-align: right;
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .report-footer {
+        display: none;
+        /* مخفي في عرض المتصفح */
+        background: #f8f9fa;
+        padding: 15px;
+        margin-top: 20px;
+        text-align: center;
+        font-family: 'Tajawal', sans-serif;
+    }
+
+    .report-footer .company-details {
+        font-size: 16px;
+        color: #333;
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .report-footer .company-details p {
+        margin: 5px 0;
+    }
+</style>
 @endsection
 @section('content')
-    <div class="app-content content">
-        <div class="content-wrapper">
-            <div class="content-header row">
-                <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block">كشف حساب المورد</h3>
-                    <div class="row breadcrumbs-top d-inline-block">
-                        <div class="breadcrumb-wrapper col-12">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية</a></li>
-                                <li class="breadcrumb-item active">إدارة الموردين</li>
-                                <li class="breadcrumb-item active">كشف حساب المورد</li>
-                            </ol>
-                        </div>
+<div class="app-content content">
+    <div class="content-wrapper">
+        <div class="content-header row">
+            <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
+                <h3 class="mb-0 content-header-title d-inline-block">كشف حساب المورد</h3>
+                <div class="row breadcrumbs-top d-inline-block">
+                    <div class="breadcrumb-wrapper col-12">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية</a></li>
+                            <li class="breadcrumb-item active">إدارة الموردين</li>
+                            <li class="breadcrumb-item active">كشف حساب المورد</li>
+                        </ol>
                     </div>
                 </div>
-                <div class="content-header-right col-md-6 col-12">
-                    <button id="printButton" class="btn btn-warning float-end">طباعة كـ PDF</button>
-                </div>
             </div>
-            <div class="content-body">
-                <!-- Bordered striped start -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <button style="margin-right: 3px" type="button" class="btn btn-primary btn-sm"
-                                    data-toggle="modal" data-target="#addtransaction{{ $supplier->id }}">
-                                    <i class="bi bi-plus"></i> إضافة دفعة إلى المورد
-                                </button>
-                                @include('admin.suppliers._add_transaction', ['supplier' => $supplier])
-                            </div>
-                            <div class="card-content collapse show">
-                                <div class="card-body">
-                                    <div id="reportContent">
-                                        <!-- رأس التقرير -->
-                                        <div class="report-header">
-                                            <img src="{{ asset('uploads/settings/logo.png') }}" alt="{{ $setting->site_name }}">
-                                            <h2>{{ $setting->site_name }}</h2>
-                                            <div class="details">
-                                                <div class="supplier-details">
-                                                    <p><strong>اسم المورد:</strong> {{ $supplier->name ?? 'غير محدد' }}</p>
-                                                    <p><strong>رقم الهاتف:</strong> {{ $supplier->mobile ?? 'غير متوفر' }}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <table class="table table-bordered table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>الرقم المرجعي</th>
-                                                    <th>دائن (مدفوع)</th>
-                                                    <th>مدين (مستحق)</th>
-                                                    <th>طريقة الدفع</th>
-                                                    <th>الوصف</th>
-                                                    <th>التاريخ</th>
-                                                    <th class="no-pdf">العمليات</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse ($transactions as $transaction)
-                                                    <tr>
-                                                        <td>{{ $loop->iteration }}</td>
-                                                        <td>{{ $transaction->purchaseInvoice->referance_number ?? 'غير مرتبط' }}
-                                                        </td>
-                                                        <td>
-                                                        <span class="text-success">
-                                                            <strong>
-                                                                @if ($transaction->type == 'credit')
-                                                                {{ number_format($transaction->amount, 2) }}
-                                                                @else
-                                                                -
-                                                                @endif
-                                                            </strong>
-                                                        </span>
-                                                        </td>
-                                                        <td>
-                                                        <span class="text-danger">
-                                                            <strong>
-                                                                @if ($transaction->type == 'debit')
-                                                                {{ number_format($transaction->amount, 2) }}
-                                                                @else
-                                                                -
-                                                                @endif
-                                                            </strong>
-                                                        </span>
-                                                        </td>
-                                                        <td>الخزينة ( {{ $transaction->safe->name ?? '-' }} )</td>
-                                                        <td>{{ $transaction->description ?? 'غير محدد' }}</td>
-                                                        <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
-                                                        <td class="no-pdf">
-                                                            <div class="btn-group">
-                                                                @if($transaction->type == 'debit')
-                                                                <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#edittransaction{{ $transaction->id }}">
-                                                                    <i class="la la-edit"></i> تعديل
-                                                                </button>
-                                                                <a href="{{ route('dashboard.suppliers.transactions.print', $transaction->id) }}" class="btn btn-sm btn-warning" target="_blank">
-                                                                    <i class="la la-print"></i> طباعة
-                                                                </a>
-                                                                @endif
-                                                            </div>
-                                                            @include('admin.suppliers._edit_transaction', ['transaction' => $transaction])
-                                                        </td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="7" class="text-center">لا يوجد معاملات</td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                            <tfoot>
-                                                <tr class="table-active">
-                                                    <th colspan="2" class="text-center">الإجمالي</th>
-                                                    <th class="text-success">{{ number_format($transactions->where('type', 'credit')->sum('amount'), 2) }}</th>
-                                                    <th class="text-danger">{{ number_format($transactions->where('type', 'debit')->sum('amount'), 2) }}</th>
-                                                    <th colspan="3"></th>
-                                                    <th class="no-pdf"></th>
-                                                </tr>
-                                                <tr class="table-light">
-                                                    <th colspan="7" class="text-center">
-                                                         <span style="color: #2a3b4b; font-weight: bold;">
-                                                            اجمالي قيم الفواتير الكلي : {{ number_format($total_invoices, 2) }} د.ل
-                                                         </span>
-                                                         &nbsp;&nbsp; | &nbsp;&nbsp;
-                                                         <span style="color: #FE4961; font-weight: bold;">
-                                                            الرصيد المستحق (Net): {{ number_format($balance, 2) }} د.ل
-                                                         </span>
-                                                    </th>
-                                                    <th class="no-pdf"></th>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-
-                                        <!-- جدول كشف الحساب -->
-                                        @if ($fromDate && $toDate)
-                                            <h5 style="text-align: center; font-weight: bold; margin-bottom: 20px">
-                                                كشف حساب من تاريخ {{ $fromDate ?? 'غير محدد' }} إلى تاريخ {{ $toDate ?? 'غير محدد' }}
-                                            </h5>
-                                            <table class="table table-bordered table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th>القيمة الافتتاحية</th>
-                                                        <th>{{ number_format($opening_balance, 2) }} د.ل</th>
-                                                        <th>المدة السابقة</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>رقم الفاتورة</th>
-                                                        <th>قيمة الفاتورة</th>
-                                                        <th>تاريخ الفاتورة</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @forelse ($invoices as $invoice)
-                                                        <tr>
-                                                            <td>{{ $invoice->referance_number ?? 'غير محدد' }}</td>
-                                                            <td>{{ number_format($invoice->total_price, 2) }} د.ل</td>
-                                                            <td>{{ $invoice->created_at->format('Y-m-d') }}</td>
-                                                        </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <td colspan="3" class="text-center">لا يوجد فواتير في الفترة المحددة</td>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </table>
-                                        @endif
-
-                                        <!-- تذييل التقرير -->
-                                        <div class="report-footer">
-                                            <div class="company-details">
-                                                <p><strong>رقم الهاتف:</strong> {{ $setting->site_phone ?? 'غير متوفر' }}</p>
-                                                <p><strong>العنوان:</strong> {{ $setting->site_address ?? 'غير متوفر' }}</p>
+            <div class="content-header-right col-md-6 col-12">
+                <button id="printButton" class="btn btn-warning float-end">طباعة كـ PDF</button>
+            </div>
+        </div>
+        <div class="content-body">
+            <!-- Bordered striped start -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <button style="margin-right: 3px" type="button" class="btn btn-primary btn-sm"
+                                data-toggle="modal" data-target="#addtransaction{{ $supplier->id }}">
+                                <i class="bi bi-plus"></i> إضافة دفعة إلى المورد
+                            </button>
+                            @include('admin.suppliers._add_transaction', ['supplier' => $supplier])
+                        </div>
+                        <div class="card-content collapse show">
+                            <div class="card-body">
+                                <div id="reportContent">
+                                    <!-- رأس التقرير -->
+                                    <div class="report-header">
+                                        <img src="{{ asset('uploads/settings/logo.png') }}"
+                                            alt="{{ $setting->site_name }}">
+                                        <h2>{{ $setting->site_name }}</h2>
+                                        <div class="details">
+                                            <div class="supplier-details">
+                                                <p><strong>اسم المورد:</strong> {{ $supplier->name ?? 'غير محدد' }}</p>
+                                                <p><strong>رقم الهاتف:</strong> {{ $supplier->mobile ?? 'غير متوفر' }}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <hr>
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>الرقم المرجعي</th>
+                                                <th>دائن (مدفوع)</th>
+                                                <th>مدين (مستحق)</th>
+                                                <th>طريقة الدفع</th>
+                                                <th class="description_td no-pdf">الوصف</th>
+                                                <th>التاريخ</th>
+                                                <th class="no-pdf">العمليات</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($transactions as $transaction)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $transaction->purchaseInvoice->referance_number ?? 'غير مرتبط' }}
+                                                </td>
+                                                <td>
+                                                    <span class="text-success">
+                                                        <strong>
+                                                            @if ($transaction->type == 'credit')
+                                                            {{ number_format($transaction->amount, 2) }}
+                                                            @else
+                                                            -
+                                                            @endif
+                                                        </strong>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-danger">
+                                                        <strong>
+                                                            @if ($transaction->type == 'debit')
+                                                            {{ number_format($transaction->amount, 2) }}
+                                                            @else
+                                                            -
+                                                            @endif
+                                                        </strong>
+                                                    </span>
+                                                </td>
+                                                <td>الخزينة ( {{ $transaction->safe->name ?? '-' }} )</td>
+                                                <td class="description_td no-pdf">{{ $transaction->description ?? 'غير محدد' }}</td>
+                                                <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
+                                                <td class="no-pdf">
+                                                    <div class="btn-group">
+                                                        @if($transaction->type == 'debit')
+                                                        <button type="button" class="btn btn-sm btn-info"
+                                                            data-toggle="modal"
+                                                            data-target="#edittransaction{{ $transaction->id }}">
+                                                            <i class="la la-edit"></i> تعديل
+                                                        </button>
+                                                        <a href="{{ route('dashboard.suppliers.transactions.print', $transaction->id) }}"
+                                                            class="btn btn-sm btn-warning" target="_blank">
+                                                            <i class="la la-print"></i> طباعة
+                                                        </a>
+                                                        @endif
+                                                    </div>
+                                                    @include('admin.suppliers._edit_transaction', ['transaction' =>
+                                                    $transaction])
+                                                </td>
+                                            </tr>
+                                            @empty
+                                            <tr>
+                                                <td colspan="7" class="text-center">لا يوجد معاملات</td>
+                                            </tr>
+                                            @endforelse
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-active">
+                                                <th colspan="2" class="text-center">الإجمالي</th>
+                                                <th class="text-success">{{ number_format($transactions->where('type',
+                                                    'credit')->sum('amount'), 2) }}</th>
+                                                <th class="text-danger">{{ number_format($transactions->where('type',
+                                                    'debit')->sum('amount'), 2) }}</th>
+                                                <th colspan="2"></th>
+                                                <th class="no-pdf"></th>
+                                                <th class="no-pdf"></th>
+                                            </tr>
+                                            <tr class="table-light">
+                                                <th colspan="7" class="text-center">
+                                                    <span style="color: #2a3b4b; font-weight: bold;">
+                                                        اجمالي قيم الفواتير الكلي : {{ number_format($total_invoices, 2)
+                                                        }} د.ل
+                                                    </span>
+                                                    &nbsp;&nbsp; | &nbsp;&nbsp;
+                                                    <span style="color: #FE4961; font-weight: bold;">
+                                                        الرصيد المستحق (Net): {{ number_format($balance, 2) }} د.ل
+                                                    </span>
+                                                </th>
+                                                <th class="no-pdf"></th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+
+                                    <!-- جدول كشف الحساب -->
+                                    @if ($fromDate && $toDate)
+                                    <h5 style="text-align: center; font-weight: bold; margin-bottom: 20px">
+                                        كشف حساب من تاريخ {{ $fromDate ?? 'غير محدد' }} إلى تاريخ {{ $toDate ?? 'غير
+                                        محدد' }}
+                                    </h5>
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>القيمة الافتتاحية</th>
+                                                <th>{{ number_format($opening_balance, 2) }} د.ل</th>
+                                                <th>المدة السابقة</th>
+                                            </tr>
+                                            <tr>
+                                                <th>رقم الفاتورة</th>
+                                                <th>قيمة الفاتورة</th>
+                                                <th>تاريخ الفاتورة</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($invoices as $invoice)
+                                            <tr>
+                                                <td>{{ $invoice->referance_number ?? 'غير محدد' }}</td>
+                                                <td>{{ number_format($invoice->total_price, 2) }} د.ل</td>
+                                                <td>{{ $invoice->created_at->format('Y-m-d') }}</td>
+                                            </tr>
+                                            @empty
+                                            <tr>
+                                                <td colspan="3" class="text-center">لا يوجد فواتير في الفترة المحددة
+                                                </td>
+                                            </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                    @endif
+
+                                    <!-- تذييل التقرير -->
+                                    <div class="report-footer">
+                                        <div class="company-details">
+                                            <p><strong>رقم الهاتف:</strong> {{ $setting->site_phone ?? 'غير متوفر' }}
+                                            </p>
+                                            <p><strong>العنوان:</strong> {{ $setting->site_address ?? 'غير متوفر' }}</p>
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <hr>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Bordered striped end -->
             </div>
+            <!-- Bordered striped end -->
         </div>
     </div>
+</div>
 @endsection
 @section('js')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script>
-        document.getElementById('printButton').addEventListener('click', function () {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+    document.getElementById('printButton').addEventListener('click', function () {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({
                 orientation: 'portrait',

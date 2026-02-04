@@ -39,6 +39,17 @@ class PurchesInvoiceCreate extends Component
     public $payment_method;
     public $safe_id;
 
+    // Add Supplier Modal Properties
+    public $showAddSupplierModal = false;
+    public $newSupplierName = '';
+    public $newSupplierMobile = '';
+    public $newSupplierEmail = '';
+    public $newSupplierWhatsapp = '';
+    public $newSupplierAddress = '';
+    public $modalErrorMessage = '';
+
+
+
     public function mount()
     {
         // جلب بيانات الموردين والخزائن والتصنيفات
@@ -211,6 +222,95 @@ class PurchesInvoiceCreate extends Component
     {
         $this->suppliers = Supplier::active()->get();
     }
+
+    public function openAddSupplierModal()
+    {
+        $this->showAddSupplierModal = true;
+        $this->resetSupplierForm();
+    }
+
+    public function closeAddSupplierModal()
+    {
+        $this->showAddSupplierModal = false;
+        $this->resetSupplierForm();
+    }
+
+    public function resetSupplierForm()
+    {
+        $this->newSupplierName = '';
+        $this->newSupplierMobile = '';
+        $this->newSupplierEmail = '';
+        $this->newSupplierWhatsapp = '';
+        $this->newSupplierAddress = '';
+        $this->modalErrorMessage = '';
+        $this->resetValidation([
+            'newSupplierName',
+            'newSupplierMobile',
+            'newSupplierEmail',
+            'newSupplierWhatsapp',
+            'newSupplierAddress'
+        ]);
+    }
+
+    public function saveSupplier()
+    {
+        // Clear previous error message
+        $this->modalErrorMessage = '';
+
+        // Validate supplier data
+        $this->validate([
+            'newSupplierName' => 'required|string|max:255',
+            'newSupplierMobile' => 'required|string|max:20',
+            'newSupplierEmail' => 'nullable|email|max:255',
+            'newSupplierWhatsapp' => 'nullable|string|max:20',
+            'newSupplierAddress' => 'nullable|string|max:500',
+        ], [
+            'newSupplierName.required' => 'اسم المورد مطلوب',
+            'newSupplierName.max' => 'اسم المورد يجب ألا يتجاوز 255 حرف',
+            'newSupplierMobile.required' => 'رقم الهاتف مطلوب',
+            'newSupplierMobile.max' => 'رقم الهاتف يجب ألا يتجاوز 20 رقم',
+            'newSupplierEmail.email' => 'البريد الإلكتروني غير صحيح',
+            'newSupplierEmail.max' => 'البريد الإلكتروني يجب ألا يتجاوز 255 حرف',
+            'newSupplierWhatsapp.max' => 'رقم الواتساب يجب ألا يتجاوز 20 رقم',
+            'newSupplierAddress.max' => 'العنوان يجب ألا يتجاوز 500 حرف',
+        ]);
+
+        try {
+            // Create new supplier
+            $supplier = Supplier::create([
+                'name' => $this->newSupplierName,
+                'mobile' => $this->newSupplierMobile,
+                'email' => $this->newSupplierEmail ?: null,
+                'whatsapp' => $this->newSupplierWhatsapp ?: null,
+                'address' => $this->newSupplierAddress ?: null,
+                'status' => 1,
+            ]);
+
+            // Refresh suppliers list
+            $this->refreshSuppliers();
+
+            // Set the newly created supplier as selected
+            $this->supplier_id = $supplier->id;
+            $this->getSupplierInfo();
+
+            // Close modal and reset form
+            $this->closeAddSupplierModal();
+
+            // Show success message
+            session()->flash('message', '✅ تم إضافة المورد بنجاح!');
+
+            // Dispatch event to update Select2 with supplier details
+            $this->dispatch('supplier-added', [
+                'supplierId' => $supplier->id,
+                'supplierName' => $supplier->name
+            ]);
+
+        } catch (\Exception $e) {
+            // Display error in modal instead of session flash
+            $this->modalErrorMessage = 'حدث خطأ أثناء إضافة المورد: ' . $e->getMessage();
+        }
+    }
+
 
     // public function calculateTotalPrice()
     // {
