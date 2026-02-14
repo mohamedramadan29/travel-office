@@ -208,7 +208,7 @@ class SellingInvoiceEdit extends Component
 
     protected function validateInvoiceData()
     {
-        return $this->validate([
+        $rules = [
             'bayan_txt' => 'required|string|max:255',
             'referance_number' => 'required|string|max:100|unique:sale_invoices,referance_number,' . $this->invoice->id,
             'client_id' => 'required|exists:clients,id',
@@ -217,8 +217,14 @@ class SellingInvoiceEdit extends Component
             'qyt' => 'required|numeric|min:1',
             'selling_price' => 'required|numeric|min:0',
             'paid' => 'nullable|numeric|min:0',
-            'safe_id' => 'required_if:paid,>,0|exists:safes,id'
-        ], [
+        ];
+
+        // Only require safe_id if paid amount is greater than 0
+        if ($this->paid > 0) {
+            $rules['safe_id'] = 'required|exists:safes,id';
+        }
+
+        return $this->validate($rules, [
             'bayan_txt.required' => 'البيان مطلوب',
             'referance_number.required' => 'الرقم المرجعي مطلوب',
             'referance_number.unique' => 'الرقم المرجعي موجود مسبقاً',
@@ -236,7 +242,7 @@ class SellingInvoiceEdit extends Component
             'selling_price.min' => 'سعر البيع يجب أن يكون أكبر من أو يساوي صفر',
             'paid.numeric' => 'المبلغ المدفوع يجب أن يكون رقماً',
             'paid.min' => 'المبلغ المدفوع يجب أن يكون أكبر من أو يساوي صفر',
-            'safe_id.required_if' => 'الخزينة مطلوبة عند دفع مبلغ',
+            'safe_id.required' => 'الخزينة مطلوبة عند دفع مبلغ',
             'safe_id.exists' => 'الخزينة المحددة غير موجودة'
         ]);
     }
@@ -310,7 +316,6 @@ class SellingInvoiceEdit extends Component
             if ($safe) {
                 $safe->increment('balance', $paidDifference);
             }
-
         } elseif ($paidDifference < 0) {
             // مبلغ تم إرجاعه - إضافة معاملة إرجاع
             $returnAmount = abs($paidDifference);

@@ -17,7 +17,8 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="client_id"> العميل </label>
-                <select name="client_id" id="client_id" class="form-control" wire:model.live="client_id" wire:change="getClientInfo">
+                <select name="client_id" id="client_id" class="form-control select2" wire:model.live="client_id"
+                    wire:change="getClientInfo">
                     <option value="">اختر العميل</option>
                     @foreach ($clients as $client)
                         <option value="{{ $client->id }}">{{ $client->name }}</option>
@@ -36,8 +37,7 @@
                         style="font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
                         <i class="fas fa-phone"></i>
                         <div>
-                            <strong>رقم الهاتف:</strong> <span
-                                    id="purchase_supplier_phone">{{ $client_mobile }}</span>
+                            <strong>رقم الهاتف:</strong> <span id="purchase_supplier_phone">{{ $client_mobile }}</span>
                         </div>
                     </div>
                     <div class="supplier-info-item"
@@ -55,8 +55,8 @@
                     <div class="supplier-info-item"
                         style="font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
                         <i class="fas fa-map-marker-alt"></i>
-                        <div><strong>العنوان:</strong> <span
-                                id="purchase_supplier_address">{{ $client_address }}</span></div>
+                        <div><strong>العنوان:</strong> <span id="purchase_supplier_address">{{ $client_address }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,7 +68,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="supplier_id"> المورد </label>
-                <select name="supplier_id" id="supplier_id" class="form-control" wire:model.live="supplier_id">
+                <select name="supplier_id" id="supplier_id" class="form-control select2" wire:model.live="supplier_id">
                     <option value="">اختر المورد</option>
                     @foreach ($suppliers as $supplier)
                         <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
@@ -118,8 +118,8 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="purches_price"> سعر الشراء </label>
-                <input wire:model.live="purches_price" type="number" step="step="0.00001"" min="0" id="purches_price"
-                    class="form-control" name="purches_price">
+                <input wire:model.live="purches_price" type="number" step="step="0.00001"" min="0"
+                    id="purches_price" class="form-control" name="purches_price">
                 @error('purches_price')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -128,8 +128,8 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="paid"> المدفوع (د.ل) </label>
-                <input step="0.00001" min="0" max="{{ $total_price }}" wire:model.live.debounce.700ms="paid" type="number" id="paid"
-                    class="form-control" name="paid">
+                <input step="0.00001" min="0" max="{{ $total_price }}" wire:model.live.debounce.700ms="paid"
+                    type="number" id="paid" class="form-control" name="paid">
                 <span>اتركه صفرًا للدفع لاحقًا</span>
                 @error('paid')
                     <span class="text-danger">{{ $message }}</span>
@@ -139,8 +139,8 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="remaining"> الباقي (د.ل) </label>
-                <input wire:model.live="remaining" readonly type="number" id="remaining" class="form-control" step="0.00001"
-                    name="remaining">
+                <input wire:model.live="remaining" readonly type="number" id="remaining" class="form-control"
+                    step="0.00001" name="remaining">
                 @error('remaining')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -149,8 +149,8 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="total_price"> السعر الكلي (د.ل) </label>
-                <input wire:model.live="total_price" readonly type="number" id="total_price" class="form-control" step="0.00001"
-                    name="total_price">
+                <input wire:model.live="total_price" readonly type="number" id="total_price" class="form-control"
+                    step="0.00001" name="total_price">
                 @error('total_price')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -161,13 +161,13 @@
     </div>
     <hr>
     <br>
-    <h4 class="card-title" id="basic-layout-colored-form-control"><strong>بيانات البيع  </strong></h4>
+    <h4 class="card-title" id="basic-layout-colored-form-control"><strong>بيانات البيع </strong></h4>
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label for="selling_price"> سعر البيع  </label>
-                <input wire:model.live="selling_price" type="number" step="0.00001" min="0" id="selling_price"
-                    class="form-control" name="selling_price">
+                <label for="selling_price"> سعر البيع </label>
+                <input wire:model.live="selling_price" type="number" step="0.00001" min="0"
+                    id="selling_price" class="form-control" name="selling_price">
                 @error('selling_price')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -176,8 +176,8 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="paid"> المدفوع (د.ل) </label>
-                <input min="0" max="{{ $selling_total_price }}" wire:model.live.debounce.700ms="selling_paid" step="0.00001" type="number" id="selling_paid"
-                    class="form-control" name="selling_paid">
+                <input min="0" max="{{ $selling_total_price }}" wire:model.live.debounce.700ms="selling_paid"
+                    step="0.00001" type="number" id="selling_paid" class="form-control" name="selling_paid">
                 <span>اتركه صفرًا للدفع لاحقًا</span>
                 @error('selling_paid')
                     <span class="text-danger">{{ $message }}</span>
@@ -187,8 +187,8 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="selling_remaining"> الباقي (د.ل) </label>
-                <input wire:model.live="selling_remaining" readonly type="number" id="selling_remaining" class="form-control"
-                    name="selling_remaining">
+                <input wire:model.live="selling_remaining" readonly type="number" id="selling_remaining"
+                    class="form-control" name="selling_remaining">
                 @error('selling_remaining')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -197,8 +197,8 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="selling_total_price"> السعر الكلي (د.ل) </label>
-                <input wire:model.live="selling_total_price" readonly type="number" id="selling_total_price" class="form-control"
-                    name="selling_total_price">
+                <input wire:model.live="selling_total_price" readonly type="number" id="selling_total_price"
+                    class="form-control" name="selling_total_price">
                 @error('selling_total_price')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
