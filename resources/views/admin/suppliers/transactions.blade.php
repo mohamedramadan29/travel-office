@@ -189,7 +189,12 @@
                                                     </span>
                                                 </td>
                                                 <td>الخزينة ( {{ $transaction->safe->name ?? '-' }} )</td>
-                                                <td class="description_td no-pdf">{{ $transaction->description ?? 'غير محدد' }}</td>
+                                                <td class="description_td no-pdf">
+
+                                                    {{-- {{ $transaction->description ?? 'غير
+                                                    محدد' }} --}}
+                                                    {{ $transaction->purchaseInvoice->bayan_txt ?? 'غير محدد'}}
+                                                </td>
                                                 <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
                                                 <td class="no-pdf">
                                                     <div class="btn-group">

@@ -13,6 +13,7 @@ use App\Models\admin\ClientTransaction;
 use App\Models\admin\SaleInvoice;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\admin\SafeTransaction;
 
 class SellingInvoiceCreate extends Component
 {
@@ -155,8 +156,8 @@ class SellingInvoiceCreate extends Component
     public function calculateInvoiceTotal($index)
     {
         if (isset($this->invoices[$index])) {
-            $qyt = is_numeric($this->invoices[$index]['qyt']) ? (float)$this->invoices[$index]['qyt'] : 0;
-            $selling_price = is_numeric($this->invoices[$index]['selling_price']) ? (float)$this->invoices[$index]['selling_price'] : 0;
+            $qyt = is_numeric($this->invoices[$index]['qyt']) ? (float) $this->invoices[$index]['qyt'] : 0;
+            $selling_price = is_numeric($this->invoices[$index]['selling_price']) ? (float) $this->invoices[$index]['selling_price'] : 0;
 
             $this->invoices[$index]['total_price'] = $qyt * $selling_price;
             $this->calculateInvoiceRemaining($index);
@@ -166,8 +167,8 @@ class SellingInvoiceCreate extends Component
     public function calculateInvoiceRemaining($index)
     {
         if (isset($this->invoices[$index])) {
-            $paid = is_numeric($this->invoices[$index]['paid']) ? (float)$this->invoices[$index]['paid'] : 0;
-            $total_price = is_numeric($this->invoices[$index]['total_price']) ? (float)$this->invoices[$index]['total_price'] : 0;
+            $paid = is_numeric($this->invoices[$index]['paid']) ? (float) $this->invoices[$index]['paid'] : 0;
+            $total_price = is_numeric($this->invoices[$index]['total_price']) ? (float) $this->invoices[$index]['total_price'] : 0;
 
             $this->invoices[$index]['remaining'] = ($paid > $total_price) ? 0 : $total_price - $paid;
         }
@@ -177,7 +178,7 @@ class SellingInvoiceCreate extends Component
     {
         // Parse the key to get index and field
         $keyParts = explode('.', $key);
-        $index = (int)$keyParts[0];
+        $index = (int) $keyParts[0];
         $field = $keyParts[1] ?? null;
 
         if ($field === 'qyt' || $field === 'selling_price') {
@@ -213,7 +214,6 @@ class SellingInvoiceCreate extends Component
         // elseif($invoice->type == 'فاتورة مؤقتة'){
         //  //   $this->referance_error = ' الفاتورة مؤقتة وغير رسمية الي الان  ';
         // }
-
         else {
             $this->referance_error = '';
             $this->invoice = $invoice;
@@ -262,8 +262,8 @@ class SellingInvoiceCreate extends Component
     public function calculateTotalPrice()
     {
         // التأكد من أن qyt و selling_price أرقام
-        $qyt = is_numeric($this->qyt) ? (float)$this->qyt : 0;
-        $selling_price = is_numeric($this->selling_price) ? (float)$this->selling_price : 0;
+        $qyt = is_numeric($this->qyt) ? (float) $this->qyt : 0;
+        $selling_price = is_numeric($this->selling_price) ? (float) $this->selling_price : 0;
 
         $this->total_price = ($qyt && $selling_price) ? $qyt * $selling_price : 0;
     }
@@ -271,10 +271,10 @@ class SellingInvoiceCreate extends Component
     public function calculateRemaining()
     {
         // التأكد من أن paid ليس null وهو رقم
-        $this->paid = is_numeric($this->paid) ? (float)$this->paid : 0;
+        $this->paid = is_numeric($this->paid) ? (float) $this->paid : 0;
 
         // التأكد من أن total_price رقم
-        $total_price = is_numeric($this->total_price) ? (float)$this->total_price : 0;
+        $total_price = is_numeric($this->total_price) ? (float) $this->total_price : 0;
 
         // حساب المتبقي
         $this->remaining = ($this->paid > $total_price) ? 0 : $total_price - $this->paid;
@@ -328,23 +328,44 @@ class SellingInvoiceCreate extends Component
                     'remaining' => $invoiceData['remaining'] ?? 0,
                     'safe_id' => $invoiceData['safe_id'] ?? null,
                     'category_id' => $invoiceData['category_id'],
-                    'admin_id' =>  Auth::id(),
+                    'admin_id' => Auth::id(),
                 ]);
 
                 // إدارة المعاملات المالية
+
+                // 1. إضافة المديونية على العميل (المبلغ الكامل)
+                ClientTransaction::create([
+                    'client_id' => $this->client_id,
+                    'sale_invoice_id' => $sellingInvoice->id,
+                    'amount' => $sellingInvoice->total_price,
+                    'type' => 'debit', // المبلغ المستحق من العميل مدين
+                    'description' => 'مبلغ مستحق من فاتورة بيع #' . $sellingInvoice->id,
+                ]);
+
+                // 2. إذا كان هناك مبلغ مدفوع
                 if ($sellingInvoice->paid > 0 && $sellingInvoice->safe_id) {
-                    // إضافة معاملة العميل
+                    // أ. إضافة معاملة العميل (دائن - سداد)
                     ClientTransaction::create([
                         'client_id' => $this->client_id,
                         'sale_invoice_id' => $sellingInvoice->id,
                         'safe_id' => $sellingInvoice->safe_id,
                         'amount' => $sellingInvoice->paid,
-                        'type' => 'credit',
-                        // 'payment_method' => 'cash',
-                        'description' => 'دفعة من فاتورة بيع رقم ' . $sellingInvoice->id,
+                        'type' => 'credit', // المبلغ المدفوع من العميل دائن
+                        'description' => 'دفعة لفاتورة بيع #' . $sellingInvoice->id,
                     ]);
 
-                    // تحديث رصيد الخزينة (إضافة رصيد)
+                    // ب. إضافة معاملة الخزنة
+                    $clientName = Client::find($this->client_id)->name ?? '';
+
+                    $safeTransaction = new SafeTransaction();
+                    $safeTransaction->safe_id = $sellingInvoice->safe_id;
+                    $safeTransaction->sale_invoice_id = $sellingInvoice->id;
+                    $safeTransaction->amount = $sellingInvoice->paid;
+                    $safeTransaction->type = 'deposit';
+                    $safeTransaction->description = ' اضافة دفعة من العميل [ ' . $clientName . ' ]' . ' من فاتورة بيع الرقم المرجعي :  ' . $sellingInvoice->referance_number;
+                    $safeTransaction->save();
+
+                    // ج. تحديث رصيد الخزينة
                     $safe = Safe::find($sellingInvoice->safe_id);
                     if ($safe) {
                         $safe->increment('balance', $sellingInvoice->paid);

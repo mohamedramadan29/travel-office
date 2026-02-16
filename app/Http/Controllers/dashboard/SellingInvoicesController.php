@@ -52,7 +52,7 @@ class SellingInvoicesController extends Controller
     {
         $data = $request->all();
         $data['admin_id'] = Auth::user()->id;
-        $rules  = [
+        $rules = [
             'bayan_txt' => 'required',
             'referance_number' => 'required',
             'supplier_id' => 'required',
@@ -145,7 +145,7 @@ class SellingInvoicesController extends Controller
                 ############################################ End Add Transaction To Safe ###############################
                 ################## Update Safe Balance #########
                 $safe = Safe::findOrFail($data['safe_id']);
-                $oldSafeBalance =  $safe->balance;
+                $oldSafeBalance = $safe->balance;
                 $newSafeBalance = $oldSafeBalance + $data['paid'];
                 $safe->update([
                     'balance' => $newSafeBalance,
@@ -348,7 +348,7 @@ class SellingInvoicesController extends Controller
                 }
 
                 if ($data['return_price'] > $selling_invoice->total_price) {
-                    $additional_profit = $data['return_price']  - $selling_invoice['total_price'];
+                    $additional_profit = $data['return_price'] - $selling_invoice['total_price'];
                     ClientTransaction::create([
                         'client_id' => $selling_invoice['client_id'],
                         'sale_invoice_id' => $selling_invoice->id,

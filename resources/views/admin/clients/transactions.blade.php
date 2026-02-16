@@ -8,6 +8,7 @@
         display: flex;
         justify-content: space-between;
     }
+
     @media print {
         .no-pdf {
             display: none !important;
@@ -216,20 +217,27 @@
                                                         </span>
                                                     </td>
                                                     <td>{{ $transaction->payment_method ?? '-' }}</td>
-                                                    <td>{{ $transaction->description }}</td>
+                                                    <td>
+                                                        {{-- {{ $transaction->description }} --}}
+                                                        {{ $transaction->saleInvoice->bayan_txt }}
+                                                    </td>
                                                     <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
                                                     <td class="no-pdf">
                                                         <div class="btn-group">
                                                             @if($transaction->type == 'credit')
-                                                            <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#edittransaction{{ $transaction->id }}">
+                                                            <button type="button" class="btn btn-sm btn-info"
+                                                                data-toggle="modal"
+                                                                data-target="#edittransaction{{ $transaction->id }}">
                                                                 <i class="la la-edit"></i> تعديل
                                                             </button>
-                                                            <a href="{{ route('dashboard.clients.transactions.print', $transaction->id) }}" class="btn btn-sm btn-warning" target="_blank">
+                                                            <a href="{{ route('dashboard.clients.transactions.print', $transaction->id) }}"
+                                                                class="btn btn-sm btn-warning" target="_blank">
                                                                 <i class="la la-print"></i> طباعة
                                                             </a>
                                                             @endif
                                                         </div>
-                                                        @include('admin.clients._edit_transaction', ['transaction' => $transaction])
+                                                        @include('admin.clients._edit_transaction', ['transaction' =>
+                                                        $transaction])
                                                     </td>
                                                 </tr>
                                                 @empty
@@ -241,20 +249,26 @@
                                             <tfoot>
                                                 <tr class="table-active">
                                                     <th colspan="2" class="text-center">الإجمالي</th>
-                                                    <th class="text-success">{{ number_format($transactions->where('type', 'credit')->sum('amount'), 2) }}</th>
-                                                    <th class="text-danger">{{ number_format($transactions->where('type', 'debit')->sum('amount'), 2) }}</th>
+                                                    <th class="text-success">{{
+                                                        number_format($transactions->where('type',
+                                                        'credit')->sum('amount'), 2) }}</th>
+                                                    <th class="text-danger">{{
+                                                        number_format($transactions->where('type',
+                                                        'debit')->sum('amount'), 2) }}</th>
                                                     <th colspan="3"></th>
                                                     <th class="no-pdf"></th>
                                                 </tr>
                                                 <tr class="table-light">
                                                     <th colspan="7" class="text-center">
-                                                         <span style="color: #2a3b4b; font-weight: bold;">
-                                                            اجمالي قيم الفواتير الكلي : {{ number_format($total_invoices, 2) }} د.ل
-                                                         </span>
-                                                         &nbsp;&nbsp; | &nbsp;&nbsp;
-                                                         <span style="color: #FE4961; font-weight: bold;">
-                                                            الرصيد المستحق (Net): {{ number_format($client_balance, 2) }} د.ل
-                                                         </span>
+                                                        <span style="color: #2a3b4b; font-weight: bold;">
+                                                            اجمالي قيم الفواتير الكلي : {{
+                                                            number_format($total_invoices, 2) }} د.ل
+                                                        </span>
+                                                        &nbsp;&nbsp; | &nbsp;&nbsp;
+                                                        <span style="color: #FE4961; font-weight: bold;">
+                                                            الرصيد المستحق (Net): {{ number_format($client_balance, 2)
+                                                            }} د.ل
+                                                        </span>
                                                     </th>
                                                     <th class="no-pdf"></th>
                                                 </tr>

@@ -13,6 +13,7 @@ use App\Models\admin\ClientTransaction;
 use App\Models\admin\SaleInvoice;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\admin\SafeTransaction;
 
 class SellingInvoiceEdit extends Component
 {
@@ -255,8 +256,25 @@ class SellingInvoiceEdit extends Component
 
             DB::beginTransaction();
 
-            // إعداد البيانات للتحديث
-            $invoiceData = [
+            // 1. استرجاع الفاتورة الحالية والتعامل مع العمليات القديمة
+            $oldInvoice = SaleInvoice::find($this->invoice->id);
+
+            // أ. إذا كان هناك دفع سابق، يجب عكس العملية في الخزنة القديمة
+            if ($oldInvoice->paid > 0 && $oldInvoice->safe_id) {
+                $oldSafe = Safe::find($oldInvoice->safe_id);
+                if ($oldSafe) {
+                    $oldSafe->decrement('balance', $oldInvoice->paid);
+                }
+
+                // حذف معاملة الخزنة القديمة
+                SafeTransaction::where('sale_invoice_id', $oldInvoice->id)->delete();
+            }
+
+            // ب. حذف جميع معاملات العميل القديمة (مدين ودائن)
+            ClientTransaction::where('sale_invoice_id', $oldInvoice->id)->delete();
+
+            // 2. تحديث بيانات الفاتورة
+            $this->invoice->update([
                 'bayan_txt' => $validatedData['bayan_txt'],
                 'referance_number' => $validatedData['referance_number'],
                 'client_id' => $validatedData['client_id'],
@@ -269,20 +287,47 @@ class SellingInvoiceEdit extends Component
                 'remaining' => $this->remaining,
                 'safe_id' => $validatedData['safe_id'] ?? null,
                 // 'updated_by' => Auth::id(),
-                // 'updated_at' => now()
-            ];
+            ]);
 
-            // حساب الفرق في المبلغ المدفوع للتعامل مع المعاملات المالية
-            $oldPaid = $this->invoice->paid;
-            $newPaid = $invoiceData['paid'];
-            $paidDifference = $newPaid - $oldPaid;
+            // 3. إنشاء المعاملات الجديدة
 
-            // تحديث الفاتورة
-            $this->invoice->update($invoiceData);
+            // أ. إضافة المديونية الجديدة على العميل (المبلغ الكامل)
+            ClientTransaction::create([
+                'client_id' => $this->client_id,
+                'sale_invoice_id' => $this->invoice->id,
+                'amount' => $this->total_price,
+                'type' => 'debit', // المبلغ المستحق من العميل مدين
+                'description' => 'مبلغ مستحق من فاتورة بيع #' . $this->invoice->id,
+            ]);
 
-            // التعامل مع المعاملات المالية إذا تغير المبلغ المدفوع
-            if ($paidDifference != 0 && $invoiceData['safe_id']) {
-                $this->handlePaymentChange($paidDifference, $invoiceData['safe_id']);
+            // ب. إدارة المدفوعات الجديدة
+            if ($this->paid > 0 && $this->safe_id) {
+                // إضافة معاملة العميل (دائن - سداد)
+                ClientTransaction::create([
+                    'client_id' => $this->client_id,
+                    'sale_invoice_id' => $this->invoice->id,
+                    'safe_id' => $this->safe_id,
+                    'amount' => $this->paid,
+                    'type' => 'credit', // المبلغ المدفوع من العميل دائن
+                    'description' => 'دفعة لفاتورة بيع #' . $this->invoice->id,
+                ]);
+
+                // إضافة معاملة الخزنة الجديدة
+                $clientName = Client::find($this->client_id)->name ?? '';
+
+                $safeTransaction = new SafeTransaction();
+                $safeTransaction->safe_id = $this->safe_id;
+                $safeTransaction->sale_invoice_id = $this->invoice->id;
+                $safeTransaction->amount = $this->paid;
+                $safeTransaction->type = 'deposit';
+                $safeTransaction->description = ' اضافة دفعة من العميل [ ' . $clientName . ' ]' . ' من فاتورة بيع الرقم المرجعي :  ' . $this->referance_number;
+                $safeTransaction->save();
+
+                // تحديث رصيد الخزينة الجديدة (إضافة رصيد)
+                $newSafe = Safe::find($this->safe_id);
+                if ($newSafe) {
+                    $newSafe->increment('balance', $this->paid);
+                }
             }
 
             DB::commit();
@@ -293,49 +338,6 @@ class SellingInvoiceEdit extends Component
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'حدث خطأ أثناء تحديث الفاتورة: ' . $e->getMessage());
-        }
-    }
-
-    private function handlePaymentChange($paidDifference, $safe_id)
-    {
-        if ($paidDifference > 0) {
-            // مبلغ إضافي تم دفعه - إضافة معاملة دفع جديدة
-            ClientTransaction::create([
-                'client_id' => $this->client_id,
-                'sale_invoice_id' => $this->invoice->id,
-                'safe_id' => $safe_id,
-                'amount' => $paidDifference,
-                'type' => 'debit',
-                // 'payment_method' => 'cash',
-                'description' => 'دفعة إضافية - تعديل فاتورة بيع رقم ' . $this->invoice->id,
-                // 'created_by' => Auth::id()
-            ]);
-
-            // تحديث رصيد الخزينة (إضافة رصيد)
-            $safe = \App\Models\admin\Safe::find($safe_id);
-            if ($safe) {
-                $safe->increment('balance', $paidDifference);
-            }
-        } elseif ($paidDifference < 0) {
-            // مبلغ تم إرجاعه - إضافة معاملة إرجاع
-            $returnAmount = abs($paidDifference);
-
-            ClientTransaction::create([
-                'client_id' => $this->client_id,
-                'sale_invoice_id' => $this->invoice->id,
-                'safe_id' => $safe_id,
-                'amount' => $returnAmount,
-                'type' => 'credit',
-                // 'payment_method' => 'cash',
-                'description' => 'استرداد - تعديل فاتورة بيع رقم ' . $this->invoice->id,
-                // 'created_by' => Auth::id()
-            ]);
-
-            // تحديث رصيد الخزينة (خصم رصيد)
-            $safe = \App\Models\admin\Safe::find($safe_id);
-            if ($safe) {
-                $safe->decrement('balance', $returnAmount);
-            }
         }
     }
 

@@ -15,9 +15,10 @@ use App\Models\admin\SupplierTransaction;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Mpdf\Mpdf;
+
 class SuppliersController extends Controller
 {
-  use Message_Trait;
+    use Message_Trait;
     public function index()
     {
         $suppliers = Supplier::paginate(10);
@@ -46,7 +47,7 @@ class SuppliersController extends Controller
             'telegram.unique' => 'رقم التيلغرام موجود بالفعل',
             'whatsapp.unique' => 'رقم الواتساب موجود بالفعل',
             'status.required' => 'الحالة مطلوبة',
-           // 'address.required' => 'العنوان مطلوب',
+            // 'address.required' => 'العنوان مطلوب',
         ];
 
         $validator = Validator::make($data, $rules, $messages);
@@ -62,7 +63,7 @@ class SuppliersController extends Controller
         $supplier->status = $data['status'];
         $supplier->address = $data['address'];
         $supplier->save();
-      return $this->success_message('تم اضافة المورد بنجاح');
+        return $this->success_message('تم اضافة المورد بنجاح');
     }
 
     public function storeQuick(Request $request)
@@ -106,7 +107,7 @@ class SuppliersController extends Controller
             ->limit(10)
             ->get(['id', 'name', 'mobile', 'email', 'whatsapp', 'address']);
 
-        $results = $suppliers->map(function($supplier) {
+        $results = $suppliers->map(function ($supplier) {
             return [
                 'id' => $supplier->id,
                 'text' => $supplier->name . (isset($supplier->mobile) ? ' - ' . $supplier->mobile : ''),
@@ -154,7 +155,7 @@ class SuppliersController extends Controller
             'telegram.unique' => 'رقم التيلغرام موجود بالفعل',
             'whatsapp.unique' => 'رقم الواتساب موجود بالفعل',
             'status.required' => 'الحالة مطلوبة',
-           // 'address.required' => 'العنوان مطلوب',
+            // 'address.required' => 'العنوان مطلوب',
         ];
         $validator = Validator::make($data, $rules, $messages);
         if ($validator->fails()) {
@@ -178,7 +179,8 @@ class SuppliersController extends Controller
         return $this->success_message('تم حذف المورد بنجاح');
     }
 
-    public function ChangeStatus($id){
+    public function ChangeStatus($id)
+    {
 
         $supplier = Supplier::findOrFail($id);
         $supplier->update([
@@ -223,7 +225,7 @@ class SuppliersController extends Controller
 
         // جلب إجمالي قيم الفواتير ضمن الفترة
         $total_invoices = $invoices->sum('total_price');
-        $total_returned = $invoices->where('return_status','returned')->sum('total_price');
+        $total_returned = $invoices->where('return_status', 'returned')->sum('total_price');
 
         // حساب الرصيد الافتتاحي (إجمالي الفواتير قبل from_date)
         $opening_balance = 0; // القيمة الافتراضية إذا لم يكن هناك from_date
@@ -241,6 +243,7 @@ class SuppliersController extends Controller
             })
             ->orderBy('id', 'desc')
             ->get();
+        // dd($transactions);
 
         // حساب إجمالي المدفوع (Debit)
         $total_debit = $transactions->where('type', 'debit')->sum('amount');
@@ -392,7 +395,7 @@ class SuppliersController extends Controller
         ]);
 
         if ($transaction->type != 'debit') {
-             return redirect()->back()->withErrors(['general' => 'لا يمكن تعديل هذه المعاملة']);
+            return redirect()->back()->withErrors(['general' => 'لا يمكن تعديل هذه المعاملة']);
         }
 
         DB::beginTransaction();
@@ -434,17 +437,17 @@ class SuppliersController extends Controller
         $data = $request->all();
         $rules = [
             'amount' => 'required|numeric|min:0.01',
-          //  'invoice_id' => 'nullable|exists:purche_invoices,id',
+            //  'invoice_id' => 'nullable|exists:purche_invoices,id',
             'safe_id' => 'required|exists:safes,id',
         ];
         $messages = [
             'amount.required' => 'المبلغ مطلوب',
             'amount.numeric' => 'المبلغ يجب أن يكون رقمًا',
             'amount.min' => 'المبلغ يجب أن يكون أكبر من 0',
-          //  'invoice_id.exists' => 'الفاتورة غير موجودة',
+            //  'invoice_id.exists' => 'الفاتورة غير موجودة',
 
-          'safe_id.required'=>' من فضلك حدد الخزينة  ',
-           'safe_id.exists' => 'الخزنة غير موجودة',
+            'safe_id.required' => ' من فضلك حدد الخزينة  ',
+            'safe_id.exists' => 'الخزنة غير موجودة',
         ];
 
         $validator = Validator::make($data, $rules, $messages);
@@ -454,29 +457,29 @@ class SuppliersController extends Controller
         $safe = Safe::findOrFail($data['safe_id']);
         $oldSafeBalance =  $safe->balance;
         $newSafeBalance = $oldSafeBalance - $data['amount'];
-        if($newSafeBalance < 0){
+        if ($newSafeBalance < 0) {
             return redirect()->back()->withErrors(['amount' => ' رصيد الخزينة غير كافي لتسديد الدفعة الي المورد  ']);
         }
-        if( isset($data['invoice_id']) && $data['invoice_id'] !=null){
+        if (isset($data['invoice_id']) && $data['invoice_id'] != null) {
             $invoice = PurcheInvoice::findOrFail($data['invoice_id']);
             if ($invoice->supplier_id != $supplier->id) {
                 return redirect()->back()->withErrors(['invoice_id' => 'لا يمكن إضافة المعاملة لفاتورة مورد آخر']);
             }
             // حساب إجمالي المدفوع (Debit) والرصيد المستحق
-        $total_balance = SupplierTransaction::where('purchase_invoice_id', $invoice->id)
-        ->where('type', 'debit')
-        ->sum('amount');
-    $remaining_balance = $invoice->total_price - $total_balance;
+            $total_balance = SupplierTransaction::where('purchase_invoice_id', $invoice->id)
+                ->where('type', 'debit')
+                ->sum('amount');
+            $remaining_balance = $invoice->total_price - $total_balance;
 
-    // التحقق من وجود رصيد مستحق
-    if ($remaining_balance <= 0) {
-        return redirect()->back()->withErrors(['amount' => 'تم تسديد الفاتورة بالكامل']);
-    }
+            // التحقق من وجود رصيد مستحق
+            if ($remaining_balance <= 0) {
+                return redirect()->back()->withErrors(['amount' => 'تم تسديد الفاتورة بالكامل']);
+            }
 
-    // التحقق من أن المبلغ المدخل مش أكبر من الرصيد المستحق
-    if ($data['amount'] > $remaining_balance) {
-        return redirect()->back()->withErrors(['amount' => 'المبلغ المدخل أكبر من الرصيد المستحق (' . $remaining_balance . ' د.ل)']);
-    }
+            // التحقق من أن المبلغ المدخل مش أكبر من الرصيد المستحق
+            if ($data['amount'] > $remaining_balance) {
+                return redirect()->back()->withErrors(['amount' => 'المبلغ المدخل أكبر من الرصيد المستحق (' . $remaining_balance . ' د.ل)']);
+            }
         }
 
 
@@ -493,13 +496,13 @@ class SuppliersController extends Controller
             $transaction->description =  $data['description'];
             $transaction->save();
 
-            if(isset($data['invoice_id']) && $data['invoice_id'] !=null){
-            // تحديث حالة الفاتورة (اختياري)
-            $new_balance = $remaining_balance - $data['amount'];
-            $invoice->update([
-                'paid' => $total_balance + $data['amount'],
-                'remaining' => $new_balance,
-            ]);
+            if (isset($data['invoice_id']) && $data['invoice_id'] != null) {
+                // تحديث حالة الفاتورة (اختياري)
+                $new_balance = $remaining_balance - $data['amount'];
+                $invoice->update([
+                    'paid' => $total_balance + $data['amount'],
+                    'remaining' => $new_balance,
+                ]);
             }
             ############################################# Start Add Transaction To Safe ############################
             $safeTransaction = new SafeTransaction();
@@ -532,7 +535,7 @@ class SuppliersController extends Controller
         $query = Supplier::latest();
         if ($request->has('supplier_ids')) {
             $supplier_ids = explode(',', $request->supplier_ids);
-            if(is_array($request->supplier_ids)){
+            if (is_array($request->supplier_ids)) {
                 $query->whereIn('id', $request->supplier_ids);
             } else {
                 $query->whereIn('id', explode(',', $request->supplier_ids));
@@ -626,7 +629,4 @@ class SuppliersController extends Controller
         }
         return (new SuppliersExport($supplier_ids))->download('Suppliers.xlsx');
     }
-
-
-
 }
