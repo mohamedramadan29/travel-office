@@ -239,7 +239,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="invoices_{{ $index }}_selling_price">سعر البيع</label>
-                        <input wire:model.live="invoices.{{ $index }}.selling_price" type="number" step="0.00001"
+                        <input wire:model.live.debounce.700ms="invoices.{{ $index }}.selling_price" type="number" step="0.00001"
                             min="0" id="invoices_{{ $index }}_selling_price" class="form-control"
                             name="invoices[{{ $index }}][selling_price]" value="{{ $invoice['selling_price'] }}">
                         @error('invoices.' . $index . '.selling_price')
@@ -255,7 +255,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="invoices_{{ $index }}_total_price">السعر الكلي (د.ل)</label>
-                        <input wire:model.live="invoices.{{ $index }}.total_price" readonly type="number"
+                        <input wire:model.live.debounce.700ms="invoices.{{ $index }}.total_price" readonly type="number"
                             id="invoices_{{ $index }}_total_price" class="form-control"
                             name="invoices[{{ $index }}][total_price]" value="{{ $invoice['total_price'] }}">
                         @error('invoices.' . $index . '.total_price')
@@ -266,7 +266,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="invoices_{{ $index }}_paid">المدفوع (د.ل)</label>
-                        <input wire:model.live="invoices.{{ $index }}.paid" type="number" step="0.00001" min="0"
+                        <input wire:model.live.debounce.700ms="invoices.{{ $index }}.paid" type="number" step="0.00001" min="0"
                             max="{{ $invoice['total_price'] }}" id="invoices_{{ $index }}_paid" class="form-control"
                             name="invoices[{{ $index }}][paid]" value="{{ $invoice['paid'] }}">
                         <span>اتركه صفرًا للدفع لاحقًا</span>
@@ -278,7 +278,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="invoices_{{ $index }}_remaining">الباقي (د.ل)</label>
-                        <input wire:model.live="invoices.{{ $index }}.remaining" readonly type="number"
+                        <input wire:model.live.debounce.700ms="invoices.{{ $index }}.remaining" readonly type="number"
                             id="invoices_{{ $index }}_remaining" class="form-control"
                             name="invoices[{{ $index }}][remaining]" value="{{ $invoice['remaining'] }}">
                         @error('invoices.' . $index . '.remaining')

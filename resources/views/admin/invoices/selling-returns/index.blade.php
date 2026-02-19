@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('title', ' فواتير البيع ')
+@section('title', ' فواتير ارجاع البيع ')
 @section('css')
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
 @endsection
@@ -8,7 +8,7 @@
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> فواتير البيع </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block"> فواتير ارجاع  البيع </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.selling_invoices.index') }}">فواتير
                                         البيع </a>
                                 </li>
-                                <li class="breadcrumb-item active"> فواتير البيع
+                                <li class="breadcrumb-item active"> فواتير ارجاع  البيع
                                 </li>
                             </ol>
                         </div>

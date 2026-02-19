@@ -18,8 +18,8 @@ class SellingInvoicesReturnController extends Controller
      */
     public function index()
     {
-        $invoices = SaleInvoiceReturn::orderBy('id','Desc')->paginate(10);
-        return view('admin.invoices.selling-returns.index',compact('invoices'));
+        $invoices = SaleInvoiceReturn::orderBy('id', 'Desc')->paginate(10);
+        return view('admin.invoices.selling-returns.index', compact('invoices'));
     }
 
     /**
@@ -43,13 +43,13 @@ class SellingInvoicesReturnController extends Controller
      */
     public function show(string $id)
     {
-        $selling_invoice = SaleInvoice::findOrFail($id);
+        // $selling_invoice = SaleInvoice::find($id);
         $suppliers = Supplier::active()->get();
         $safes = Safe::active()->get();
         $categories = Category::active()->get();
         $clients = Client::active()->get();
-        $invoice = SaleInvoiceReturn::findOrFail($id);
-        return view('admin.invoices.selling-returns.view',compact('invoice','selling_invoice','suppliers','safes','categories','clients'));
+        $invoice = SaleInvoiceReturn::find($id);
+        return view('admin.invoices.selling-returns.view', compact('invoice', 'suppliers', 'safes', 'categories', 'clients'));
     }
 
     /**

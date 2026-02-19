@@ -165,7 +165,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="purches_price">سعر الشراء</label>
-                        <input wire:model.live="purches_price" type="number" step="0.00001" min="0" id="purches_price"
+                        <input wire:model.live.debounce.700ms="purches_price" type="number" step="0.00001" min="0" id="purches_price"
                             class="form-control">
                         @error('purches_price')
                         <span class="text-danger">{{ $message }}</span>
@@ -177,7 +177,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="total_price">السعر الكلي (د.ل)</label>
-                        <input wire:model.live="total_price" readonly type="number" id="total_price" class="form-control">
+                        <input wire:model.live.debounce.700ms="total_price" readonly type="number" id="total_price" class="form-control">
                         @error('total_price')
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -191,7 +191,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="paid">المدفوع (د.ل)</label>
-                        <input wire:model.live="paid" type="number" step="0.00001" min="0" max="{{ $total_price }}"
+                        <input wire:model.live.debounce.700ms="paid" type="number" step="0.00001" min="0" max="{{ $total_price }}"
                             id="paid" class="form-control">
                         <span>اتركه صفرًا للدفع لاحقًا</span>
                         @error('paid')
@@ -202,7 +202,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="remaining">الباقي (د.ل)</label>
-                        <input wire:model.live="remaining" readonly type="number" id="remaining" class="form-control">
+                        <input wire:model.live.debounce.700ms="remaining" readonly type="number" id="remaining" class="form-control">
                         @error('remaining')
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
