@@ -219,7 +219,7 @@
                                                     <td>{{ $transaction->payment_method ?? '-' }}</td>
                                                     <td>
                                                         {{-- {{ $transaction->description }} --}}
-                                                        {{ $transaction->saleInvoice->bayan_txt }}
+                                                        {{ $transaction->saleInvoice->bayan_txt ?? 'لا يوجد بيان' }}
                                                     </td>
                                                     <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
                                                     <td class="no-pdf">

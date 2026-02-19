@@ -633,7 +633,7 @@ class SellingInvoiceCreate extends Component
     {
         $this->clients = Client::active()->get();
         $this->categories = Category::active()->get();
-        $this->purchesInvoices = PurcheInvoice::all();
+        $this->purchesInvoices = PurcheInvoice::where('status', 'available')->where('return_status', 'not_returned')->get();
         return view('livewire.dashboard.selling-invoice-create');
     }
 }

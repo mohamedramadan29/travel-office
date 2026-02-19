@@ -130,16 +130,16 @@ class PurchesInvoiceEdit extends Component
 
     public function calculateTotalPrice()
     {
-        $qyt = is_numeric($this->qyt) ? (float)$this->qyt : 0;
-        $purches_price = is_numeric($this->purches_price) ? (float)$this->purches_price : 0;
+        $qyt = is_numeric($this->qyt) ? (float) $this->qyt : 0;
+        $purches_price = is_numeric($this->purches_price) ? (float) $this->purches_price : 0;
         $this->total_price = $qyt * $purches_price;
         $this->calculateRemaining();
     }
 
     public function calculateRemaining()
     {
-        $paid = is_numeric($this->paid) ? (float)$this->paid : 0;
-        $total_price = is_numeric($this->total_price) ? (float)$this->total_price : 0;
+        $paid = is_numeric($this->paid) ? (float) $this->paid : 0;
+        $total_price = is_numeric($this->total_price) ? (float) $this->total_price : 0;
 
         if ($paid > $total_price) {
             $this->paid = $total_price;
@@ -213,6 +213,7 @@ class PurchesInvoiceEdit extends Component
                 'updated_at' => now()
             ];
 
+
             // حساب الفرق في المبلغ المدفوع للتعامل مع المعاملات المالية
             $oldPaid = $this->invoice->paid;
             $newPaid = $invoiceData['paid'];
@@ -221,9 +222,29 @@ class PurchesInvoiceEdit extends Component
             // تحديث الفاتورة
             $this->invoice->update($invoiceData);
 
-            // التعامل مع المعاملات المالية إذا تغير المبلغ المدفوع
-            if ($paidDifference != 0 && $invoiceData['safe_id']) {
-                $this->handlePaymentChange($paidDifference, $invoiceData['safe_id']);
+            #### Delete Old Transactions First
+            // حذف جميع المعاملات القديمة المرتبطة بالفاتورة
+            SupplierTransaction::where('purchase_invoice_id', $this->invoice->id)->delete();
+
+            // إنشاء معاملة دائنة جديدة للمبلغ الكلي
+            SupplierTransaction::create([
+                'supplier_id' => $this->supplier_id,
+                'purchase_invoice_id' => $this->invoice->id,
+                'amount' => $this->total_price,
+                'type' => 'credit', // المبلغ الكلي للفاتورة الدائن
+                'description' => 'مبلغ فاتورة شراء #' . $this->invoice->id . ' (الإجمالي: ' . $this->total_price . ' - المدفوع: ' . $this->paid . ' - المتبقي: ' . $this->remaining . ')',
+            ]);
+
+            // إنشاء معاملة مدينة للمبلغ المدفوع
+            if ($this->paid > 0 && $invoiceData['safe_id']) {
+                SupplierTransaction::create([
+                    'supplier_id' => $this->supplier_id,
+                    'purchase_invoice_id' => $this->invoice->id,
+                    'safe_id' => $invoiceData['safe_id'],
+                    'amount' => $this->paid,
+                    'type' => 'debit', // المبلغ المدفوع للمورد مدين
+                    'description' => 'دفعة لفاتورة شراء #' . $this->invoice->id,
+                ]);
             }
 
             DB::commit();
@@ -233,49 +254,6 @@ class PurchesInvoiceEdit extends Component
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'حدث خطأ أثناء تحديث الفاتورة: ' . $e->getMessage());
-        }
-    }
-
-    private function handlePaymentChange($paidDifference, $safe_id)
-    {
-        if ($paidDifference > 0) {
-            // مبلغ إضافي تم دفعه - إضافة معاملة دفع جديدة
-            SupplierTransaction::create([
-                'supplier_id' => $this->supplier_id,
-                'purchase_invoice_id' => $this->invoice->id,
-                'safe_id' => $safe_id,
-                'amount' => $paidDifference,
-                'transaction_type' => 'payment',
-                'payment_method' => 'cash',
-                'notes' => 'دفعة إضافية - تعديل فاتورة رقم ' . $this->invoice->id,
-                'created_by' => Auth::id()
-            ]);
-
-            // تحديث رصيد الخزينة
-            $safe = \App\Models\admin\Safe::find($safe_id);
-            if ($safe) {
-                $safe->decrement('balance', $paidDifference);
-            }
-        } elseif ($paidDifference < 0) {
-            // مبلغ تم إرجاعه - إضافة معاملة إرجاع
-            $returnAmount = abs($paidDifference);
-
-            SupplierTransaction::create([
-                'supplier_id' => $this->supplier_id,
-                'purchase_invoice_id' => $this->invoice->id,
-                'safe_id' => $safe_id,
-                'amount' => $returnAmount,
-                'transaction_type' => 'refund',
-                'payment_method' => 'cash',
-                'notes' => 'استرداد - تعديل فاتورة رقم ' . $this->invoice->id,
-                'created_by' => Auth::id()
-            ]);
-
-            // تحديث رصيد الخزينة
-            $safe = \App\Models\admin\Safe::find($safe_id);
-            if ($safe) {
-                $safe->increment('balance', $returnAmount);
-            }
         }
     }
 

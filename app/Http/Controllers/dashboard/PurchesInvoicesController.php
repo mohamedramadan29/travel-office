@@ -26,7 +26,7 @@ class PurchesInvoicesController extends Controller
     use Message_Trait;
     public function index()
     {
-        $invoices = PurcheInvoice::orderBy('id','DESC')->paginate(100);
+        $invoices = PurcheInvoice::orderBy('id', 'DESC')->paginate(100);
         return view('admin.invoices.purches.index', compact('invoices'));
 
     }
@@ -35,19 +35,19 @@ class PurchesInvoicesController extends Controller
         $suppliers = Supplier::active()->get();
         $safes = Safe::active()->get();
         $categories = Category::active()->get();
-        return view('admin.invoices.purches.create', compact('suppliers', 'safes','categories'));
+        return view('admin.invoices.purches.create', compact('suppliers', 'safes', 'categories'));
     }
     public function store(Request $request)
     {
         $data = $request->all();
         $data['admin_id'] = Auth::user()->id;
         $rules = [
-            'type'=>'required'
+            'type' => 'required'
         ];
-        if($data['type'] == 'فاتورة رسمية'){
+        if ($data['type'] == 'فاتورة رسمية') {
             $rules = [
-                'bayan_txt'=>'required',
-                'referance_number'=>'required|unique:purche_invoices,referance_number',
+                'bayan_txt' => 'required',
+                'referance_number' => 'required|unique:purche_invoices,referance_number',
                 'supplier_id' => 'required',
                 'qyt' => 'required',
                 'purches_price' => 'required',
@@ -57,76 +57,76 @@ class PurchesInvoicesController extends Controller
                 // 'payment_method' => 'required|if:paid,>',
                 // 'safe_id' => 'required|if:paid,>',
             ];
-             // لو المدفوع أكبر من صفر أضف القواعد
-                if (!empty($data['paid']) && $data['paid'] > 0) {
-                   // $rules['payment_method'] = 'required';
-                    $rules['safe_id'] = 'required';
-                }
-        }else{
+            // لو المدفوع أكبر من صفر أضف القواعد
+            if (!empty($data['paid']) && $data['paid'] > 0) {
+                // $rules['payment_method'] = 'required';
+                $rules['safe_id'] = 'required';
+            }
+        } else {
             $rules = [
-                'bayan_txt'=>'required',
-                'referance_number'=>'required|unique:purche_invoices,referance_number',
+                'bayan_txt' => 'required',
+                'referance_number' => 'required|unique:purche_invoices,referance_number',
                 'supplier_id' => 'required',
             ];
             // لو المدفوع أكبر من صفر أضف القواعد
             if (!empty($data['paid']) && $data['paid'] > 0) {
-               // $rules['payment_method'] = 'required';
+                // $rules['payment_method'] = 'required';
                 $rules['safe_id'] = 'required';
             }
         }
-       $messages = [
-        'bayan_txt.required'=>'البيان / الوصف مطلوب',
-        'referance_number.required'=>'الرقم المرجعي مطلوب',
-        'referance_number.unique'=>'الرقم المرجعي موجود',
-        'supplier_id.required'=>'المورد مطلوب',
-        'qyt.required'=>'الكمية مطلوبة',
-        'purches_price.required'=>'سعر الشراء مطلوب',
-        'total_price.required'=>'السعر الكلي مطلوب',
-        'paid.required'=>'المدفوع مطلوب',
-        'remaining.required'=>'الباقي مطلوب',
-       // 'payment_method.required'=>'طريقة الدفع مطلوبة',
-        'safe_id.required'=>'الخزنة مطلوبة',
-       ];
-       $validator = Validator::make($data,$rules,$messages);
-       if($validator->fails()){
-           return redirect()->back()->withErrors($validator)->withInput();
-       }
-       // التحقق من العلاقة بين total_price و paid و remaining
-    if ($data['type'] == 'فاتورة رسمية' && ($data['total_price'] != $data['paid'] + $data['remaining'])) {
-        return redirect()->back()->withErrors(['total_price' => 'السعر الكلي يجب أن يساوي مجموع المدفوع والباقي'])->withInput();
-    }
-       try{
-        DB::beginTransaction();
-        $invoice = new PurcheInvoice;
-        $invoice->type = 'فاتورة رسمية'; // القيمة الافتراضية
-        $invoice->bayan_txt = $data['bayan_txt'];
-        $invoice->referance_number = $data['referance_number'];
-        $invoice->supplier_id = $data['supplier_id'];
-        $invoice->qyt = $data['qyt'];
-        $invoice->purches_price = $data['purches_price'];
-        $invoice->total_price = $data['total_price'];
-        $invoice->paid = $data['paid'];
-        $invoice->remaining = $data['remaining'];
-       // $invoice->payment_method = $data['payment_method']??null;
-        $invoice->safe_id = $data['safe_id']??null;
-        $invoice->category_id = $data['category_id'];
-        $invoice->admin_id = Auth::user()->id;
-        $invoice->save();
-        ################################################ Add Transaction In Supplier Account ##############
+        $messages = [
+            'bayan_txt.required' => 'البيان / الوصف مطلوب',
+            'referance_number.required' => 'الرقم المرجعي مطلوب',
+            'referance_number.unique' => 'الرقم المرجعي موجود',
+            'supplier_id.required' => 'المورد مطلوب',
+            'qyt.required' => 'الكمية مطلوبة',
+            'purches_price.required' => 'سعر الشراء مطلوب',
+            'total_price.required' => 'السعر الكلي مطلوب',
+            'paid.required' => 'المدفوع مطلوب',
+            'remaining.required' => 'الباقي مطلوب',
+            // 'payment_method.required'=>'طريقة الدفع مطلوبة',
+            'safe_id.required' => 'الخزنة مطلوبة',
+        ];
+        $validator = Validator::make($data, $rules, $messages);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        // التحقق من العلاقة بين total_price و paid و remaining
+        if ($data['type'] == 'فاتورة رسمية' && ($data['total_price'] != $data['paid'] + $data['remaining'])) {
+            return redirect()->back()->withErrors(['total_price' => 'السعر الكلي يجب أن يساوي مجموع المدفوع والباقي'])->withInput();
+        }
+        try {
+            DB::beginTransaction();
+            $invoice = new PurcheInvoice;
+            $invoice->type = 'فاتورة رسمية'; // القيمة الافتراضية
+            $invoice->bayan_txt = $data['bayan_txt'];
+            $invoice->referance_number = $data['referance_number'];
+            $invoice->supplier_id = $data['supplier_id'];
+            $invoice->qyt = $data['qyt'];
+            $invoice->purches_price = $data['purches_price'];
+            $invoice->total_price = $data['total_price'];
+            $invoice->paid = $data['paid'];
+            $invoice->remaining = $data['remaining'];
+            // $invoice->payment_method = $data['payment_method']??null;
+            $invoice->safe_id = $data['safe_id'] ?? null;
+            $invoice->category_id = $data['category_id'];
+            $invoice->admin_id = Auth::user()->id;
+            $invoice->save();
+            ################################################ Add Transaction In Supplier Account ##############
 
-        //if($data['type'] == 'فاتورة رسمية'){
-           // if ($data['remaining'] > 0) {
-                SupplierTransaction::create([
-                    'supplier_id' => $data['supplier_id'],
-                    'purchase_invoice_id' => $invoice->id,
-                    //'amount' => $data['remaining'],
-                    'amount'=>$data['total_price'],
-                    'type' => 'credit', // المبلغ المستحق للمورد   الدائن
-                    'description' => 'مبلغ مستحق من فاتورة شراء #' . $invoice->id,
-                ]);
-           // }
+            //if($data['type'] == 'فاتورة رسمية'){
+            // if ($data['remaining'] > 0) {
+            SupplierTransaction::create([
+                'supplier_id' => $data['supplier_id'],
+                'purchase_invoice_id' => $invoice->id,
+                //'amount' => $data['remaining'],
+                'amount' => $data['total_price'],
+                'type' => 'credit', // المبلغ المستحق للمورد   الدائن
+                'description' => 'مبلغ مستحق من فاتورة شراء #' . $invoice->id,
+            ]);
+            // }
             if ($data['paid'] > 0) {
-               SupplierTransaction::create([
+                SupplierTransaction::create([
                     'supplier_id' => $data['supplier_id'],
                     'purchase_invoice_id' => $invoice->id,
                     'amount' => $data['paid'],
@@ -137,34 +137,34 @@ class PurchesInvoicesController extends Controller
                 ]);
             }
 
-   //     }
+            //     }
 
-   if($data['paid'] > 0){
-    ############################################# Start Add Transaction To Safe ############################
-    $safeTransaction = new SafeTransaction();
-    $safeTransaction->safe_id = $data['safe_id'];
-    $safeTransaction->purchase_invoice_id = $invoice->id;
-    $safeTransaction->amount = $data['paid'];
-    $safeTransaction->type = 'withdraw';
-    //$safeTransaction->payment_method = $data['payment_method'];
-    $safeTransaction->description = ' اضافة دفعة الي المورد [ ' . $invoice->supplier->name . ' ]' . ' من فاتورة شراء الرقم المرجعي :  ' . $invoice->referance_number;
-    $safeTransaction->save();
-    ############################################ End Add Transaction To Safe ###############################
-    ################## Update Safe Balance #########
-    $safe = Safe::findOrFail($data['safe_id']);
-    $oldSafeBalance =  $safe->balance;
-    $newSafeBalance = $oldSafeBalance - $data['paid'];
-    $safe->update([
-        'balance' => $newSafeBalance,
-    ]);
-    ################ End Update Safe Balance ########
-   }
-        DB::commit();
-        return $this->success_message(' تم اضافة الفاتورة بنجاح  ');
-       }catch(\Exception $e){
-        DB::rollBack();
-        return $this->exception_message($e);
-       }
+            if ($data['paid'] > 0) {
+                ############################################# Start Add Transaction To Safe ############################
+                $safeTransaction = new SafeTransaction();
+                $safeTransaction->safe_id = $data['safe_id'];
+                $safeTransaction->purchase_invoice_id = $invoice->id;
+                $safeTransaction->amount = $data['paid'];
+                $safeTransaction->type = 'withdraw';
+                //$safeTransaction->payment_method = $data['payment_method'];
+                $safeTransaction->description = ' اضافة دفعة الي المورد [ ' . $invoice->supplier->name . ' ]' . ' من فاتورة شراء الرقم المرجعي :  ' . $invoice->referance_number;
+                $safeTransaction->save();
+                ############################################ End Add Transaction To Safe ###############################
+                ################## Update Safe Balance #########
+                $safe = Safe::findOrFail($data['safe_id']);
+                $oldSafeBalance = $safe->balance;
+                $newSafeBalance = $oldSafeBalance - $data['paid'];
+                $safe->update([
+                    'balance' => $newSafeBalance,
+                ]);
+                ################ End Update Safe Balance ########
+            }
+            DB::commit();
+            return $this->success_message(' تم اضافة الفاتورة بنجاح  ');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->exception_message($e);
+        }
     }
 
     public function storeMultiple(Request $request)
@@ -302,7 +302,7 @@ class PurchesInvoicesController extends Controller
         $suppliers = Supplier::active()->get();
         $safes = Safe::active()->get();
         $categories = Category::active()->get();
-        return view('admin.invoices.purches.edit',compact('invoice','suppliers','safes','categories'));
+        return view('admin.invoices.purches.edit', compact('invoice', 'suppliers', 'safes', 'categories'));
     }
     public function update(Request $request, string $id)
     {
@@ -310,12 +310,12 @@ class PurchesInvoicesController extends Controller
         $invoice = PurcheInvoice::findOrFail($id);
         $data['admin_id'] = Auth::user()->id;
         $rules = [
-            'type'=>'required'
+            'type' => 'required'
         ];
-        if($data['type'] == 'فاتورة رسمية'){
+        if ($data['type'] == 'فاتورة رسمية') {
             $rules = [
-                'bayan_txt'=>'required',
-                'referance_number'=>'required|unique:purche_invoices,referance_number,'.$id,
+                'bayan_txt' => 'required',
+                'referance_number' => 'required|unique:purche_invoices,referance_number,' . $id,
                 'supplier_id' => 'required',
                 'qyt' => 'required|numeric|min:1',
                 'purches_price' => 'required|numeric|min:1',
@@ -326,221 +326,226 @@ class PurchesInvoicesController extends Controller
                 // 'safe_id' => 'required',
             ];
             if (!empty($data['paid']) && $data['paid'] > 0) {
-             //   $rules['payment_method'] = 'required';
+                //   $rules['payment_method'] = 'required';
                 $rules['safe_id'] = 'required';
             }
-        }else{
+        } else {
             $rules = [
-                'bayan_txt'=>'required',
-                'referance_number'=>'required|unique:purche_invoices,referance_number,'.$id,
+                'bayan_txt' => 'required',
+                'referance_number' => 'required|unique:purche_invoices,referance_number,' . $id,
                 'supplier_id' => 'required',
             ];
         }
 
-       $messages = [
-        'bayan_txt.required'=>'البيان / الوصف مطلوب',
-        'referance_number.required'=>'الرقم المرجعي مطلوب',
-        'referance_number.unique'=>'الرقم المرجعي موجود',
-        'supplier_id.required'=>'المورد مطلوب',
-        'qyt.required'=>'الكمية مطلوبة',
-        'purches_price.required' => 'سعر الشراء مطلوب',
-        'purches_price.numeric' => 'سعر الشراء يجب أن يكون رقمًا',
-        'purches_price.min' => 'سعر الشراء يجب أن يكون 1 أو أكثر',
-        'total_price.required' => 'السعر الكلي مطلوب',
-        'total_price.numeric' => 'السعر الكلي يجب أن يكون رقمًا',
-        'total_price.min' => 'السعر الكلي يجب أن يكون 1 أو أكثر',
-        'paid.required'=>'المدفوع مطلوب',
-        'remaining.required'=>'الباقي مطلوب',
-       // 'payment_method.required'=>'طريقة الدفع مطلوبة',
-        'safe_id.required'=>'الخزنة مطلوبة',
-       ];
-       $validator = Validator::make($data,$rules,$messages);
-       if($validator->fails()){
-           return redirect()->back()->withErrors($validator)->withInput();
-       }
-       // التحقق من العلاقة بين total_price و paid و remaining
-    if ($data['type'] == 'فاتورة رسمية' && ($data['total_price'] != $data['paid'] + $data['remaining'])) {
-        return redirect()->back()->withErrors(['total_price' => 'السعر الكلي يجب أن يساوي مجموع المدفوع والباقي'])->withInput();
-    }
-       try{
-        DB::beginTransaction();
-        $invoice->update([
-            "type" => 'فاتورة رسمية', // القيمة الافتراضية
-            "bayan_txt" => $data['bayan_txt'],
-            "referance_number" => $data['referance_number'],
-            "supplier_id" => $data['supplier_id'],
-            "qyt" => $data['qyt'],
-            "purches_price" => $data['purches_price'],
-            "total_price" => $data['total_price'],
-            "paid" => $data['paid'],
-            "remaining" => $data['remaining'],
-           // "payment_method" => $data['payment_method']??null,
-            "safe_id" => $data['safe_id']??null,
-            "category_id" => $data['category_id'],
-        ]);
-        ######################  Delete Old Transaction And Create New ########################
-        SupplierTransaction::where('purchase_invoice_id', $invoice->id)->delete();
-
-         ################################################ Add Transaction In Supplier Account ##############
-
-         if($data['type'] == 'فاتورة رسمية'){
-
-            if ($data['remaining'] > 0) {
-                SupplierTransaction::create([
-                    'supplier_id' => $data['supplier_id'],
-                    'purchase_invoice_id' => $invoice->id,
-                    'amount' => $data['remaining'],
-                    'type' => 'credit', // المبلغ المستحق للمورد
-                    'description' => 'مبلغ مستحق من فاتورة شراء #' . $invoice->id,
-                ]);
-            }
-            if ($data['paid'] > 0) {
-                SupplierTransaction::create([
-                    'supplier_id' => $data['supplier_id'],
-                    'purchase_invoice_id' => $invoice->id,
-                    'amount' => $data['paid'],
-                    'type' => 'debit', // المبلغ المدفوع للمورد
-                   // 'payment_method' => $data['payment_method']??null,
-                    'safe_id' => $data['safe_id']??null,
-                    'description' => 'دفعة لفاتورة شراء #' . $invoice->id,
-                ]);
-            }
+        $messages = [
+            'bayan_txt.required' => 'البيان / الوصف مطلوب',
+            'referance_number.required' => 'الرقم المرجعي مطلوب',
+            'referance_number.unique' => 'الرقم المرجعي موجود',
+            'supplier_id.required' => 'المورد مطلوب',
+            'qyt.required' => 'الكمية مطلوبة',
+            'purches_price.required' => 'سعر الشراء مطلوب',
+            'purches_price.numeric' => 'سعر الشراء يجب أن يكون رقمًا',
+            'purches_price.min' => 'سعر الشراء يجب أن يكون 1 أو أكثر',
+            'total_price.required' => 'السعر الكلي مطلوب',
+            'total_price.numeric' => 'السعر الكلي يجب أن يكون رقمًا',
+            'total_price.min' => 'السعر الكلي يجب أن يكون 1 أو أكثر',
+            'paid.required' => 'المدفوع مطلوب',
+            'remaining.required' => 'الباقي مطلوب',
+            // 'payment_method.required'=>'طريقة الدفع مطلوبة',
+            'safe_id.required' => 'الخزنة مطلوبة',
+        ];
+        $validator = Validator::make($data, $rules, $messages);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
         }
-        DB::commit();
-        return $this->success_message(' تم تعديل الفاتورة بنجاح  ');
-       }catch(\Exception $e){
-        DB::rollBack();
-        return $this->exception_message($e);
-       }
+        // التحقق من العلاقة بين total_price و paid و remaining
+        if ($data['type'] == 'فاتورة رسمية' && ($data['total_price'] != $data['paid'] + $data['remaining'])) {
+            return redirect()->back()->withErrors(['total_price' => 'السعر الكلي يجب أن يساوي مجموع المدفوع والباقي'])->withInput();
+        }
+        try {
+            DB::beginTransaction();
+            $invoice->update([
+                "type" => 'فاتورة رسمية', // القيمة الافتراضية
+                "bayan_txt" => $data['bayan_txt'],
+                "referance_number" => $data['referance_number'],
+                "supplier_id" => $data['supplier_id'],
+                "qyt" => $data['qyt'],
+                "purches_price" => $data['purches_price'],
+                "total_price" => $data['total_price'],
+                "paid" => $data['paid'],
+                "remaining" => $data['remaining'],
+                // "payment_method" => $data['payment_method']??null,
+                "safe_id" => $data['safe_id'] ?? null,
+                "category_id" => $data['category_id'],
+            ]);
+            ######################  Delete Old Transaction And Create New ########################
+            SupplierTransaction::where('purchase_invoice_id', $invoice->id)->delete();
+
+            ################################################ Add Transaction In Supplier Account ##############
+
+            if ($data['type'] == 'فاتورة رسمية') {
+
+                if ($data['remaining'] > 0) {
+                    SupplierTransaction::create([
+                        'supplier_id' => $data['supplier_id'],
+                        'purchase_invoice_id' => $invoice->id,
+                        'amount' => $data['remaining'],
+                        'type' => 'credit', // المبلغ المستحق للمورد
+                        'description' => 'مبلغ مستحق من فاتورة شراء #' . $invoice->id,
+                    ]);
+                }
+                if ($data['paid'] > 0) {
+                    SupplierTransaction::create([
+                        'supplier_id' => $data['supplier_id'],
+                        'purchase_invoice_id' => $invoice->id,
+                        'amount' => $data['paid'],
+                        'type' => 'debit', // المبلغ المدفوع للمورد
+                        // 'payment_method' => $data['payment_method']??null,
+                        'safe_id' => $data['safe_id'] ?? null,
+                        'description' => 'دفعة لفاتورة شراء #' . $invoice->id,
+                    ]);
+                }
+            }
+            DB::commit();
+            return $this->success_message(' تم تعديل الفاتورة بنجاح  ');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->exception_message($e);
+        }
     }
     public function destroy(string $id)
     {
         $invoice = PurcheInvoice::findOrFail($id);
-        try{
+        try {
             $invoice->delete();
             return $this->success_message(' تم حذف الفاتورة بنجاح  ');
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return $this->exception_message($e);
         }
     }
 
-    public function PurchesInvoice($type){
-        if($type == 'official'){
+    public function PurchesInvoice($type)
+    {
+        if ($type == 'official') {
             $type = 'فواتير شراء رسمية';
-            $invoices = PurcheInvoice::where('type','فاتورة رسمية')->orderBy('id','DESC')->paginate(10);
-        }elseif($type == 'interim'){
+            $invoices = PurcheInvoice::where('type', 'فاتورة رسمية')->orderBy('id', 'DESC')->paginate(10);
+        } elseif ($type == 'interim') {
             $type = 'فواتير شراء  مؤقتة';
-            $invoices = PurcheInvoice::where('type','فاتورة مؤقتة')->orderBy('id','DESC')->paginate(10);
-        }else{
+            $invoices = PurcheInvoice::where('type', 'فاتورة مؤقتة')->orderBy('id', 'DESC')->paginate(10);
+        } else {
             $type = 'فواتير شراء  مؤقتة';
-            $invoices = PurcheInvoice::orderBy('id','DESC')->paginate(10);
+            $invoices = PurcheInvoice::orderBy('id', 'DESC')->paginate(10);
         }
-        return view('admin.invoices.purches.invoices-by-type', compact('invoices','type'));
+        return view('admin.invoices.purches.invoices-by-type', compact('invoices', 'type'));
     }
 
-    public function ConvertToOfficial($id){
+    public function ConvertToOfficial($id)
+    {
         $invoice = PurcheInvoice::findOrFail($id);
-        $type ='official';
-        if(!$invoice){
+        $type = 'official';
+        if (!$invoice) {
             abort(404);
         }
-        if($invoice['bayan_txt'] !='' && $invoice['referance_number'] !='' && $invoice['supplier_id'] !='' && $invoice['qyt'] !='' && $invoice['admin_id'] !='' && $invoice['purches_price'] != 0
-        ){
+        if (
+            $invoice['bayan_txt'] != '' && $invoice['referance_number'] != '' && $invoice['supplier_id'] != '' && $invoice['qyt'] != '' && $invoice['admin_id'] != '' && $invoice['purches_price'] != 0
+        ) {
             $invoice->update([
                 "type" => "فاتورة رسمية",
             ]);
             return $this->success_message(' تم تحويل الفاتورة إلى فاتورة رسمية بنجاح  ');
         }
 
-       // return Redirect()->back()->withInput()->withErrors(' يجب اكمال جميع بيانات الفاتورة ');
-       return to_route('dashboard.purches_invoices.edit',$invoice->id)->with('type',$type)->withErrors(' يجب اكمال جميع بيانات الفاتورة ');
+        // return Redirect()->back()->withInput()->withErrors(' يجب اكمال جميع بيانات الفاتورة ');
+        return to_route('dashboard.purches_invoices.edit', $invoice->id)->with('type', $type)->withErrors(' يجب اكمال جميع بيانات الفاتورة ');
     }
 
-    public function ReturnInvoice(Request $request,$id){
+    public function ReturnInvoice(Request $request, $id)
+    {
 
         $invoice = PurcheInvoice::findOrFail($id);
         $suppliers = Supplier::active()->get();
         $safes = Safe::active()->get();
         $categories = Category::active()->get();
         $admin_id = Auth::guard('admin')->id();
-        if($request->isMethod('post')){
-            try{
+        if ($request->isMethod('post')) {
+            try {
 
 
-        $data = $request->all();
-        DB::beginTransaction();
-        $additional_profit = $data['return_price'] - $invoice['total_price'];
-        $returnInvoice = new PurcheInvoiceReturn();
-        $returnInvoice->create([
-            'purche_invoice_id'=>$invoice->id,
-            'type'=>$invoice->type,
-            'bayan_txt'=>$invoice->bayan_txt,
-            'referance_number'=>$invoice->referance_number,
-            'qyt'=>$invoice->qyt,
-            'purches_price'=>$invoice->purches_price,
-            'total_price'=>$invoice->total_price,
-            'supplier_id'=>$invoice->supplier_id,
-           // 'payment_method'=>$invoice->payment_method,
-            'safe_id'=>$invoice->safe_id,
-            'paid'=>$invoice->paid,
-            'remaining'=>$invoice->remaining,
-            'admin_id'=>$admin_id,
-            'category_id'=>$invoice->category_id,
-            'return_price'=>$data['return_price'],
-            'additional_profit'=>$additional_profit,
-        ]);
-        ########### Update Invoice Return Status ########
+                $data = $request->all();
+                DB::beginTransaction();
+                $additional_profit = $data['return_price'] - $invoice['total_price'];
+                $returnInvoice = new PurcheInvoiceReturn();
+                $returnInvoice->create([
+                    'purche_invoice_id' => $invoice->id,
+                    'type' => $invoice->type,
+                    'bayan_txt' => $invoice->bayan_txt,
+                    'referance_number' => $invoice->referance_number,
+                    'qyt' => $invoice->qyt,
+                    'purches_price' => $invoice->purches_price,
+                    'total_price' => $invoice->total_price,
+                    'supplier_id' => $invoice->supplier_id,
+                    // 'payment_method'=>$invoice->payment_method,
+                    'safe_id' => $invoice->safe_id,
+                    'paid' => $invoice->paid,
+                    'remaining' => $invoice->remaining,
+                    'admin_id' => $admin_id,
+                    'category_id' => $invoice->category_id,
+                    'return_price' => $data['return_price'],
+                    'additional_profit' => $additional_profit,
+                ]);
+                ########### Update Invoice Return Status ########
 
-        $invoice->return_status = 'returned';
-        $invoice->status = 'not_available';
-        $invoice->save();
+                $invoice->return_status = 'returned';
+                $invoice->status = 'not_available';
+                $invoice->save();
 
-        ################################################ Add Transaction In Supplier Account ##############
-        SupplierTransaction::create([
-            'supplier_id' => $invoice->supplier_id,
-            'purchase_invoice_id' => $invoice->id,
-           // 'amount' => $data['return_price'],
-           'amount'=>$invoice->total_price,
-            'type' => 'debit',
-            'description' => ' فاتورة رجوع الي المورد #' . $invoice->id,
-        ]);
-        ######## If return Price  > total Price Add New Trasactin credit to supplier ( More Liked  )
-        if($data['return_price'] > $invoice->total_price){
-            $additional_profit = $data['return_price'] - $invoice->total_price;
-            SupplierTransaction::create([
-                'supplier_id' => $invoice->supplier_id,
-                'purchase_invoice_id' => $invoice->id,
-               // 'amount' => $data['return_price'],
-               'amount'=>$additional_profit,
-               'type' => 'credit',
-               'description' => ' مبلغ مستحق للمورد من فاتورة الرجوع  #' . $invoice->id,
-            ]);
+                ################################################ Add Transaction In Supplier Account ##############
+                SupplierTransaction::create([
+                    'supplier_id' => $invoice->supplier_id,
+                    'purchase_invoice_id' => $invoice->id,
+                    // 'amount' => $data['return_price'],
+                    'amount' => $invoice->total_price,
+                    'type' => 'debit',
+                    'description' => ' فاتورة رجوع الي المورد #' . $invoice->id,
+                ]);
+                ######## If return Price  > total Price Add New Trasactin credit to supplier ( More Liked  )
+                if ($data['return_price'] > $invoice->total_price) {
+                    $additional_profit = $data['return_price'] - $invoice->total_price;
+                    SupplierTransaction::create([
+                        'supplier_id' => $invoice->supplier_id,
+                        'purchase_invoice_id' => $invoice->id,
+                        // 'amount' => $data['return_price'],
+                        'amount' => $additional_profit,
+                        'type' => 'credit',
+                        'description' => ' مبلغ مستحق للمورد من فاتورة الرجوع  #' . $invoice->id,
+                    ]);
+                }
+                ####### If return Price < total Price Add New Transaction debit To Supplier
+                if ($data['return_price'] < $invoice->total_price) {
+                    $additional_profit = $invoice->total_price - $data['return_price'];
+                    SupplierTransaction::create([
+                        'supplier_id' => $invoice->supplier_id,
+                        'purchase_invoice_id' => $invoice->id,
+                        // 'amount' => $data['return_price'],
+                        'amount' => $additional_profit,
+                        'type' => 'debit',
+                        'description' => ' مبلغ مستحق للشركة من فاتورة الرجوع  #' . $invoice->id,
+                    ]);
+                }
+                DB::commit();
+                return to_route('dashboard.purches_invoices_return.index');
+            } catch (\Exception $e) {
+                return $this->exception_message($e);
+            }
+            //  return $this->success_message(' تم ارجاع الفاتورة بنجاح ');
         }
-        ####### If return Price < total Price Add New Transaction debit To Supplier
-        if($data['return_price'] < $invoice->total_price){
-            $additional_profit = $invoice->total_price - $data['return_price'];
-            SupplierTransaction::create([
-                'supplier_id' => $invoice->supplier_id,
-                'purchase_invoice_id' => $invoice->id,
-               // 'amount' => $data['return_price'],
-               'amount'=>$additional_profit,
-               'type' => 'debit',
-               'description' => ' مبلغ مستحق للشركة من فاتورة الرجوع  #' . $invoice->id,
-            ]);
-        }
-        DB::commit();
-        return to_route('dashboard.purches_invoices_return.index');
-    }catch(\Exception $e){
-        return $this->exception_message($e);
-    }
-      //  return $this->success_message(' تم ارجاع الفاتورة بنجاح ');
-        }
-        return view('admin.invoices.purches.return',compact('invoice','suppliers','safes','categories'));
+        return view('admin.invoices.purches.return', compact('invoice', 'suppliers', 'safes', 'categories'));
     }
 
 
     ########################################### Generate All Purches Invoices  Pdf ##########################################
-    public function PurchesInvoicesPdf(){
+    public function PurchesInvoicesPdf()
+    {
         $invoices = PurcheInvoice::latest()->get();
         // إعداد محتوى HTML
         $html = '
@@ -621,13 +626,15 @@ class PurchesInvoicesController extends Controller
 
     ######################################### Generate Purches Invoices Excel ############################
 
-    public function PurchesInvoicesExcel(){
+    public function PurchesInvoicesExcel()
+    {
         return (new PurchesInvoicesExport())->download('PurchesInvoices.xlsx');
     }
 
-     ########################################### Generate Purches Invoices Pdf By Type  ##########################################
-     public function PurchesInvoicesPdfType($type){
-        $invoices = PurcheInvoice::latest()->where('type',$type)->get();
+    ########################################### Generate Purches Invoices Pdf By Type  ##########################################
+    public function PurchesInvoicesPdfType($type)
+    {
+        $invoices = PurcheInvoice::latest()->where('type', $type)->get();
         // إعداد محتوى HTML
         $html = '
         <html lang="ar" dir="rtl">
@@ -706,11 +713,13 @@ class PurchesInvoicesController extends Controller
 
     ######################################### Generate Purches Invoices Excel By Type ############################
 
-    public function PurchesInvoicesExcelType($type){
+    public function PurchesInvoicesExcelType($type)
+    {
         return (new PurchesInvoicesExportType($type))->download('PurchesInvoices.xlsx');
     }
 
-    public function PrintInvoice($id){
+    public function PrintInvoice($id)
+    {
 
         $invoice = PurcheInvoice::findOrFail($id);
         return view('admin.invoices.purches.print', compact('invoice'));

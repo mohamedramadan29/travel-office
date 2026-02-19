@@ -193,7 +193,7 @@
 
                                                     {{-- {{ $transaction->description ?? 'غير
                                                     محدد' }} --}}
-                                                    {{ $transaction->purchaseInvoice->bayan_txt ?? 'غير محدد'}}
+                                                    {{ $transaction->purchaseInvoice->bayan_txt ?? 'لا يوجد بيان'}}
                                                 </td>
                                                 <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
                                                 <td class="no-pdf">

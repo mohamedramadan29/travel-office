@@ -32,7 +32,7 @@
                         <div class="card">
                             <div class="card-header d-flex align-items-center">
                                 <a href="{{ route('dashboard.suppliers.report') }}" class="btn btn-success btn-sm"> كشف شامل
-                                    للعملاء </a>
+                                    للموردين  </a>
                                 <a href="{{ route('dashboard.suppliers.create') }}" class="btn btn-primary btn-sm"> اضافة
                                     مورد </a>
                                 <a style="margin:5px" target="_blank" class="btn btn-info btn-sm"
